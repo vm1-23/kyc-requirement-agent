@@ -38,7 +38,31 @@ kyc-re interview --role compliance --name "Arjun"
 pytest -q      # 30 tests
 ```
 
-### LLM mode (Claude)
+### Local LLM mode (recommended for sensitive data)
+
+Run a model on your own machine so that no stakeholder or customer text leaves it.
+
+```bash
+# Arch: sudo pacman -S ollama-cuda && sudo systemctl enable --now ollama
+# Other OSes: https://ollama.com/download
+ollama pull qwen2.5:7b-instruct          # ~4.7 GB, fits a 6 GB GPU
+kyc-re --llm ollama run samples/kyc_onboarding -o output
+```
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `KYC_RE_LLM` | `auto` | `ollama`, `openai_compat`, `claude`, `offline`, or `auto` |
+| `KYC_RE_LOCAL_MODEL` | `qwen2.5:7b-instruct` | Model name on the local server |
+| `OLLAMA_HOST` | `http://localhost:11434` | Ollama endpoint |
+| `KYC_RE_LOCAL_URL` | `http://localhost:8080/v1` | OpenAI-compatible endpoint (llama.cpp `llama-server`, LM Studio, vLLM) |
+| `KYC_RE_LOCAL_TIMEOUT` | `600` | Seconds per call |
+
+`auto` tries a reachable local server first, then Claude if credentials are set, and
+otherwise falls back to offline rules. Local output is constrained to a JSON schema
+(Ollama `format` / `response_format`), checked structurally, and passed through the
+same grounding guards as Claude. Any failure falls back to the rule baseline for that step.
+
+### Cloud LLM mode (Claude)
 
 The system runs fully **offline** with deterministic rule-based agents, which is how the
 tests and the reported evaluation run. With Anthropic credentials (`ANTHROPIC_API_KEY`

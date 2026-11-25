@@ -106,7 +106,8 @@ def cmd_kb(a) -> None:
 
 def main(argv: list[str] | None = None) -> None:
     p = argparse.ArgumentParser(prog="kyc-re", description="Agentic requirement engineering for KYC onboarding")
-    p.add_argument("--llm", choices=["auto", "claude", "offline"], default=None, help="LLM mode (default: env KYC_RE_LLM or auto)")
+    p.add_argument("--llm", choices=["auto", "ollama", "openai_compat", "claude", "offline"], default=None,
+                   help="LLM backend (default: env KYC_RE_LLM or auto = local model if reachable, else Claude if configured, else offline rules)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     r = sub.add_parser("run"); r.add_argument("case"); r.add_argument("-o", "--output", default="output")
