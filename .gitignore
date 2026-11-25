@@ -9,3 +9,4 @@ dist/
 output/
 *.sqlite3
 *.db
+data/

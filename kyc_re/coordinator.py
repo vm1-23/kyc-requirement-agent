@@ -59,6 +59,12 @@ class Coordinator:
             self.llm.audit = self.audit  # type: ignore[attr-defined]
         self.ctx = Context(state=state or ProjectState(project=project), kb=kb or default_kb(), llm=self.llm, audit=self.audit)
         self._sync_counters()
+        if state is not None:  # resuming: restore agent stats and masking-token counters
+            self.ctx.stats = dict(state.metrics.get("agent_stats", {}))
+            import re as _re
+            for d in state.documents:
+                for label, n in _re.findall(r"<([A-Z]+)_(\d+)>", d.masked_text):
+                    self.ctx.masker._counters[label] = max(self.ctx.masker._counters.get(label, 0), int(n))
         self.audit.record("coordinator", "session_start", project.name, llm=self.llm.name, kb_version=self.ctx.kb.version,
                           jurisdictions=project.jurisdictions)
 
@@ -123,6 +129,7 @@ class Coordinator:
         self._stage("sdlc", SDLCAgent(c).run)
         self._stage("validation", ValidationAgent(c).run)
         self._stage("approval", ApprovalAgent(c).run)
+        self.state.metrics["agent_stats"] = {k: v for k, v in c.stats.items()}
 
     def reanalyse(self) -> ProjectState:
         self._analyse()
