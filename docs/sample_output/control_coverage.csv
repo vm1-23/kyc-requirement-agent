@@ -1,0 +1,23 @@
+control_id,title,mandatory,status,covered_by
+KYC-C01,Customer identification data capture,True,covered,INT-KYC-001
+KYC-C02,Identity document verification against independent sources,True,covered,DAT-KYC-002;INT-KYC-001;INT-KYC-002;INT-KYC-004
+KYC-C03,Liveness / presentation-attack detection and face match for remote onboarding,True,covered,INT-KYC-004;SEC-KYC-001;SR-KYC-002
+KYC-C04,Beneficial ownership identification for legal entities,True,derived,FR-KYC-008
+KYC-C05,Sanctions screening at onboarding and on list updates,True,covered,FR-KYC-003;INT-KYC-004;REG-KYC-004
+KYC-C06,PEP screening with enhanced due diligence,True,covered,REG-KYC-001
+KYC-C07,Customer risk rating (risk-based approach),True,covered,AUD-KYC-002;FR-KYC-004
+KYC-C08,Enhanced due diligence for high-risk customers,True,covered,REG-KYC-002
+KYC-C09,Ongoing monitoring and periodic re-KYC,True,covered,DAT-KYC-002
+KYC-C10,Record retention,True,partial,DAT-KYC-003;DAT-KYC-005
+KYC-C11,Suspicious activity / transaction reporting,True,covered,REG-KYC-003
+KYC-C12,Consent and privacy notice,True,covered,PRV-KYC-002
+KYC-C13,Data minimisation and purpose limitation,True,covered,FR-KYC-007;PRV-KYC-001
+KYC-C14,Audit trail of KYC decisions,True,covered,AUD-KYC-002;SEC-KYC-006
+KYC-C15,Strong authentication and least-privilege access,True,covered,SEC-KYC-004;SEC-KYC-005
+KYC-C16,Encryption of PII at rest and in transit,True,covered,SEC-KYC-002;SEC-KYC-003
+KYC-C17,Human review of automated adverse decisions,True,covered,OPS-KYC-001;SR-KYC-003
+KYC-C18,Central KYC Registry upload (India),True,covered,DAT-KYC-004
+KYC-C19,Personal-data breach notification,True,derived,PRV-KYC-003
+KYC-C20,Maker-checker for manual KYC overrides,True,covered,FR-KYC-005
+KYC-C21,New-product ML/TF risk assessment for digital onboarding,False,gap,
+KYC-C22,AI/model governance for automated KYC decisions,False,gap,

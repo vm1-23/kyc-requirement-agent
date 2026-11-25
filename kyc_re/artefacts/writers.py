@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Pt, RGBColor
+from docx.shared import Inches, Pt, RGBColor
 
 from ..models import Category as C, ProjectState
 
@@ -82,9 +82,32 @@ def _csv(path: Path, rows: list[dict[str, Any]]) -> None:
         w.writerows(rows)
 
 
+USABLE_WIDTH_IN = 7.3  # letter page with 0.6" margins
+
+
+def _auto_widths(headers: list[str], rows: list[list[Any]]) -> list[float]:
+    """Column widths proportional to (capped) typical content length, with a readable minimum."""
+    n = len(headers)
+    weights = []
+    for i in range(n):
+        lens = sorted(len(str(r[i])) for r in rows) or [0]
+        typical = lens[int(len(lens) * 0.8)] if lens else 0
+        weights.append(max(len(headers[i]), min(typical, 220)) ** 0.8 + 4)
+    total = sum(weights)
+    mins = []
+    for i in range(n):  # short identifier columns must not wrap
+        longest = max([len(str(r[i])) for r in rows] + [len(headers[i])])
+        mins.append(max(0.55, 0.075 * longest + 0.15) if longest <= 16 else 0.55)
+    widths = [max(m, USABLE_WIDTH_IN * w / total) for m, w in zip(mins, weights)]
+    scale = USABLE_WIDTH_IN / sum(widths)
+    return [w * scale for w in widths]
+
+
 def _table(doc, headers: list[str], rows: list[list[Any]], widths: list[float] | None = None) -> None:
     t = doc.add_table(rows=1, cols=len(headers))
     t.style = "Light Grid Accent 1"
+    t.autofit = False
+    widths = widths or _auto_widths(headers, rows)
     for i, h in enumerate(headers):
         cell = t.rows[0].cells[i]
         cell.text = h
@@ -99,11 +122,19 @@ def _table(doc, headers: list[str], rows: list[list[Any]], widths: list[float] |
             for p in cells[i].paragraphs:
                 for run in p.runs:
                     run.font.size = Pt(8.5)
+    for i, w in enumerate(widths):
+        t.columns[i].width = Inches(w)  # grid columns (used by LibreOffice / Google Docs)
+    for r in t.rows:
+        for i, w in enumerate(widths):
+            r.cells[i].width = Inches(w)  # cell widths (used by Word)
 
 
 def write_srs(ctx: "Context", path: Path, stories: list[dict[str, Any]], use_cases: list[dict[str, Any]]) -> None:
     st, kb = ctx.state, ctx.kb
     doc = Document()
+    for sec in doc.sections:
+        sec.left_margin = sec.right_margin = Inches(0.6)
+        sec.top_margin = sec.bottom_margin = Inches(0.7)
     doc.styles["Normal"].font.name = "Calibri"
     doc.styles["Normal"].font.size = Pt(10)
     title = doc.add_heading(f"Software Requirements Specification\n{st.project.name}", 0)

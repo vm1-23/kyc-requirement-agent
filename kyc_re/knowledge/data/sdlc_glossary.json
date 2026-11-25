@@ -4,31 +4,222 @@
     "_doc": "Each profile states the factor value (1-5) where the model fits best, and how much that factor matters for the model (weight 0-3). Suitability = weighted closeness of project factors to the profile.",
     "Waterfall": {
       "summary": "Sequential phases with a signed-off baseline. Best when requirements are stable and approvals are heavy.",
-      "profile": {"requirement_stability": [5, 3], "change_frequency": [1, 3], "continuous_delivery_need": [1, 2], "documentation_need": [5, 2], "complexity": [2, 1], "technical_uncertainty": [1, 2], "stakeholder_availability": [2, 1]}
+      "profile": {
+        "requirement_stability": [
+          5,
+          3
+        ],
+        "change_frequency": [
+          1,
+          3
+        ],
+        "continuous_delivery_need": [
+          1,
+          2
+        ],
+        "documentation_need": [
+          5,
+          2
+        ],
+        "complexity": [
+          2,
+          1
+        ],
+        "technical_uncertainty": [
+          1,
+          2
+        ],
+        "stakeholder_availability": [
+          2,
+          1
+        ]
+      }
     },
     "V-Model": {
       "summary": "Each development phase is paired with a verification phase. Best for strict verification and validation and high failure consequence.",
-      "profile": {"requirement_stability": [4, 2], "formal_verification_need": [5, 3], "failure_consequence": [5, 2], "documentation_need": [5, 2], "regulatory_criticality": [5, 2], "change_frequency": [2, 2], "continuous_delivery_need": [2, 1]}
+      "profile": {
+        "requirement_stability": [
+          4,
+          2
+        ],
+        "formal_verification_need": [
+          5,
+          3
+        ],
+        "failure_consequence": [
+          5,
+          2
+        ],
+        "documentation_need": [
+          5,
+          2
+        ],
+        "regulatory_criticality": [
+          5,
+          2
+        ],
+        "change_frequency": [
+          2,
+          2
+        ],
+        "continuous_delivery_need": [
+          2,
+          1
+        ]
+      }
     },
     "Spiral": {
       "summary": "Risk-driven iterations with explicit risk analysis per cycle. Best for high technical uncertainty and large, novel systems.",
-      "profile": {"technical_uncertainty": [5, 3], "complexity": [5, 2], "system_size": [5, 1], "security_risk": [4, 1], "budget_schedule_pressure": [1, 2], "requirement_stability": [2, 1]}
+      "profile": {
+        "technical_uncertainty": [
+          5,
+          3
+        ],
+        "complexity": [
+          5,
+          2
+        ],
+        "system_size": [
+          5,
+          1
+        ],
+        "security_risk": [
+          4,
+          1
+        ],
+        "budget_schedule_pressure": [
+          1,
+          2
+        ],
+        "requirement_stability": [
+          2,
+          1
+        ]
+      }
     },
     "Agile (Scrum)": {
       "summary": "Short iterations with continuous stakeholder feedback. Best for frequently changing requirements and available stakeholders.",
-      "profile": {"change_frequency": [5, 3], "requirement_stability": [1, 2], "stakeholder_availability": [5, 2], "formal_verification_need": [1, 2], "regulatory_criticality": [2, 1], "documentation_need": [2, 1], "budget_schedule_pressure": [4, 1]}
+      "profile": {
+        "change_frequency": [
+          5,
+          3
+        ],
+        "requirement_stability": [
+          1,
+          2
+        ],
+        "stakeholder_availability": [
+          5,
+          2
+        ],
+        "formal_verification_need": [
+          1,
+          2
+        ],
+        "regulatory_criticality": [
+          2,
+          1
+        ],
+        "documentation_need": [
+          2,
+          1
+        ],
+        "budget_schedule_pressure": [
+          4,
+          1
+        ]
+      }
     },
     "DevSecOps": {
       "summary": "Continuous delivery with security automated in the pipeline. Best for continuous secure deployment and high security risk.",
-      "profile": {"continuous_delivery_need": [5, 3], "security_risk": [5, 2], "change_frequency": [4, 2], "legacy_dependence": [2, 1], "stakeholder_availability": [4, 1]}
+      "profile": {
+        "continuous_delivery_need": [
+          5,
+          3
+        ],
+        "security_risk": [
+          5,
+          2
+        ],
+        "change_frequency": [
+          4,
+          2
+        ],
+        "legacy_dependence": [
+          2,
+          1
+        ],
+        "stakeholder_availability": [
+          4,
+          1
+        ]
+      }
     },
     "Hybrid Agile-V-Model": {
       "summary": "Agile increments inside a V-Model governance frame. Each increment is traced to requirements and verified at V-level gates. Best for regulated systems with evolving requirements.",
-      "profile": {"regulatory_criticality": [5, 3], "change_frequency": [4, 2], "formal_verification_need": [4, 2], "documentation_need": [4, 2], "stakeholder_availability": [4, 1], "failure_consequence": [5, 1], "requirement_stability": [3, 1]}
+      "profile": {
+        "regulatory_criticality": [
+          5,
+          3
+        ],
+        "change_frequency": [
+          4,
+          2
+        ],
+        "formal_verification_need": [
+          4,
+          2
+        ],
+        "documentation_need": [
+          4,
+          2
+        ],
+        "stakeholder_availability": [
+          4,
+          1
+        ],
+        "failure_consequence": [
+          5,
+          1
+        ],
+        "requirement_stability": [
+          3,
+          1
+        ]
+      }
     },
     "Hybrid Agile-DevSecOps": {
       "summary": "Scrum delivery on a DevSecOps pipeline, with compliance-as-code gates and human approval checkpoints. Best for regulated, security-critical, frequently changing digital products.",
-      "profile": {"regulatory_criticality": [5, 2], "security_risk": [5, 3], "change_frequency": [4, 2], "continuous_delivery_need": [4, 2], "stakeholder_availability": [4, 1], "documentation_need": [4, 1], "failure_consequence": [4, 1]}
+      "profile": {
+        "regulatory_criticality": [
+          5,
+          2
+        ],
+        "security_risk": [
+          5,
+          3
+        ],
+        "change_frequency": [
+          4,
+          2
+        ],
+        "continuous_delivery_need": [
+          4,
+          2
+        ],
+        "stakeholder_availability": [
+          4,
+          1
+        ],
+        "documentation_need": [
+          4,
+          1
+        ],
+        "failure_consequence": [
+          4,
+          1
+        ]
+      }
     }
   },
   "glossary": {
@@ -50,6 +241,20 @@
     "IAL": "Identity Assurance Level (NIST SP 800-63A).",
     "AAL": "Authenticator Assurance Level (NIST SP 800-63B).",
     "Maker-checker": "A dual-control process where one user initiates an action and a second user approves it.",
-    "DPIA": "Data Protection Impact Assessment."
+    "DPIA": "Data Protection Impact Assessment.",
+    "UN": "United Nations (Security Council sanctions lists).",
+    "EU": "European Union.",
+    "OFAC": "US Office of Foreign Assets Control.",
+    "SDN": "OFAC Specially Designated Nationals and Blocked Persons list.",
+    "CIP": "Customer Identification Program (US).",
+    "SSN": "US Social Security Number.",
+    "TIN": "Taxpayer Identification Number.",
+    "BSA": "US Bank Secrecy Act.",
+    "RTO": "Recovery Time Objective.",
+    "RPO": "Recovery Point Objective.",
+    "SLA": "Service Level Agreement.",
+    "MIS": "Management Information System report.",
+    "DPO": "Data Protection Officer.",
+    "CBS": "Core Banking System."
   }
 }
