@@ -72,10 +72,10 @@ analytics), KYC is the best first use case because:
 
 ## 4. SDLC selection
 
-1. **Factor extraction:** 13 decision factors (requirement stability, regulatory
+1. **Factor extraction:** 14 decision factors (requirement stability, regulatory
    criticality, security risk, complexity, size, legacy dependence, change frequency,
    CD need, stakeholder availability, documentation need, budget/schedule pressure,
-   formal-verification need, failure consequence), each scored 1–5 with evidence.
+   formal-verification need, failure consequence, technical uncertainty), each scored 1–5 with evidence.
 2. **Hard rules:** for example, regulatory criticality ≥ 4 *and* change frequency ≥ 4
    promotes the regulated hybrids, and formal-verification need ≥ 4 penalises pure Agile.
 3. **MCDA:** a weighted fit of each candidate model's profile against the project
