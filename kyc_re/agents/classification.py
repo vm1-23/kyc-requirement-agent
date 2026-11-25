@@ -7,7 +7,7 @@ from ..models import NON_FUNCTIONAL, Category as C, Requirement
 from .base import Agent
 
 LEXICON: dict[C, list[str]] = {
-    C.BUSINESS: [r"\b(revenue|cost|conversion|drop-?off|market|kpi|business goal|objective|reduce .* (time|cost)|increase|competitive|customer acquisition)\b"],
+    C.BUSINESS: [r"\b(revenue|cost|conversion|drop-?off|market|kpi|business goal|objective|reduce .* (time|cost)|increase|competit\w*|customer acquisition|releases?|go-?live|deadline|budget)\b"],
     C.STAKEHOLDER: [r"\b(customers? (want|expect|need)|agents? (want|need)|officers? need|branch staff)\b"],
     C.FUNCTIONAL: [r"\b(capture|upload|verify|validate|screen|calculate|assign|generate|display|notify|send|allow|enable|route|create|submit|scan|match|schedule|store|search|block|reject|approve|escalate|download|select|fetch|record)\b"],
     C.SECURITY: [r"\b(secur|encrypt|mfa|multi-factor|two-factor|otp|authenticat|authori[sz]|access control|rbac|role-based|least privilege|tls|aes|hsm|malware|penetration|vulnerab|tamper|fraud|spoof|deepfake|liveness|presentation attack|session timeout|step-up|firewall|threat|password|token)\w*"],
@@ -18,8 +18,8 @@ LEXICON: dict[C, list[str]] = {
     C.USABILITY: [r"\b(usab|user-?friendly|intuitive|accessib|wcag|language|vernacular|mobile|ui|ux|screen reader|easy|simple|steps|guidance|error message|drop-?off)\w*"],
     C.DATA: [r"\b(retain|retention|store|storage|archive|delete|deletion|purge|data quality|backup|master data|record(s)? (for|of)|years|database|data residency|localisation|localization)\w*"],
     C.INTEGRATION: [r"\b(integrat|api|core banking|cbs|crm|vendor|third[- ]party|registry|ckyc|digilocker|uidai|webhook|interface|connector|legacy|bureau|e-?sign|nsdl|message queue|batch)\w*"],
-    C.AUDIT: [r"\b(audit|log|trail|report|mis|dashboard|evidence|record (who|every|each)|regulator(y)? report|inspection)\w*"],
-    C.OPERATIONAL: [r"\b(operations?|ops|monitor|alert|support|queue|backlog|sla|maintenance|on-?call|runbook|incident|manual review|case management|workload|staff)\w*"],
+    C.AUDIT: [r"\b(audit\w*|logs|logging|logged|audit trail|mis|dashboards?|reports? (of|on)|regulatory reports?|inspection|record (who|every|each))\b"],
+    C.OPERATIONAL: [r"\b(operations?|ops|monitor\w*|alerts?|customer support|queue\w*|backlog|sla|maintenance|on-?call|runbook|incident|manual(ly)? review\w*|case management|workload|staff)\b"],
 }
 
 ID_PREFIX = {
@@ -29,8 +29,8 @@ ID_PREFIX = {
 }
 
 # Primary category precedence (most specific first) for ID prefix.
-PRIMARY_ORDER = [C.SECURITY, C.PRIVACY, C.PERFORMANCE, C.AVAILABILITY, C.DATA, C.AUDIT, C.INTEGRATION,
-                 C.USABILITY, C.OPERATIONAL, C.REGULATORY, C.FUNCTIONAL, C.BUSINESS, C.STAKEHOLDER]
+PRIMARY_ORDER = [C.SECURITY, C.PRIVACY, C.PERFORMANCE, C.AVAILABILITY, C.DATA, C.INTEGRATION, C.AUDIT,
+                 C.REGULATORY, C.USABILITY, C.OPERATIONAL, C.FUNCTIONAL, C.BUSINESS, C.STAKEHOLDER]
 
 _CLASSIFY_SCHEMA = {
     "type": "object",

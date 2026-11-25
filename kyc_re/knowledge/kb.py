@@ -22,6 +22,7 @@ DATA_DIR = Path(__file__).parent / "data"
 
 _STOP = set("""a an the of to and or for in on at by with from as is are be been shall should must will may can
 this that these those it its into than then such any all each per not no if when where which who whom what
+customer customers system app want wants need needs every two able also our we they their them have has
 """.split())
 
 
@@ -148,6 +149,9 @@ class KnowledgeBase:
             if s >= min_score:
                 scored.append((item, s))
         scored.sort(key=lambda x: -x[1])
+        if scored:
+            floor = scored[0][1] * 0.45  # drop weak tail matches relative to the best hit
+            scored = [x for x in scored if x[1] >= floor]
         return scored[:k]
 
     def get(self, kb_id: str) -> KBItem | None:

@@ -1,0 +1,13 @@
+Subject: KYC must-haves for the digital onboarding project
+
+Team,
+The system must screen every applicant against UN, domestic and internal sanctions lists before the account is opened.
+All customers must be screened for PEP status and PEP relationships must be approved by a senior compliance officer.
+The system shall assign every customer a low, medium or high risk rating based on the approved risk-scoring model.
+High-risk customers must be manually reviewed and go through enhanced due diligence with source of funds evidence.
+Periodic re-KYC must be scheduled every 2 years for high-risk, 8 years for medium-risk and 10 years for low-risk customers.
+KYC records must be retained for at least 5 years after the account is closed.
+KYC records of new customers must be uploaded to CKYCR within the regulatory timeline.
+Where video KYC is used, the session must include liveness check, geo-tagging and face match by a trained official, and the recording must be stored securely.
+Staff must be able to escalate suspicious applications to the Principal Officer for STR filing without alerting the customer.
+Regards, Arjun

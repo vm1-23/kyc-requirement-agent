@@ -1,0 +1,23 @@
+{
+  "project": {
+    "name": "NeoBank Digital Onboarding & KYC (Phase 1)",
+    "domain": "kyc_onboarding",
+    "jurisdictions": ["IN"],
+    "description": "Replace branch-based account opening with a mobile-first digital onboarding journey for resident individual customers and sole proprietors, including e-KYC, video KYC, sanctions/PEP screening, customer risk rating, enhanced due diligence and periodic re-KYC, integrated with the legacy core banking system.",
+    "channels": ["mobile app", "web"],
+    "customer_types": ["resident individuals", "sole proprietors"],
+    "legacy_systems": ["Core banking system (batch account creation)"],
+    "timeline_months": 6,
+    "team_size": 12,
+    "budget_flexibility": "medium"
+  },
+  "documents": [
+    {"file": "01_product_owner_interview.txt", "title": "Interview - Head of Digital Product", "type": "transcript", "stakeholder": "Priya (Product Owner)", "role": "product_owner"},
+    {"file": "02_compliance_email.txt", "title": "Email - KYC requirements from Compliance", "type": "email", "stakeholder": "Arjun (Chief Compliance Officer)", "role": "compliance"},
+    {"file": "03_security_notes.txt", "title": "Meeting notes - Information security review", "type": "meeting_notes", "stakeholder": "Meera (CISO office)", "role": "security"},
+    {"file": "04_operations_interview.txt", "title": "Interview - KYC operations lead", "type": "transcript", "stakeholder": "Rahul (Operations Lead)", "role": "operations"},
+    {"file": "05_architecture_notes.txt", "title": "Architecture constraints - legacy CBS", "type": "legacy_doc", "stakeholder": "Sanjay (Enterprise Architect)", "role": "architect"},
+    {"file": "06_customer_feedback.txt", "title": "Customer research summary", "type": "questionnaire", "stakeholder": "Customer research panel", "role": "customer"},
+    {"file": "07_audit_finding.txt", "title": "Internal audit finding IA-2025-14", "type": "audit_finding", "stakeholder": "Internal Audit", "role": "auditor"}
+  ]
+}

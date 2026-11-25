@@ -1,0 +1,6 @@
+Architecture constraints
+The legacy core banking system only creates accounts through a nightly batch file; real-time account creation is not available until the CBS upgrade next year.
+The onboarding platform must integrate with the core banking system through an asynchronous adapter and report account status back to the customer.
+The onboarding APIs must handle a peak of 200 applications per minute during campaigns.
+The onboarding service must have 99.9% monthly availability with an RTO of 4 hours and RPO of 15 minutes.
+All integrations with vendors (e-KYC, video KYC, screening) must go through the API gateway.

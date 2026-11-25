@@ -1,0 +1,4 @@
+Internal audit finding IA-2025-14 (High)
+Sample testing found 12 accounts where the risk rating was changed manually without documented approval.
+Recommendation: the new system must record who changed a customer risk rating, when, and why, and the change must be approved by a second user.
+Consent for data processing was not recorded for 3% of sampled customers; the new system must capture and store explicit consent before collecting personal data.

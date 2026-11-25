@@ -1,0 +1,8 @@
+Interviewer: How does KYC operations work today?
+Rahul: Currently our team manually checks about 4,000 applications a day from branches, and the backlog is often 2 days.
+Any manual override of an automated KYC decision must go through maker-checker approval with a reason.
+Potential sanctions matches need a case management queue where analysts can review evidence and close alerts with comments.
+We need the review queue to show cases sorted by risk and SLA age.
+Ops needs a daily MIS report of applications approved, rejected and pending, by channel.
+If the e-KYC vendor is down, applications should be queued and customers notified, not rejected.
+Customer data must be retained for 10 years after the account is closed.

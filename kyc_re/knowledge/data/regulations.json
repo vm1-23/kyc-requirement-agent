@@ -76,7 +76,7 @@
       "id": "IN-RBI-REKYC", "type": "regulation", "title": "RBI KYC Direction - Periodic updation of KYC",
       "source": "Reserve Bank of India", "jurisdiction": "IN", "effective_date": "2016-02-25", "version": "amended-2025",
       "applicability": ["banks", "nbfc", "payments"],
-      "tags": ["re-kyc", "periodic updation", "ongoing due diligence", "high risk two years", "medium risk eight years", "low risk ten years"],
+      "tags": ["re-kyc", "periodic updation", "ongoing due diligence", "kyc refresh", "risk-based periodicity"],
       "text": "KYC must be periodically updated on a risk basis: at least once every two years for high-risk customers, once every eight years for medium-risk customers and once every ten years for low-risk customers."
     },
     {

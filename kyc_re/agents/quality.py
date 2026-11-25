@@ -114,9 +114,13 @@ class QualityAgent(Agent):
             r.status = ApprovalStatus.NEEDS_CLARIFICATION if blocking else ApprovalStatus.PENDING_APPROVAL
         r.confidence = round(max(0.2, min(0.99, r.confidence - 0.08 * len(blocking) + (0.05 if r.regulations else 0))), 2)
 
-    def run(self) -> None:
+    def run(self, only_origin: str | None = None) -> None:
         self.need("read:requirements", "write:requirements")
         for r in self.ctx.state.requirements:
+            if only_origin and r.origin != only_origin:
+                continue
+            if r.status in (ApprovalStatus.APPROVED, ApprovalStatus.REJECTED):
+                continue
             self.assess(r)
         issues = sum(len(r.quality_issues) for r in self.ctx.state.requirements)
         self.log("quality_checked", "project", requirements=len(self.ctx.state.requirements), issues=issues)

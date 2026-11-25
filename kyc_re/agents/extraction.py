@@ -21,6 +21,8 @@ NEED = re.compile(
     r"is not allowed|are not allowed|not permitted|ensure|has to be|important that|would like)\b",
     re.I,
 )
+SPEAKER = re.compile(r"^\s*(?:[A-Z][\w .()'-]{0,40}):\s+")
+HEADER = re.compile(r"^(subject|from|to|cc|date|re|interviewer|regards|note|recommendation)\b", re.I)
 NOT_REQ = re.compile(r"^(hi|hello|thanks|thank you|ok|okay|yes|no|sure|great|regards|best)\b|\?\s*$", re.I)
 CONTEXT_ONLY = re.compile(r"^(today|currently|at the moment|right now|last (year|quarter|month)|we (had|saw|used))\b", re.I)
 
@@ -116,6 +118,9 @@ class ExtractionAgent(Agent):
     def _rule_extract(self, doc: SourceDocument) -> list[Requirement]:
         out = []
         for s in sentences(doc.masked_text):
+            if re.match(r"^\s*(interviewer|subject|from|to|cc|date)\s*:", s, re.I) or s.rstrip().endswith("?"):
+                continue
+            s = SPEAKER.sub("", s, count=1).strip()
             if NOT_REQ.search(s) or CONTEXT_ONLY.search(s) or not NEED.search(s) or len(s.split()) < 5:
                 continue
             out.append(self._new(doc, normalise(s), s, priority=priority_of(s), confidence=0.6,

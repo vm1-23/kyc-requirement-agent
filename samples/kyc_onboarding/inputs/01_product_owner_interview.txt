@@ -1,0 +1,11 @@
+Interviewer: What is the goal of the new onboarding?
+Priya: Today customers have to visit a branch and it takes 3 days to open an account. We want customers to open an account fully digitally on the mobile app.
+The onboarding journey must be completed within 5 minutes for a normal customer.
+We need the onboarding to be fast and user-friendly so that drop-off falls below 20%.
+Customers should be able to fetch their identity details from DigiLocker or Aadhaar e-KYC instead of typing them.
+To keep it frictionless, onboarding should be approved automatically without manual review for every customer.
+We want to delete customer data after 3 years to reduce storage cost.
+Customers must be able to save a partially completed application and resume it within 7 days.
+The app should support English and Hindi in phase 1.
+Example from the pilot: customer Ravi Kumar, PAN ABCPK1234Z, mobile +91 98765 43210, email ravi.kumar@example.com was stuck for 2 days.
+Releases should happen every two weeks because competitors change their journeys frequently.

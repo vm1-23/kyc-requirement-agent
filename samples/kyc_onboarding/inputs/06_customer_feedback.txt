@@ -1,0 +1,5 @@
+Customer research summary (n=40)
+Customers want to know what is happening; the app should show clear progress and the reason if an application is rejected.
+Customers expect the selfie step to work in low light and on older Android phones.
+Customers want to be able to contest a rejection and talk to a human.
+Several customers said they do not want their data used for marketing without asking them.
