@@ -1,0 +1,6 @@
+DPO review
+- Directors' identity document images must be deleted 30 days after verification; only the verification result is kept.
+- A DPIA must be completed before go-live because biometric face matching is used for directors.
+- Merchants must be told how their data is used through a privacy notice at the start of onboarding.
+- Personal data must be stored in EU data centres only.
+- Automated rejections must be reviewable by a human on request.

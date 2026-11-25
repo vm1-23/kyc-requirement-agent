@@ -1,0 +1,121 @@
+{
+  "case": "NeoBank Digital Onboarding & KYC (Phase 1)",
+  "llm": "offline-rules",
+  "kb_version": "2026.11.0",
+  "extraction": {
+    "precision": 0.976,
+    "recall": 0.976,
+    "f1": 0.976,
+    "tp": 41,
+    "fp": 1,
+    "fn": 1,
+    "unmatched_system": [
+      "SR-KYC-001: Customers want to know what is happening."
+    ],
+    "missed_gold": [
+      "G42"
+    ]
+  },
+  "classification": {
+    "primary_accuracy": 0.976,
+    "evaluated": 41
+  },
+  "ambiguity_detection": {
+    "precision": 0.6,
+    "recall": 0.75,
+    "f1": 0.667,
+    "tp": 3,
+    "fp": 2,
+    "fn": 1
+  },
+  "conflict_detection": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 3,
+    "fp": 0,
+    "fn": 0,
+    "regulatory_conflict_recall": 1.0
+  },
+  "regulatory_control_mapping": {
+    "precision": 0.75,
+    "recall": 0.889,
+    "f1": 0.814,
+    "tp": 24,
+    "fp": 8,
+    "fn": 3
+  },
+  "control_gap_detection": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 2,
+    "fp": 0,
+    "fn": 0,
+    "system_gaps": [
+      "KYC-C04",
+      "KYC-C19"
+    ],
+    "expected_gaps": [
+      "KYC-C04",
+      "KYC-C19"
+    ]
+  },
+  "regulatory_control_coverage": {
+    "stakeholder_only": 0.85,
+    "after_derivation": 1.0
+  },
+  "citation_validity": 1.0,
+  "hallucination_rate": 0.0,
+  "hallucinations_blocked": 0,
+  "sdlc": {
+    "expert_choice": "Hybrid Agile-DevSecOps",
+    "system_top1": "Hybrid Agile-DevSecOps",
+    "top1_match": true,
+    "top2_contains_expert": true,
+    "top1_acceptable": true,
+    "ranking": [
+      [
+        "Hybrid Agile-DevSecOps",
+        94.6
+      ],
+      [
+        "Hybrid Agile-V-Model",
+        92.5
+      ],
+      [
+        "Spiral",
+        82.5
+      ],
+      [
+        "V-Model",
+        71.4
+      ],
+      [
+        "DevSecOps",
+        66.7
+      ],
+      [
+        "Agile (Scrum)",
+        57.5
+      ],
+      [
+        "Waterfall",
+        24.6
+      ]
+    ]
+  },
+  "traceability_coverage": 1.0,
+  "acceptance_criteria_coverage": 1.0,
+  "security_gate": {
+    "pii_masked": 3,
+    "injection_quarantined": 1
+  },
+  "processing_time_s": 0.08,
+  "estimated_manual_minutes": 665,
+  "estimated_time_saved_pct": 100.0,
+  "human_review_load": {
+    "open_questions": 19,
+    "pending_approvals": 34
+  }
+}

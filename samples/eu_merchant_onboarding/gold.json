@@ -1,0 +1,31 @@
+{
+  "_note": "Held-out case: inputs and gold written before running the system; rules were not tuned on it. Gold authored by the project team.",
+  "requirements": [
+    {"id": "H01", "match": ["24 hours"], "primary": ["performance", "business"]},
+    {"id": "H02", "match": ["upload company documents"], "primary": ["functional"]},
+    {"id": "H03", "match": ["business register"], "primary": ["integration", "functional"], "controls": ["KYC-C01", "KYC-C02"]},
+    {"id": "H04", "match": ["beneficial owner details"], "primary": ["functional", "business", "regulatory"], "controls": ["KYC-C04"]},
+    {"id": "H05", "match": ["simple and intuitive"], "primary": ["usability"], "ambiguous": true},
+    {"id": "H06", "match": ["every sprint"], "primary": ["business", "operational"]},
+    {"id": "H07", "match": ["25%"], "primary": ["functional", "regulatory"], "controls": ["KYC-C04"]},
+    {"id": "H08", "match": ["sanctions lists"], "primary": ["functional", "regulatory"], "controls": ["KYC-C05", "KYC-C06"]},
+    {"id": "H09", "match": ["enhanced due diligence"], "primary": ["regulatory", "functional"], "controls": ["KYC-C08"]},
+    {"id": "H10", "match": ["risk score", "annually"], "primary": ["functional", "regulatory"], "controls": ["KYC-C07", "KYC-C09"]},
+    {"id": "H11", "match": ["5 years"], "primary": ["data_management", "regulatory"], "controls": ["KYC-C10"]},
+    {"id": "H12", "match": ["suspicious activity"], "primary": ["regulatory", "functional"], "controls": ["KYC-C11"]},
+    {"id": "H13", "match": ["30 days"], "primary": ["data_management", "privacy"], "controls": ["KYC-C13"]},
+    {"id": "H14", "match": ["dpia"], "primary": ["privacy", "regulatory"]},
+    {"id": "H15", "match": ["privacy notice"], "primary": ["privacy"], "controls": ["KYC-C12"]},
+    {"id": "H16", "match": ["eu data centres"], "primary": ["data_management", "privacy"]},
+    {"id": "H17", "match": ["reviewable by a human"], "primary": ["functional", "regulatory"], "controls": ["KYC-C17"]},
+    {"id": "H18", "match": ["800 ms"], "primary": ["performance"]},
+    {"id": "H19", "match": ["99.95%"], "primary": ["availability"]},
+    {"id": "H20", "match": ["mfa"], "primary": ["security"], "controls": ["KYC-C15"]},
+    {"id": "H21", "match": ["audit log"], "primary": ["audit_reporting", "security"], "controls": ["KYC-C14"]}
+  ],
+  "conflicts": [["H04", "H07"]],
+  "regulatory_conflicts": ["H04"],
+  "expected_control_gaps": ["KYC-C03", "KYC-C16", "KYC-C19", "KYC-C20"],
+  "sdlc": {"expert_choice": "Hybrid Agile-DevSecOps", "acceptable": ["Hybrid Agile-DevSecOps", "Hybrid Agile-V-Model", "DevSecOps"]},
+  "manual_baseline": {"minutes_per_source_document": 45, "minutes_per_requirement_compliance_mapping": 4, "minutes_per_requirement_documentation": 3}
+}

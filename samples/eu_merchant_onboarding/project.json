@@ -1,0 +1,20 @@
+{
+  "project": {
+    "name": "PayFlow EU Merchant Onboarding (held-out case)",
+    "domain": "kyc_onboarding",
+    "jurisdictions": ["EU"],
+    "description": "Digital onboarding of small and medium merchants (legal entities) for a payment-acceptance product, including company verification, beneficial ownership, screening and risk rating.",
+    "channels": ["web"],
+    "customer_types": ["SME legal entities", "sole traders"],
+    "legacy_systems": [],
+    "timeline_months": 9,
+    "team_size": 8,
+    "budget_flexibility": "medium"
+  },
+  "documents": [
+    {"file": "01_sales_head.txt", "title": "Interview - Head of Merchant Sales", "type": "transcript", "stakeholder": "Lena (Sales)", "role": "product_owner"},
+    {"file": "02_mlro_memo.txt", "title": "Memo - MLRO onboarding requirements", "type": "policy", "stakeholder": "Tomas (MLRO)", "role": "compliance"},
+    {"file": "03_dpo_notes.txt", "title": "DPO review notes", "type": "meeting_notes", "stakeholder": "Ines (DPO)", "role": "legal"},
+    {"file": "04_platform_team.txt", "title": "Platform team constraints", "type": "meeting_notes", "stakeholder": "Marco (Platform lead)", "role": "architect"}
+  ]
+}

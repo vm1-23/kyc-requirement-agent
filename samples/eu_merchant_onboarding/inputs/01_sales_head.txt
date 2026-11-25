@@ -1,0 +1,6 @@
+Lena: Merchants complain that onboarding takes two weeks. We need merchants to be live within 24 hours of applying.
+Merchants must be able to upload company documents in PDF or image format.
+The system should pre-fill company details from the business register using the registration number.
+We should not ask small merchants for beneficial owner details because it slows them down.
+The onboarding form should be simple and intuitive.
+We plan to release new features every sprint because the market moves quickly.

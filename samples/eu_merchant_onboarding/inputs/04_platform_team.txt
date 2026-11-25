@@ -1,0 +1,4 @@
+Marco: The onboarding API must respond within 800 ms at the 95th percentile.
+The service must be available 99.95% of the time.
+All admin users must authenticate with MFA and access must be role-based.
+Every change to a merchant's risk score must be written to an audit log.
