@@ -1,0 +1,75 @@
+{
+  "kb_version": "2026.11.0",
+  "items": [
+    {
+      "id": "NIST-800-63A", "type": "standard", "title": "NIST SP 800-63A - Identity proofing (IAL2)",
+      "source": "NIST SP 800-63-3/-4", "jurisdiction": "GLOBAL", "effective_date": "2017-06-22", "version": "rev4-2025",
+      "applicability": ["all"],
+      "tags": ["identity proofing", "ial2", "remote proofing", "document verification", "evidence strength", "liveness"],
+      "text": "Identity assurance level 2 requires evidence of real-world existence, validation of identity evidence against authoritative or issuing sources, and verification that the applicant is the genuine owner of the evidence (for example biometric comparison with presentation-attack detection) for remote or in-person proofing."
+    },
+    {
+      "id": "NIST-800-63B", "type": "standard", "title": "NIST SP 800-63B - Authentication (AAL2)",
+      "source": "NIST SP 800-63-3/-4", "jurisdiction": "GLOBAL", "effective_date": "2017-06-22", "version": "rev4-2025",
+      "applicability": ["all"],
+      "tags": ["mfa", "multi-factor", "aal2", "authentication", "session", "otp", "phishing resistant", "step-up"],
+      "text": "Authenticator assurance level 2 requires proof of possession and control of two distinct authentication factors, with reauthentication and session-timeout requirements and resistance to replay attacks."
+    },
+    {
+      "id": "ISO-30107-3", "type": "standard", "title": "ISO/IEC 30107-3 - Biometric presentation attack detection",
+      "source": "ISO/IEC", "jurisdiction": "GLOBAL", "effective_date": "2017-09-01", "version": "2023",
+      "applicability": ["all"],
+      "tags": ["liveness", "presentation attack detection", "pad", "deepfake", "spoofing", "biometric"],
+      "text": "Defines testing and reporting of presentation-attack detection mechanisms, including attack presentation classification error rate (APCER) and bona fide presentation classification error rate (BPCER)."
+    },
+    {
+      "id": "OWASP-ASVS", "type": "standard", "title": "OWASP Application Security Verification Standard 4.0",
+      "source": "OWASP", "jurisdiction": "GLOBAL", "effective_date": "2019-03-01", "version": "4.0.3",
+      "applicability": ["all"],
+      "tags": ["secure development", "input validation", "session management", "access control", "logging", "cryptography", "api security", "file upload"],
+      "text": "Provides verifiable security requirements for authentication, session management, access control, input validation, cryptography at rest, error handling and logging, data protection, communications security, file upload handling and API security."
+    },
+    {
+      "id": "ISO-27001-A", "type": "standard", "title": "ISO/IEC 27001:2022 Annex A controls",
+      "source": "ISO/IEC", "jurisdiction": "GLOBAL", "effective_date": "2022-10-25", "version": "2022",
+      "applicability": ["all"],
+      "tags": ["access control", "least privilege", "logging", "monitoring", "cryptography", "encryption", "supplier security", "segregation of duties"],
+      "text": "Annex A includes controls on access control and least privilege, segregation of duties, cryptography, logging and monitoring, secure development life cycle, supplier relationships and information-security incident management."
+    },
+    {
+      "id": "POL-ORG-KYC-01", "type": "policy", "title": "Org KYC & Customer Acceptance Policy v3.2",
+      "source": "Internal - Compliance", "jurisdiction": "ORG", "effective_date": "2025-04-01", "version": "3.2",
+      "applicability": ["retail", "sme"],
+      "tags": ["customer acceptance", "risk rating", "high risk", "edd", "senior management approval", "prohibited customers", "shell companies", "maker-checker"],
+      "text": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval by a senior compliance officer. Any manual override of a KYC decision requires maker-checker approval with a recorded reason."
+    },
+    {
+      "id": "POL-ORG-DATA-02", "type": "policy", "title": "Org Data Classification & Retention Standard v2.0",
+      "source": "Internal - CISO Office", "jurisdiction": "ORG", "effective_date": "2025-01-15", "version": "2.0",
+      "applicability": ["all"],
+      "tags": ["data classification", "restricted data", "encryption", "aes-256", "tls 1.2", "retention schedule", "masking", "tokenisation", "deletion"],
+      "text": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production environments and UIs by default, and retained per the regulatory retention schedule, then securely deleted."
+    },
+    {
+      "id": "POL-ORG-SEC-03", "type": "policy", "title": "Org Identity & Access Management Standard v4.1",
+      "source": "Internal - CISO Office", "jurisdiction": "ORG", "effective_date": "2025-06-01", "version": "4.1",
+      "applicability": ["all"],
+      "tags": ["rbac", "mfa", "privileged access", "least privilege", "access review", "session timeout", "staff access"],
+      "text": "All staff access to customer PII requires role-based access, MFA and quarterly access recertification. Privileged access is just-in-time and session-recorded. Customer sessions time out after 15 minutes of inactivity."
+    },
+    {
+      "id": "POL-ORG-AI-04", "type": "policy", "title": "Org Responsible AI & Model Risk Policy v1.1",
+      "source": "Internal - Model Risk Management", "jurisdiction": "ORG", "effective_date": "2025-09-01", "version": "1.1",
+      "applicability": ["all"],
+      "tags": ["model risk", "explainability", "bias", "fairness", "human oversight", "model validation", "ai", "monitoring"],
+      "text": "Models that influence customer decisions must be validated before use, monitored for drift and bias across protected groups, produce explainable outcomes, and keep a human in the loop for adverse decisions. LLM outputs must be grounded in approved sources and logged."
+    },
+    {
+      "id": "POL-ORG-OPS-05", "type": "policy", "title": "Org Service Level & Resilience Standard v1.4",
+      "source": "Internal - Operations", "jurisdiction": "ORG", "effective_date": "2024-11-01", "version": "1.4",
+      "applicability": ["all"],
+      "tags": ["availability", "99.9", "rto", "rpo", "disaster recovery", "sla", "incident", "capacity"],
+      "text": "Customer-facing tier-1 services target 99.9% monthly availability, RTO 4 hours and RPO 15 minutes, with active-passive disaster recovery tested twice a year and P1 incidents acknowledged within 15 minutes."
+    }
+  ]
+}

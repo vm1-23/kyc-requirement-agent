@@ -1,0 +1,160 @@
+{
+  "kb_version": "2026.11.0",
+  "disclaimer": "Paraphrased summaries for prototyping only. Verify against the official text before relying on any item. Not legal advice.",
+  "items": [
+    {
+      "id": "FATF-R1", "type": "regulation", "title": "FATF Recommendation 1 - Risk-based approach",
+      "source": "FATF Recommendations (2012, as amended)", "jurisdiction": "GLOBAL", "effective_date": "2012-02-16", "version": "2023-11",
+      "applicability": ["banks", "nbfc", "fintech", "payments", "insurance"],
+      "tags": ["risk-based approach", "risk assessment", "customer risk rating", "rba"],
+      "text": "Institutions should identify, assess and understand money-laundering and terrorist-financing risks and apply measures commensurate with those risks: enhanced measures where risk is higher, simplified measures may be permitted where risk is demonstrably lower."
+    },
+    {
+      "id": "FATF-R10", "type": "regulation", "title": "FATF Recommendation 10 - Customer due diligence",
+      "source": "FATF Recommendations (2012, as amended)", "jurisdiction": "GLOBAL", "effective_date": "2012-02-16", "version": "2023-11",
+      "applicability": ["banks", "nbfc", "fintech", "payments", "insurance"],
+      "tags": ["cdd", "customer due diligence", "identification", "verification", "beneficial owner", "purpose of relationship", "ongoing due diligence", "onboarding"],
+      "text": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose and intended nature of the business relationship; and conduct ongoing due diligence. Where CDD cannot be completed, the relationship should not be opened and a suspicious transaction report should be considered."
+    },
+    {
+      "id": "FATF-R11", "type": "regulation", "title": "FATF Recommendation 11 - Record keeping",
+      "source": "FATF Recommendations (2012, as amended)", "jurisdiction": "GLOBAL", "effective_date": "2012-02-16", "version": "2023-11",
+      "applicability": ["banks", "nbfc", "fintech", "payments", "insurance"],
+      "tags": ["record keeping", "retention", "five years", "records", "audit"],
+      "text": "Records obtained through CDD, account files and business correspondence should be kept for at least five years after the business relationship ends, and transaction records for at least five years after the transaction, sufficient to permit reconstruction and to be made available to competent authorities swiftly."
+    },
+    {
+      "id": "FATF-R12", "type": "regulation", "title": "FATF Recommendation 12 - Politically exposed persons",
+      "source": "FATF Recommendations (2012, as amended)", "jurisdiction": "GLOBAL", "effective_date": "2012-02-16", "version": "2023-11",
+      "applicability": ["banks", "nbfc", "fintech", "payments", "insurance"],
+      "tags": ["pep", "politically exposed person", "enhanced due diligence", "edd", "senior management approval", "source of wealth", "source of funds"],
+      "text": "For foreign PEPs (and domestic PEPs where higher risk), institutions should have risk-management systems to determine PEP status, obtain senior-management approval to establish the relationship, establish source of wealth and source of funds, and conduct enhanced ongoing monitoring."
+    },
+    {
+      "id": "FATF-R6", "type": "regulation", "title": "FATF Recommendation 6 - Targeted financial sanctions",
+      "source": "FATF Recommendations (2012, as amended)", "jurisdiction": "GLOBAL", "effective_date": "2012-02-16", "version": "2023-11",
+      "applicability": ["banks", "nbfc", "fintech", "payments", "insurance"],
+      "tags": ["sanctions", "screening", "un sanctions", "watchlist", "asset freeze", "terrorist financing"],
+      "text": "Institutions must screen customers against designated-persons lists and freeze without delay funds or assets of designated persons, and must not make funds available to them."
+    },
+    {
+      "id": "FATF-R15", "type": "regulation", "title": "FATF Recommendation 15 - New technologies",
+      "source": "FATF Recommendations (2012, as amended)", "jurisdiction": "GLOBAL", "effective_date": "2012-02-16", "version": "2023-11",
+      "applicability": ["banks", "nbfc", "fintech", "payments"],
+      "tags": ["new technologies", "digital onboarding", "non-face-to-face", "remote onboarding", "digital identity", "risk assessment"],
+      "text": "Institutions should assess ML/TF risks of new products, business practices and delivery mechanisms, including non-face-to-face and digital onboarding, before launch, and take measures to manage and mitigate those risks."
+    },
+    {
+      "id": "FATF-R20", "type": "regulation", "title": "FATF Recommendation 20 - Reporting of suspicious transactions",
+      "source": "FATF Recommendations (2012, as amended)", "jurisdiction": "GLOBAL", "effective_date": "2012-02-16", "version": "2023-11",
+      "applicability": ["banks", "nbfc", "fintech", "payments", "insurance"],
+      "tags": ["str", "sar", "suspicious transaction report", "suspicious activity", "fiu", "tipping off", "reporting"],
+      "text": "If an institution suspects or has reasonable grounds to suspect funds are proceeds of crime or related to terrorist financing, it must promptly report to the financial intelligence unit. Tipping-off the customer is prohibited."
+    },
+    {
+      "id": "FATF-DIGID", "type": "guidance", "title": "FATF Guidance on Digital Identity",
+      "source": "FATF Guidance on Digital ID (2020)", "jurisdiction": "GLOBAL", "effective_date": "2020-03-06", "version": "2020",
+      "applicability": ["banks", "fintech", "payments"],
+      "tags": ["digital identity", "remote onboarding", "assurance level", "identity proofing", "authentication", "liveness"],
+      "text": "Reliable, independent digital ID systems with appropriate assurance levels for identity proofing and authentication can be used for CDD in non-face-to-face onboarding; institutions should understand the assurance level and governance of the digital ID system relied upon."
+    },
+    {
+      "id": "IN-RBI-KYC-MD", "type": "regulation", "title": "RBI Master Direction - Know Your Customer (KYC) Direction, 2016 (as amended)",
+      "source": "Reserve Bank of India", "jurisdiction": "IN", "effective_date": "2016-02-25", "version": "amended-2025",
+      "applicability": ["banks", "nbfc", "payments"],
+      "tags": ["kyc", "cdd", "officially valid document", "ovd", "customer acceptance policy", "risk categorisation", "beneficial owner", "onboarding"],
+      "text": "Regulated entities must have a board-approved KYC policy covering customer acceptance, risk management, customer identification procedures and monitoring of transactions; identify customers using officially valid documents or equivalent e-documents, Aadhaar-based e-KYC where permitted, or digital KYC; categorise customers by risk; and identify beneficial owners of legal-entity customers."
+    },
+    {
+      "id": "IN-RBI-VCIP", "type": "regulation", "title": "RBI KYC Direction - Video-based Customer Identification Process (V-CIP)",
+      "source": "Reserve Bank of India", "jurisdiction": "IN", "effective_date": "2020-01-09", "version": "amended-2025",
+      "applicability": ["banks", "nbfc"],
+      "tags": ["v-cip", "video kyc", "liveness", "geo-tagging", "remote onboarding", "official", "recording", "face match"],
+      "text": "V-CIP must be conducted by a trained official of the regulated entity through a live, real-time, consent-based audio-visual interaction with liveness checks, geo-tagging of the customer's location within the country, face matching against the identity document, and secure storage of the recorded session with date-time stamp; the process must be auditable and the infrastructure must meet prescribed security standards."
+    },
+    {
+      "id": "IN-RBI-REKYC", "type": "regulation", "title": "RBI KYC Direction - Periodic updation of KYC",
+      "source": "Reserve Bank of India", "jurisdiction": "IN", "effective_date": "2016-02-25", "version": "amended-2025",
+      "applicability": ["banks", "nbfc", "payments"],
+      "tags": ["re-kyc", "periodic updation", "ongoing due diligence", "high risk two years", "medium risk eight years", "low risk ten years"],
+      "text": "KYC must be periodically updated on a risk basis: at least once every two years for high-risk customers, once every eight years for medium-risk customers and once every ten years for low-risk customers."
+    },
+    {
+      "id": "IN-RBI-CKYCR", "type": "regulation", "title": "RBI KYC Direction - Central KYC Records Registry (CKYCR)",
+      "source": "Reserve Bank of India / CERSAI", "jurisdiction": "IN", "effective_date": "2016-07-15", "version": "amended-2025",
+      "applicability": ["banks", "nbfc", "payments"],
+      "tags": ["ckycr", "central kyc", "cersai", "kyc identifier", "upload", "registry"],
+      "text": "Regulated entities must upload KYC records of new individual and legal-entity customers to the Central KYC Records Registry within the prescribed timeline, and use the KYC identifier to retrieve records where the customer provides it."
+    },
+    {
+      "id": "IN-PMLA", "type": "regulation", "title": "Prevention of Money-laundering Act, 2002 and PML (Maintenance of Records) Rules, 2005",
+      "source": "Government of India", "jurisdiction": "IN", "effective_date": "2005-07-01", "version": "amended-2023",
+      "applicability": ["banks", "nbfc", "payments", "insurance"],
+      "tags": ["pmla", "record retention", "five years", "str", "ctr", "fiu-ind", "principal officer", "reporting"],
+      "text": "Reporting entities must verify client identity, maintain records of transactions and identity for five years after the relationship ends or the transaction, and furnish cash-transaction and suspicious-transaction reports to FIU-IND within prescribed timelines through a designated principal officer."
+    },
+    {
+      "id": "IN-DPDP", "type": "regulation", "title": "Digital Personal Data Protection Act, 2023",
+      "source": "Government of India", "jurisdiction": "IN", "effective_date": "2023-08-11", "version": "2023 (rules 2025)",
+      "applicability": ["all"],
+      "tags": ["consent", "notice", "purpose limitation", "data principal rights", "erasure", "breach notification", "data fiduciary", "privacy"],
+      "text": "Personal data may be processed for a lawful purpose with consent following an itemised notice, or for certain legitimate uses including compliance with law. Data fiduciaries must implement reasonable security safeguards, notify the Data Protection Board and affected data principals of breaches, honour access, correction and erasure rights, and erase data when the purpose is served unless retention is required by law."
+    },
+    {
+      "id": "EU-AMLD", "type": "regulation", "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+      "source": "European Union", "jurisdiction": "EU", "effective_date": "2017-06-26", "version": "AMLR-2024",
+      "applicability": ["banks", "fintech", "payments", "insurance"],
+      "tags": ["cdd", "edd", "beneficial ownership", "high-risk third countries", "record retention", "remote onboarding", "eidas"],
+      "text": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third countries and PEPs, and retain CDD records for five years after the end of the relationship."
+    },
+    {
+      "id": "EU-GDPR-5-6", "type": "regulation", "title": "GDPR Articles 5-6 - Principles and lawful basis",
+      "source": "Regulation (EU) 2016/679", "jurisdiction": "EU", "effective_date": "2018-05-25", "version": "2016/679",
+      "applicability": ["all"],
+      "tags": ["data minimisation", "purpose limitation", "storage limitation", "lawful basis", "legal obligation", "privacy"],
+      "text": "Personal data must be processed lawfully, fairly and transparently, collected for specified purposes, adequate and limited to what is necessary, accurate, kept no longer than necessary and secured. KYC processing typically relies on the legal-obligation basis."
+    },
+    {
+      "id": "EU-GDPR-9", "type": "regulation", "title": "GDPR Article 9 - Special categories (biometric data)",
+      "source": "Regulation (EU) 2016/679", "jurisdiction": "EU", "effective_date": "2018-05-25", "version": "2016/679",
+      "applicability": ["all"],
+      "tags": ["biometric", "face match", "liveness", "special category", "explicit consent"],
+      "text": "Biometric data processed to uniquely identify a person is special-category data; processing requires a condition such as explicit consent or a specific legal basis, with appropriate safeguards."
+    },
+    {
+      "id": "EU-GDPR-22", "type": "regulation", "title": "GDPR Article 22 - Automated individual decision-making",
+      "source": "Regulation (EU) 2016/679", "jurisdiction": "EU", "effective_date": "2018-05-25", "version": "2016/679",
+      "applicability": ["all"],
+      "tags": ["automated decision", "human review", "explanation", "contest decision", "rejection", "profiling"],
+      "text": "Individuals have the right not to be subject to decisions based solely on automated processing that significantly affect them, subject to exceptions; where exceptions apply, safeguards include the right to obtain human intervention, express a view and contest the decision."
+    },
+    {
+      "id": "EU-GDPR-25-32-35", "type": "regulation", "title": "GDPR Articles 25, 32, 33 and 35 - Privacy by design, security, breach notification, DPIA",
+      "source": "Regulation (EU) 2016/679", "jurisdiction": "EU", "effective_date": "2018-05-25", "version": "2016/679",
+      "applicability": ["all"],
+      "tags": ["privacy by design", "encryption", "pseudonymisation", "security of processing", "breach notification", "72 hours", "dpia"],
+      "text": "Controllers must implement data protection by design and by default, appropriate technical and organisational security measures such as encryption and pseudonymisation, notify the supervisory authority of personal-data breaches within 72 hours where feasible, and carry out a DPIA for high-risk processing."
+    },
+    {
+      "id": "US-CIP", "type": "regulation", "title": "US Customer Identification Program rule (31 CFR 1020.220)",
+      "source": "FinCEN / US Treasury", "jurisdiction": "US", "effective_date": "2003-10-01", "version": "current",
+      "applicability": ["banks"],
+      "tags": ["cip", "customer identification", "name", "date of birth", "address", "identification number", "verification"],
+      "text": "Banks must implement a written CIP that, at minimum, collects name, date of birth, address and an identification number before opening an account, verifies identity within a reasonable time through documentary or non-documentary methods, keeps records, and checks government lists."
+    },
+    {
+      "id": "US-CDD", "type": "regulation", "title": "US FinCEN Customer Due Diligence Rule (31 CFR 1010.230)",
+      "source": "FinCEN / US Treasury", "jurisdiction": "US", "effective_date": "2018-05-11", "version": "current",
+      "applicability": ["banks", "fintech"],
+      "tags": ["beneficial owner", "25 percent", "control person", "legal entity", "cdd"],
+      "text": "Covered institutions must identify and verify the beneficial owners of legal-entity customers: each individual owning 25 percent or more of equity interests and one individual with significant responsibility to control the entity."
+    },
+    {
+      "id": "US-OFAC-BSA", "type": "regulation", "title": "US OFAC sanctions compliance and BSA suspicious activity reporting",
+      "source": "OFAC / FinCEN", "jurisdiction": "US", "effective_date": "1996-04-01", "version": "current",
+      "applicability": ["banks", "fintech", "payments"],
+      "tags": ["ofac", "sdn list", "sanctions", "sar", "suspicious activity report", "30 days"],
+      "text": "US persons must not deal with sanctioned parties and should screen against OFAC lists; banks must file suspicious activity reports generally within 30 calendar days of initial detection of facts that may constitute a basis for filing."
+    }
+  ]
+}
