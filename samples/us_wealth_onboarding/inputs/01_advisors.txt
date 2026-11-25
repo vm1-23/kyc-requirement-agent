@@ -1,0 +1,6 @@
+Advisor workshop notes
+- Advisors want to start an application on behalf of a client and send it to the client to finish and e-sign.
+- Clients should be able to link their external bank account for funding during onboarding.
+- The application must collect the client's employment status, net worth and investment objectives for suitability.
+- Accounts for existing clients should open instantly without repeating identity checks.
+- New accounts must be created in the portfolio accounting mainframe, which only accepts files twice a day.

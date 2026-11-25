@@ -33,9 +33,26 @@ _UNIT = {"year": "years", "years": "years", "month": "months", "months": "months
          "second": "seconds", "seconds": "seconds", "sec": "seconds", "secs": "seconds", "%": "%"}
 
 
+# Restrictive/protective controls: "not/never/without" phrasing usually *is* the control.
+PROTECTIVE_CONTROLS = ("KYC-C12", "KYC-C13", "KYC-C16", "KYC-C19")
+
+
+def _control_topics() -> dict[str, str]:
+    """Each mandatory KYC control is also a comparison topic, so opposing statements about
+    any regulated obligation (e.g. beneficial ownership) are caught, not just the hand-listed topics."""
+    from ..knowledge.kb import default_kb
+
+    return {f"control {c['id']} ({c['title']})": "(" + "|".join(c["match"]) + ")"
+            for c in default_kb().controls if c["mandatory"]}
+
+
+def all_topics() -> dict[str, str]:
+    return {**TOPICS, **_control_topics()}
+
+
 def topics_of(text: str) -> set[str]:
     low = text.lower()
-    return {t for t, rx in TOPICS.items() if re.search(rx, low)}
+    return {t for t, rx in all_topics().items() if re.search(rx, low)}
 
 
 def quantities(text: str) -> dict[str, set[float]]:
@@ -62,7 +79,7 @@ def compatible(a: list[tuple[float, float]], b: list[tuple[float, float]]) -> bo
 def polarity(text: str, topic: str) -> int:
     """-1 if the topic is negated in the clause where it appears, else +1."""
     low = text.lower()
-    m = re.search(TOPICS[topic], low)
+    m = re.search(all_topics()[topic], low)
     if not m:
         return 1
     window = low[max(0, m.start() - 60): m.end() + 10]
@@ -113,6 +130,8 @@ class ConflictAgent(Agent):
                                     severity=sev,
                                     detail=f"Conflicting {t.replace('_', ' ')} values: {a.id} ({a.source_stakeholder or 'n/a'}) says "
                                            f"{sorted(qa[unit])} {unit}, {b.id} ({b.source_stakeholder or 'n/a'}) says {sorted(qb[unit])} {unit}.")
+            if any(pc in t for pc in PROTECTIVE_CONTROLS):
+                continue  # negated wording expresses these controls ("must not be used for marketing"), not a waiver
             if polarity(a.statement, t) != polarity(b.statement, t):
                 return Conflict(id=("CON-?" if dry else self.ctx.next_id("CON")), requirement_ids=[a.id, b.id], type="contradiction",
                                 severity=Level.HIGH if cross_stakeholder else Level.MEDIUM,

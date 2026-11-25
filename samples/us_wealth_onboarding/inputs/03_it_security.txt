@@ -1,0 +1,4 @@
+- Client sessions must expire after 15 minutes of inactivity.
+- SSNs must be encrypted at rest and displayed masked except for the last four digits.
+- Advisors must authenticate with phishing-resistant MFA.
+- The system should log all access to client records for at least 7 years.

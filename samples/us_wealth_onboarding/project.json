@@ -1,0 +1,19 @@
+{
+  "project": {
+    "name": "Summit Wealth Account Opening (US, held-out case 2)",
+    "domain": "kyc_onboarding",
+    "jurisdictions": ["US"],
+    "description": "Online account opening for individual investors and revocable trusts at a US wealth manager, replacing paper forms.",
+    "channels": ["web", "advisor portal"],
+    "customer_types": ["individuals", "trusts"],
+    "legacy_systems": ["Portfolio accounting mainframe"],
+    "timeline_months": 12,
+    "team_size": 15,
+    "budget_flexibility": "high"
+  },
+  "documents": [
+    {"file": "01_advisors.txt", "title": "Workshop - Financial advisors", "type": "meeting_notes", "stakeholder": "Advisor council", "role": "business_analyst"},
+    {"file": "02_bsa_officer.txt", "title": "Email - BSA/AML officer", "type": "email", "stakeholder": "Dana (BSA Officer)", "role": "compliance"},
+    {"file": "03_it_security.txt", "title": "IT security standards excerpt", "type": "policy", "stakeholder": "IT Security", "role": "security"}
+  ]
+}

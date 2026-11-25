@@ -1,0 +1,5 @@
+Dana: Our CIP requires that we collect name, date of birth, address and SSN or TIN before opening any account.
+Identity must be verified through a documentary or non-documentary method within 5 business days of account opening.
+For trusts, we must identify the trustees and verify the identity of each trustee.
+All new clients must be checked against the OFAC SDN list before the account is opened.
+SAR decisions must be documented and SARs filed within 30 days of detection.

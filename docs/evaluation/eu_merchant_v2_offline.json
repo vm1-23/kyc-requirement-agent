@@ -1,0 +1,122 @@
+{
+  "case": "PayFlow EU Merchant Onboarding (held-out case)",
+  "llm": "offline-rules",
+  "kb_version": "2026.11.0",
+  "extraction": {
+    "precision": 1.0,
+    "recall": 0.952,
+    "f1": 0.976,
+    "tp": 20,
+    "fp": 0,
+    "fn": 1,
+    "unmatched_system": [],
+    "missed_gold": [
+      "H06"
+    ]
+  },
+  "classification": {
+    "primary_accuracy": 0.85,
+    "evaluated": 20
+  },
+  "ambiguity_detection": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0
+  },
+  "conflict_detection": {
+    "precision": 0.5,
+    "recall": 1.0,
+    "f1": 0.667,
+    "tp": 1,
+    "fp": 1,
+    "fn": 0,
+    "regulatory_conflict_recall": 1.0
+  },
+  "regulatory_control_mapping": {
+    "precision": 0.8,
+    "recall": 1.0,
+    "f1": 0.889,
+    "tp": 16,
+    "fp": 4,
+    "fn": 0
+  },
+  "control_gap_detection": {
+    "precision": 1.0,
+    "recall": 0.75,
+    "f1": 0.857,
+    "tp": 3,
+    "fp": 0,
+    "fn": 1,
+    "system_gaps": [
+      "KYC-C16",
+      "KYC-C19",
+      "KYC-C20"
+    ],
+    "expected_gaps": [
+      "KYC-C03",
+      "KYC-C16",
+      "KYC-C19",
+      "KYC-C20"
+    ]
+  },
+  "regulatory_control_coverage": {
+    "stakeholder_only": 0.789,
+    "after_derivation": 1.0
+  },
+  "citation_validity": 1.0,
+  "hallucination_rate": 0.0,
+  "hallucinations_blocked": 0,
+  "sdlc": {
+    "expert_choice": "Hybrid Agile-DevSecOps",
+    "system_top1": "Hybrid Agile-V-Model",
+    "top1_match": false,
+    "top2_contains_expert": true,
+    "top1_acceptable": true,
+    "ranking": [
+      [
+        "Hybrid Agile-V-Model",
+        94.6
+      ],
+      [
+        "Hybrid Agile-DevSecOps",
+        94.6
+      ],
+      [
+        "V-Model",
+        75.0
+      ],
+      [
+        "Spiral",
+        72.5
+      ],
+      [
+        "DevSecOps",
+        72.2
+      ],
+      [
+        "Agile (Scrum)",
+        53.3
+      ],
+      [
+        "Waterfall",
+        46.8
+      ]
+    ]
+  },
+  "traceability_coverage": 1.0,
+  "acceptance_criteria_coverage": 1.0,
+  "security_gate": {
+    "pii_masked": 0,
+    "injection_quarantined": 0
+  },
+  "processing_time_s": 0.051,
+  "estimated_manual_minutes": 390,
+  "estimated_time_saved_pct": 100.0,
+  "human_review_load": {
+    "open_questions": 13,
+    "pending_approvals": 30
+  }
+}

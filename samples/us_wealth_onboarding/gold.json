@@ -1,0 +1,24 @@
+{
+  "_note": "Held-out case 2: written after the v2 rule changes and evaluated once without further tuning. Gold authored by the project team.",
+  "requirements": [
+    {"id": "U01", "match": ["on behalf of"], "primary": ["functional"]},
+    {"id": "U02", "match": ["external bank account"], "primary": ["functional", "integration"]},
+    {"id": "U03", "match": ["net worth"], "primary": ["functional", "regulatory", "data_management"]},
+    {"id": "U04", "match": ["instantly"], "primary": ["functional", "performance", "business"], "ambiguous": true, "controls": ["KYC-C02"]},
+    {"id": "U05", "match": ["twice a day"], "primary": ["integration"]},
+    {"id": "U06", "match": ["date of birth", "ssn"], "primary": ["functional", "regulatory"], "controls": ["KYC-C01"]},
+    {"id": "U07", "match": ["5 business days"], "primary": ["functional", "regulatory"], "controls": ["KYC-C02"]},
+    {"id": "U08", "match": ["trustee"], "primary": ["functional", "regulatory"], "controls": ["KYC-C04"]},
+    {"id": "U09", "match": ["ofac"], "primary": ["functional", "regulatory"], "controls": ["KYC-C05"]},
+    {"id": "U10", "match": ["30 days"], "primary": ["regulatory", "functional", "audit_reporting"], "controls": ["KYC-C11"]},
+    {"id": "U11", "match": ["15 minutes"], "primary": ["security"]},
+    {"id": "U12", "match": ["encrypted"], "primary": ["security", "privacy"], "controls": ["KYC-C16", "KYC-C13"]},
+    {"id": "U13", "match": ["phishing-resistant"], "primary": ["security"], "controls": ["KYC-C15"]},
+    {"id": "U14", "match": ["7 years"], "primary": ["audit_reporting", "data_management", "security"], "controls": ["KYC-C14", "KYC-C10"]}
+  ],
+  "conflicts": [["U04", "U07"]],
+  "regulatory_conflicts": [],
+  "expected_control_gaps": ["KYC-C03", "KYC-C06", "KYC-C07", "KYC-C08", "KYC-C09", "KYC-C12", "KYC-C17", "KYC-C19", "KYC-C20"],
+  "sdlc": {"expert_choice": "Hybrid Agile-V-Model", "acceptable": ["Hybrid Agile-V-Model", "Hybrid Agile-DevSecOps", "V-Model"]},
+  "manual_baseline": {"minutes_per_source_document": 45, "minutes_per_requirement_compliance_mapping": 4, "minutes_per_requirement_documentation": 3}
+}

@@ -1,0 +1,133 @@
+{
+  "case": "Summit Wealth Account Opening (US, held-out case 2)",
+  "llm": "offline-rules",
+  "kb_version": "2026.11.0",
+  "extraction": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 14,
+    "fp": 0,
+    "fn": 0,
+    "unmatched_system": [],
+    "missed_gold": []
+  },
+  "classification": {
+    "primary_accuracy": 0.786,
+    "evaluated": 14
+  },
+  "ambiguity_detection": {
+    "precision": 0.5,
+    "recall": 1.0,
+    "f1": 0.667,
+    "tp": 1,
+    "fp": 1,
+    "fn": 0
+  },
+  "conflict_detection": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 1,
+    "regulatory_conflict_recall": 0.0
+  },
+  "regulatory_control_mapping": {
+    "precision": 0.778,
+    "recall": 0.636,
+    "f1": 0.7,
+    "tp": 7,
+    "fp": 2,
+    "fn": 4
+  },
+  "control_gap_detection": {
+    "precision": 0.818,
+    "recall": 1.0,
+    "f1": 0.9,
+    "tp": 9,
+    "fp": 2,
+    "fn": 0,
+    "system_gaps": [
+      "KYC-C03",
+      "KYC-C04",
+      "KYC-C06",
+      "KYC-C07",
+      "KYC-C08",
+      "KYC-C09",
+      "KYC-C10",
+      "KYC-C12",
+      "KYC-C17",
+      "KYC-C19",
+      "KYC-C20"
+    ],
+    "expected_gaps": [
+      "KYC-C03",
+      "KYC-C06",
+      "KYC-C07",
+      "KYC-C08",
+      "KYC-C09",
+      "KYC-C12",
+      "KYC-C17",
+      "KYC-C19",
+      "KYC-C20"
+    ]
+  },
+  "regulatory_control_coverage": {
+    "stakeholder_only": 0.421,
+    "after_derivation": 1.0
+  },
+  "citation_validity": 1.0,
+  "hallucination_rate": 0.0,
+  "hallucinations_blocked": 0,
+  "sdlc": {
+    "expert_choice": "Hybrid Agile-V-Model",
+    "system_top1": "Spiral",
+    "top1_match": false,
+    "top2_contains_expert": false,
+    "top1_acceptable": false,
+    "ranking": [
+      [
+        "Spiral",
+        85.0
+      ],
+      [
+        "Hybrid Agile-DevSecOps",
+        83.3
+      ],
+      [
+        "V-Model",
+        82.1
+      ],
+      [
+        "Hybrid Agile-V-Model",
+        81.2
+      ],
+      [
+        "DevSecOps",
+        63.9
+      ],
+      [
+        "Waterfall",
+        57.5
+      ],
+      [
+        "Agile (Scrum)",
+        34.6
+      ]
+    ]
+  },
+  "traceability_coverage": 0.939,
+  "acceptance_criteria_coverage": 1.0,
+  "security_gate": {
+    "pii_masked": 0,
+    "injection_quarantined": 0
+  },
+  "processing_time_s": 0.039,
+  "estimated_manual_minutes": 366,
+  "estimated_time_saved_pct": 100.0,
+  "human_review_load": {
+    "open_questions": 13,
+    "pending_approvals": 23
+  }
+}

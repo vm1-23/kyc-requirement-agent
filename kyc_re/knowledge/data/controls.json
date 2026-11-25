@@ -2,93 +2,592 @@
   "kb_version": "2026.11.0",
   "description": "Mandatory KYC/onboarding control catalogue used for rule-based compliance coverage. 'match' terms are regex fragments; a requirement covers the control if it matches any term.",
   "controls": [
-    {"id": "KYC-C01", "title": "Customer identification data capture", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["functional", "regulatory"], "kb_refs": ["FATF-R10", "US-CIP", "IN-RBI-KYC-MD"], "risk": "high",
-     "match": ["capture (the )?customer", "collect (the )?(customer'?s? )?(full )?name", "date of birth", "residential address", "identity (number|details)", "customer identification", "personal details"],
-     "requirement": "The system shall capture the customer's full legal name, date of birth, residential address, nationality and government identity number before an account is opened."},
-    {"id": "KYC-C02", "title": "Identity document verification against independent sources", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["functional", "regulatory", "security"], "kb_refs": ["FATF-R10", "NIST-800-63A", "IN-RBI-KYC-MD"], "risk": "high",
-     "match": ["verify (the )?(identity|document|id)", "document verification", "ocr", "officially valid document", "ovd", "authentic", "issuing (source|authority)", "e-?kyc", "digilocker"],
-     "requirement": "The system shall verify each identity document's authenticity and data against an independent or issuing source and record the verification method and result."},
-    {"id": "KYC-C03", "title": "Liveness / presentation-attack detection and face match for remote onboarding", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["security", "regulatory", "functional"], "kb_refs": ["IN-RBI-VCIP", "ISO-30107-3", "NIST-800-63A", "FATF-DIGID"], "risk": "high",
-     "match": ["liveness", "selfie", "face match", "video kyc", "v-?cip", "presentation attack", "deepfake", "biometric"],
-     "requirement": "For remote onboarding the system shall perform liveness detection (ISO/IEC 30107-3 tested) and a face match between the live capture and the identity document photo."},
-    {"id": "KYC-C04", "title": "Beneficial ownership identification for legal entities", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["functional", "regulatory"], "kb_refs": ["FATF-R10", "US-CDD", "EU-AMLD", "IN-RBI-KYC-MD"], "risk": "high",
-     "match": ["beneficial own", "ubo", "ownership structure", "controlling person", "control person"],
-     "requirement": "For legal-entity customers the system shall identify and verify all beneficial owners above the jurisdictional ownership threshold and at least one controlling person."},
-    {"id": "KYC-C05", "title": "Sanctions screening at onboarding and on list updates", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["functional", "regulatory", "integration"], "kb_refs": ["FATF-R6", "US-OFAC-BSA"], "risk": "critical",
-     "match": ["sanction", "watch ?list", "ofac", "un list", "screening"],
-     "requirement": "The system shall screen every customer and beneficial owner against applicable sanctions lists before onboarding and re-screen the customer base whenever a list is updated, blocking onboarding on a confirmed match."},
-    {"id": "KYC-C06", "title": "PEP screening with enhanced due diligence", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["functional", "regulatory"], "kb_refs": ["FATF-R12", "POL-ORG-KYC-01"], "risk": "high",
-     "match": ["\\bpeps?\\b", "politically exposed", "adverse media"],
-     "requirement": "The system shall screen customers for politically-exposed-person status and route PEP matches to enhanced due diligence requiring senior compliance approval, including source of wealth and source of funds."},
-    {"id": "KYC-C07", "title": "Customer risk rating (risk-based approach)", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["functional", "regulatory"], "kb_refs": ["FATF-R1", "IN-RBI-KYC-MD", "POL-ORG-KYC-01"], "risk": "high",
-     "match": ["risk (rating|score|scoring|categori[sz]ation|categor(y|ies)|profile)", "low, medium (or|and) high", "risk-based"],
-     "requirement": "The system shall assign every customer a low, medium or high risk rating using the approved, versioned risk-scoring model and record the contributing factors."},
-    {"id": "KYC-C08", "title": "Enhanced due diligence for high-risk customers", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["functional", "regulatory"], "kb_refs": ["FATF-R1", "FATF-R12", "EU-AMLD", "POL-ORG-KYC-01"], "risk": "high",
-     "match": ["enhanced due diligence", "\\bedd\\b", "source of (wealth|funds)", "high[- ]risk customers?"],
-     "requirement": "The system shall route high-risk customers to enhanced due diligence, collecting source of funds and source of wealth evidence and requiring senior compliance approval before activation."},
-    {"id": "KYC-C09", "title": "Ongoing monitoring and periodic re-KYC", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["functional", "regulatory", "operational"], "kb_refs": ["FATF-R10", "IN-RBI-REKYC"], "risk": "medium",
-     "match": ["re-?kyc", "periodic (update|updation|review)", "ongoing (monitoring|due diligence)", "kyc refresh", "kyc expir"],
-     "requirement": "The system shall schedule periodic KYC updates by risk rating (high: 2 years, medium: 8 years, low: 10 years where RBI rules apply) and trigger re-KYC on material changes in customer profile."},
-    {"id": "KYC-C10", "title": "Record retention", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["data_management", "regulatory"], "kb_refs": ["FATF-R11", "IN-PMLA", "EU-AMLD", "POL-ORG-DATA-02"], "risk": "high",
-     "match": ["retain", "retention", "stored? for", "keep (the )?records", "archiv", "delete .* after"],
-     "requirement": "The system shall retain KYC records and verification evidence for at least five years after the business relationship ends (or longer where local law requires) and securely delete them at the end of the retention period."},
-    {"id": "KYC-C11", "title": "Suspicious activity / transaction reporting", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["functional", "regulatory", "audit_reporting"], "kb_refs": ["FATF-R20", "IN-PMLA", "US-OFAC-BSA"], "risk": "high",
-     "match": ["suspicious", "\\bstr\\b", "\\bsar\\b", "fiu", "tipping"],
-     "requirement": "The system shall allow onboarding staff to escalate suspicious applications to the principal/MLRO officer and generate suspicious transaction reports to the FIU within the regulatory deadline, without alerting the customer."},
-    {"id": "KYC-C12", "title": "Consent and privacy notice", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["privacy", "regulatory"], "kb_refs": ["IN-DPDP", "EU-GDPR-5-6", "EU-GDPR-9"], "risk": "high",
-     "match": ["consent", "privacy notice", "notice", "opt[- ]in"],
-     "requirement": "The system shall present an itemised privacy notice and capture explicit, recorded consent (including separate consent for biometric processing) before collecting personal data."},
-    {"id": "KYC-C13", "title": "Data minimisation and purpose limitation", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["privacy", "data_management"], "kb_refs": ["EU-GDPR-5-6", "IN-DPDP", "POL-ORG-DATA-02"], "risk": "medium",
-     "match": ["minimi[sz]", "only (collect|the data)", "purpose limitation", "necessary data", "mask"],
-     "requirement": "The system shall collect only data fields mandated for KYC, mask national identifiers in all UIs by default, and prevent re-use of KYC data for unrelated purposes such as marketing without separate consent."},
-    {"id": "KYC-C14", "title": "Audit trail of KYC decisions", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["audit_reporting", "security"], "kb_refs": ["FATF-R11", "IN-RBI-VCIP", "ISO-27001-A"], "risk": "high",
-     "match": ["audit (trail|log)", "tamper", "immutable log", "log (every|all)", "record (who|each decision)"],
-     "requirement": "The system shall record an immutable, time-stamped audit trail of every KYC decision, data access, override and screening result, including actor, reason and evidence references."},
-    {"id": "KYC-C15", "title": "Strong authentication and least-privilege access", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["security"], "kb_refs": ["NIST-800-63B", "POL-ORG-SEC-03", "ISO-27001-A"], "risk": "high",
-     "match": ["\\bmfa\\b", "multi-factor", "two-factor", "otp", "role-based", "\\brbac\\b", "least privilege", "step-up"],
-     "requirement": "The system shall enforce multi-factor authentication for customers and staff, role-based least-privilege access to KYC data, and quarterly access recertification for staff."},
-    {"id": "KYC-C16", "title": "Encryption of PII at rest and in transit", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["security", "privacy"], "kb_refs": ["POL-ORG-DATA-02", "EU-GDPR-25-32-35", "OWASP-ASVS"], "risk": "high",
-     "match": ["encrypt", "tls", "aes", "hsm", "tokeni[sz]"],
-     "requirement": "The system shall encrypt identity documents, biometric data and national identifiers at rest (AES-256, HSM-managed keys) and in transit (TLS 1.2 or higher)."},
-    {"id": "KYC-C17", "title": "Human review of automated adverse decisions", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["functional", "regulatory", "usability"], "kb_refs": ["EU-GDPR-22", "POL-ORG-AI-04"], "risk": "medium",
-     "match": ["manual review", "human review", "appeal", "contest", "explain (the )?(rejection|decision)", "reason for rejection"],
-     "requirement": "The system shall not reject an applicant solely by automated decision; rejections shall be reviewable by a trained officer, and the customer shall receive a reason code and a way to contest."},
-    {"id": "KYC-C18", "title": "Central KYC Registry upload (India)", "mandatory": true, "jurisdictions": ["IN"],
-     "categories": ["integration", "regulatory"], "kb_refs": ["IN-RBI-CKYCR"], "risk": "medium",
-     "match": ["ckyc", "central kyc", "cersai"],
-     "requirement": "The system shall upload KYC records of new customers to CKYCR within the prescribed timeline and retrieve records using the customer's KYC identifier where provided."},
-    {"id": "KYC-C19", "title": "Personal-data breach notification", "mandatory": true, "jurisdictions": ["GLOBAL"],
-     "categories": ["privacy", "operational", "security"], "kb_refs": ["IN-DPDP", "EU-GDPR-25-32-35"], "risk": "medium",
-     "match": ["breach", "incident (response|notification)"],
-     "requirement": "The system shall support detection and notification of personal-data breaches to the regulator and affected customers within statutory deadlines (for example 72 hours under GDPR)."},
-    {"id": "KYC-C20", "title": "Maker-checker for manual KYC overrides", "mandatory": true, "jurisdictions": ["ORG"],
-     "categories": ["functional", "security", "audit_reporting"], "kb_refs": ["POL-ORG-KYC-01", "ISO-27001-A"], "risk": "high",
-     "match": ["maker[- ]checker", "four[- ]eyes", "dual (control|approval)", "override"],
-     "requirement": "The system shall require maker-checker (four-eyes) approval with a recorded reason for any manual override of an automated KYC outcome."},
-    {"id": "KYC-C21", "title": "New-product ML/TF risk assessment for digital onboarding", "mandatory": false, "jurisdictions": ["GLOBAL"],
-     "categories": ["regulatory", "business"], "kb_refs": ["FATF-R15"], "risk": "medium",
-     "match": ["risk assessment (of|for) (the )?(new )?(product|channel)", "ml/tf risk assessment", "product risk"],
-     "requirement": "An ML/TF risk assessment of the digital onboarding channel shall be completed and approved by compliance before launch."},
-    {"id": "KYC-C22", "title": "AI/model governance for automated KYC decisions", "mandatory": false, "jurisdictions": ["ORG"],
-     "categories": ["regulatory", "operational"], "kb_refs": ["POL-ORG-AI-04"], "risk": "medium",
-     "match": ["bias", "fairness", "model (validation|monitoring|drift)", "explainab"],
-     "requirement": "Risk-scoring and face-match models shall be validated before use and monitored for drift and demographic bias, with results reviewed by model-risk management each quarter."}
+    {
+      "id": "KYC-C01",
+      "title": "Customer identification data capture",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "functional",
+        "regulatory"
+      ],
+      "kb_refs": [
+        "FATF-R10",
+        "US-CIP",
+        "IN-RBI-KYC-MD"
+      ],
+      "risk": "high",
+      "match": [
+        "capture (the )?customer",
+        "collect (the )?(customer'?s? )?(full )?name",
+        "date of birth",
+        "residential address",
+        "identity (number|details)",
+        "customer identification",
+        "personal details",
+        "pre-?fill",
+        "(company|business) details",
+        "registration number",
+        "identity details"
+      ],
+      "requirement": "The system shall capture the customer's full legal name, date of birth, residential address, nationality and government identity number before an account is opened."
+    },
+    {
+      "id": "KYC-C02",
+      "title": "Identity document verification against independent sources",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "functional",
+        "regulatory",
+        "security"
+      ],
+      "kb_refs": [
+        "FATF-R10",
+        "NIST-800-63A",
+        "IN-RBI-KYC-MD"
+      ],
+      "risk": "high",
+      "match": [
+        "verify (the )?(identity|document|id)",
+        "document verification",
+        "ocr",
+        "officially valid document",
+        "ovd",
+        "authentic",
+        "issuing (source|authority)",
+        "e-?kyc",
+        "digilocker",
+        "(company|business) regist(er|ry)"
+      ],
+      "requirement": "The system shall verify each identity document's authenticity and data against an independent or issuing source and record the verification method and result."
+    },
+    {
+      "id": "KYC-C03",
+      "title": "Liveness / presentation-attack detection and face match for remote onboarding",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "security",
+        "regulatory",
+        "functional"
+      ],
+      "kb_refs": [
+        "IN-RBI-VCIP",
+        "ISO-30107-3",
+        "NIST-800-63A",
+        "FATF-DIGID"
+      ],
+      "risk": "high",
+      "match": [
+        "liveness",
+        "selfie",
+        "face match",
+        "video kyc",
+        "v-?cip",
+        "presentation attack",
+        "deepfake",
+        "biometric"
+      ],
+      "requirement": "For remote onboarding the system shall perform liveness detection (ISO/IEC 30107-3 tested) and a face match between the live capture and the identity document photo."
+    },
+    {
+      "id": "KYC-C04",
+      "title": "Beneficial ownership identification for legal entities",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "functional",
+        "regulatory"
+      ],
+      "kb_refs": [
+        "FATF-R10",
+        "US-CDD",
+        "EU-AMLD",
+        "IN-RBI-KYC-MD"
+      ],
+      "risk": "high",
+      "match": [
+        "beneficial own",
+        "ubo",
+        "ownership structure",
+        "controlling person",
+        "control person"
+      ],
+      "requirement": "For legal-entity customers the system shall identify and verify all beneficial owners above the jurisdictional ownership threshold and at least one controlling person."
+    },
+    {
+      "id": "KYC-C05",
+      "title": "Sanctions screening at onboarding and on list updates",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "functional",
+        "regulatory",
+        "integration"
+      ],
+      "kb_refs": [
+        "FATF-R6",
+        "US-OFAC-BSA"
+      ],
+      "risk": "critical",
+      "match": [
+        "sanction",
+        "watch ?list",
+        "ofac",
+        "un list",
+        "screening"
+      ],
+      "requirement": "The system shall screen every customer and beneficial owner against applicable sanctions lists before onboarding and re-screen the customer base whenever a list is updated, blocking onboarding on a confirmed match."
+    },
+    {
+      "id": "KYC-C06",
+      "title": "PEP screening with enhanced due diligence",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "functional",
+        "regulatory"
+      ],
+      "kb_refs": [
+        "FATF-R12",
+        "POL-ORG-KYC-01"
+      ],
+      "risk": "high",
+      "match": [
+        "\\bpeps?\\b",
+        "politically exposed",
+        "adverse media"
+      ],
+      "requirement": "The system shall screen customers for politically-exposed-person status and route PEP matches to enhanced due diligence requiring senior compliance approval, including source of wealth and source of funds."
+    },
+    {
+      "id": "KYC-C07",
+      "title": "Customer risk rating (risk-based approach)",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "functional",
+        "regulatory"
+      ],
+      "kb_refs": [
+        "FATF-R1",
+        "IN-RBI-KYC-MD",
+        "POL-ORG-KYC-01"
+      ],
+      "risk": "high",
+      "match": [
+        "risk (rating|score|scoring|categori[sz]ation|categor(y|ies)|profile)",
+        "low, medium (or|and) high",
+        "risk-based"
+      ],
+      "requirement": "The system shall assign every customer a low, medium or high risk rating using the approved, versioned risk-scoring model and record the contributing factors."
+    },
+    {
+      "id": "KYC-C08",
+      "title": "Enhanced due diligence for high-risk customers",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "functional",
+        "regulatory"
+      ],
+      "kb_refs": [
+        "FATF-R1",
+        "FATF-R12",
+        "EU-AMLD",
+        "POL-ORG-KYC-01"
+      ],
+      "risk": "high",
+      "match": [
+        "enhanced due diligence",
+        "\\bedd\\b",
+        "source of (wealth|funds)",
+        "high[- ]risk customers?"
+      ],
+      "requirement": "The system shall route high-risk customers to enhanced due diligence, collecting source of funds and source of wealth evidence and requiring senior compliance approval before activation."
+    },
+    {
+      "id": "KYC-C09",
+      "title": "Ongoing monitoring and periodic re-KYC",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "functional",
+        "regulatory",
+        "operational"
+      ],
+      "kb_refs": [
+        "FATF-R10",
+        "IN-RBI-REKYC"
+      ],
+      "risk": "medium",
+      "match": [
+        "re-?kyc",
+        "periodic (update|updation|review)",
+        "ongoing (monitoring|due diligence)",
+        "kyc refresh",
+        "kyc expir",
+        "reviewed (at least )?(annually|yearly|every)",
+        "annual(ly)? review",
+        "periodic(ally)? review"
+      ],
+      "requirement": "The system shall schedule periodic KYC updates by risk rating (high: 2 years, medium: 8 years, low: 10 years where RBI rules apply) and trigger re-KYC on material changes in customer profile."
+    },
+    {
+      "id": "KYC-C10",
+      "title": "Record retention",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "data_management",
+        "regulatory"
+      ],
+      "kb_refs": [
+        "FATF-R11",
+        "IN-PMLA",
+        "EU-AMLD",
+        "POL-ORG-DATA-02"
+      ],
+      "risk": "high",
+      "match": [
+        "retain",
+        "retention",
+        "stored? for",
+        "keep (the )?records",
+        "archiv",
+        "delete .* after",
+        "kept for",
+        "keep .{0,30}for \\d",
+        "retained"
+      ],
+      "requirement": "The system shall retain KYC records and verification evidence for at least five years after the business relationship ends (or longer where local law requires) and securely delete them at the end of the retention period."
+    },
+    {
+      "id": "KYC-C11",
+      "title": "Suspicious activity / transaction reporting",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "functional",
+        "regulatory",
+        "audit_reporting"
+      ],
+      "kb_refs": [
+        "FATF-R20",
+        "IN-PMLA",
+        "US-OFAC-BSA"
+      ],
+      "risk": "high",
+      "match": [
+        "suspicious",
+        "\\bstr\\b",
+        "\\bsar\\b",
+        "fiu",
+        "tipping"
+      ],
+      "requirement": "The system shall allow onboarding staff to escalate suspicious applications to the principal/MLRO officer and generate suspicious transaction reports to the FIU within the regulatory deadline, without alerting the customer."
+    },
+    {
+      "id": "KYC-C12",
+      "title": "Consent and privacy notice",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "privacy",
+        "regulatory"
+      ],
+      "kb_refs": [
+        "IN-DPDP",
+        "EU-GDPR-5-6",
+        "EU-GDPR-9"
+      ],
+      "risk": "high",
+      "match": [
+        "consent",
+        "privacy notice",
+        "notice",
+        "opt[- ]in"
+      ],
+      "requirement": "The system shall present an itemised privacy notice and capture explicit, recorded consent (including separate consent for biometric processing) before collecting personal data."
+    },
+    {
+      "id": "KYC-C13",
+      "title": "Data minimisation and purpose limitation",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "privacy",
+        "data_management"
+      ],
+      "kb_refs": [
+        "EU-GDPR-5-6",
+        "IN-DPDP",
+        "POL-ORG-DATA-02"
+      ],
+      "risk": "medium",
+      "match": [
+        "minimi[sz]",
+        "only (collect|the data)",
+        "purpose limitation",
+        "necessary data",
+        "mask",
+        "deleted .{0,40}after",
+        "only the .{0,30}(result|outcome) is kept",
+        "marketing"
+      ],
+      "requirement": "The system shall collect only data fields mandated for KYC, mask national identifiers in all UIs by default, and prevent re-use of KYC data for unrelated purposes such as marketing without separate consent."
+    },
+    {
+      "id": "KYC-C14",
+      "title": "Audit trail of KYC decisions",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "audit_reporting",
+        "security"
+      ],
+      "kb_refs": [
+        "FATF-R11",
+        "IN-RBI-VCIP",
+        "ISO-27001-A"
+      ],
+      "risk": "high",
+      "match": [
+        "audit (trail|log)",
+        "tamper",
+        "immutable log",
+        "log (every|all)",
+        "record (who|each decision)"
+      ],
+      "requirement": "The system shall record an immutable, time-stamped audit trail of every KYC decision, data access, override and screening result, including actor, reason and evidence references."
+    },
+    {
+      "id": "KYC-C15",
+      "title": "Strong authentication and least-privilege access",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "security"
+      ],
+      "kb_refs": [
+        "NIST-800-63B",
+        "POL-ORG-SEC-03",
+        "ISO-27001-A"
+      ],
+      "risk": "high",
+      "match": [
+        "\\bmfa\\b",
+        "multi-factor",
+        "two-factor",
+        "otp",
+        "role-based",
+        "\\brbac\\b",
+        "least privilege",
+        "step-up"
+      ],
+      "requirement": "The system shall enforce multi-factor authentication for customers and staff, role-based least-privilege access to KYC data, and quarterly access recertification for staff."
+    },
+    {
+      "id": "KYC-C16",
+      "title": "Encryption of PII at rest and in transit",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "security",
+        "privacy"
+      ],
+      "kb_refs": [
+        "POL-ORG-DATA-02",
+        "EU-GDPR-25-32-35",
+        "OWASP-ASVS"
+      ],
+      "risk": "high",
+      "match": [
+        "encrypt",
+        "tls",
+        "aes",
+        "hsm",
+        "tokeni[sz]"
+      ],
+      "requirement": "The system shall encrypt identity documents, biometric data and national identifiers at rest (AES-256, HSM-managed keys) and in transit (TLS 1.2 or higher)."
+    },
+    {
+      "id": "KYC-C17",
+      "title": "Human review of automated adverse decisions",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "functional",
+        "regulatory",
+        "usability"
+      ],
+      "kb_refs": [
+        "EU-GDPR-22",
+        "POL-ORG-AI-04"
+      ],
+      "risk": "medium",
+      "match": [
+        "manual review",
+        "human review",
+        "appeal",
+        "contest",
+        "explain (the )?(rejection|decision)",
+        "reason for rejection",
+        "reviewable by a human",
+        "human (on request|intervention)",
+        "talk to a human"
+      ],
+      "requirement": "The system shall not reject an applicant solely by automated decision; rejections shall be reviewable by a trained officer, and the customer shall receive a reason code and a way to contest."
+    },
+    {
+      "id": "KYC-C18",
+      "title": "Central KYC Registry upload (India)",
+      "mandatory": true,
+      "jurisdictions": [
+        "IN"
+      ],
+      "categories": [
+        "integration",
+        "regulatory"
+      ],
+      "kb_refs": [
+        "IN-RBI-CKYCR"
+      ],
+      "risk": "medium",
+      "match": [
+        "ckyc",
+        "central kyc",
+        "cersai"
+      ],
+      "requirement": "The system shall upload KYC records of new customers to CKYCR within the prescribed timeline and retrieve records using the customer's KYC identifier where provided."
+    },
+    {
+      "id": "KYC-C19",
+      "title": "Personal-data breach notification",
+      "mandatory": true,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "privacy",
+        "operational",
+        "security"
+      ],
+      "kb_refs": [
+        "IN-DPDP",
+        "EU-GDPR-25-32-35"
+      ],
+      "risk": "medium",
+      "match": [
+        "breach",
+        "incident (response|notification)"
+      ],
+      "requirement": "The system shall support detection and notification of personal-data breaches to the regulator and affected customers within statutory deadlines (for example 72 hours under GDPR)."
+    },
+    {
+      "id": "KYC-C20",
+      "title": "Maker-checker for manual KYC overrides",
+      "mandatory": true,
+      "jurisdictions": [
+        "ORG"
+      ],
+      "categories": [
+        "functional",
+        "security",
+        "audit_reporting"
+      ],
+      "kb_refs": [
+        "POL-ORG-KYC-01",
+        "ISO-27001-A"
+      ],
+      "risk": "high",
+      "match": [
+        "maker[- ]checker",
+        "four[- ]eyes",
+        "dual (control|approval)",
+        "override"
+      ],
+      "requirement": "The system shall require maker-checker (four-eyes) approval with a recorded reason for any manual override of an automated KYC outcome."
+    },
+    {
+      "id": "KYC-C21",
+      "title": "New-product ML/TF risk assessment for digital onboarding",
+      "mandatory": false,
+      "jurisdictions": [
+        "GLOBAL"
+      ],
+      "categories": [
+        "regulatory",
+        "business"
+      ],
+      "kb_refs": [
+        "FATF-R15"
+      ],
+      "risk": "medium",
+      "match": [
+        "risk assessment (of|for) (the )?(new )?(product|channel)",
+        "ml/tf risk assessment",
+        "product risk"
+      ],
+      "requirement": "An ML/TF risk assessment of the digital onboarding channel shall be completed and approved by compliance before launch."
+    },
+    {
+      "id": "KYC-C22",
+      "title": "AI/model governance for automated KYC decisions",
+      "mandatory": false,
+      "jurisdictions": [
+        "ORG"
+      ],
+      "categories": [
+        "regulatory",
+        "operational"
+      ],
+      "kb_refs": [
+        "POL-ORG-AI-04"
+      ],
+      "risk": "medium",
+      "match": [
+        "bias",
+        "fairness",
+        "model (validation|monitoring|drift)",
+        "explainab"
+      ],
+      "requirement": "Risk-scoring and face-match models shall be validated before use and monitored for drift and demographic bias, with results reviewed by model-risk management each quarter."
+    }
   ]
 }
