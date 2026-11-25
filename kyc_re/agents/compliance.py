@@ -15,20 +15,21 @@ from .base import Agent
 from .conflict import NEGATION
 
 RETRIEVAL_MIN = 6.0
+LLM_BATCH = 8  # requirements per LLM call (keeps prompts inside a local 4k context window)
 
-_OBLIGATION_SCHEMA = {
+_BATCH_SCHEMA = {
     "type": "object",
     "properties": {
-        "mappings": {"type": "array", "items": {
+        "items": {"type": "array", "items": {
             "type": "object",
             "properties": {
-                "kb_id": {"type": "string"},
-                "obligation": {"type": "string", "description": "What the cited source requires of this requirement, in one sentence"},
-                "supports": {"type": "boolean", "description": "Does the evidence actually apply to the requirement?"},
+                "requirement_id": {"type": "string"},
+                "applicable": {"type": "array", "items": {"type": "string"},
+                               "description": "Candidate kb ids that actually apply to this requirement"},
             },
-            "required": ["kb_id", "obligation", "supports"], "additionalProperties": False}},
+            "required": ["requirement_id", "applicable"], "additionalProperties": False}},
     },
-    "required": ["mappings"],
+    "required": ["items"],
     "additionalProperties": False,
 }
 
@@ -48,31 +49,51 @@ class ComplianceAgent(Agent):
         juris = st.project.jurisdictions
         controls = kb.controls_for(juris)
         st.compliance = []
-        for r in list(st.requirements):
+
+        # Pass 1: deterministic retrieval + control matching.
+        plan: list[tuple[Requirement, list[dict[str, Any]], dict[str, Citation], set[str]]] = []
+        for r in st.requirements:
             if r.origin == "derived_control":
                 continue
-            retrieved = kb.search(r.statement, juris, k=4, min_score=RETRIEVAL_MIN)
-            cites = {i.id: i.citation(s) for i, s in retrieved}
+            retrieved = {i.id: i.citation(s) for i, s in kb.search(r.statement, juris, k=4, min_score=RETRIEVAL_MIN)}
             matched = [c for c in controls if _matches(c, r.statement)]
+            control_refs: dict[str, Citation] = {}
             for c in matched:
                 for ref in c["kb_refs"]:
                     item = kb.get(ref)
-                    if item and kb.applicable(item, juris) and ref not in cites:
-                        cites[ref] = item.citation(0.0)
-            obligations = self._llm_obligations(r, cites) if (self.ctx.llm.available and cites and
-                                                              (matched or Category.REGULATORY in r.categories)) else None
-            if obligations is not None:
-                cites = {k: v for k, v in cites.items() if k in obligations}
+                    if item and kb.applicable(item, juris):
+                        control_refs[ref] = retrieved.get(ref) or item.citation(0.0)
+            plan.append((r, matched, {**retrieved, **control_refs}, set(control_refs)))
+
+        # Pass 2: one batched LLM call per LLM_BATCH requirements (not one per requirement).
+        obligations: dict[str, dict[str, str]] = {}
+        if self.ctx.llm.available:
+            todo = [(r, cites) for r, matched, cites, _ in plan if cites and (matched or Category.REGULATORY in r.categories)]
+            for i in range(0, len(todo), LLM_BATCH):
+                obligations.update(self._llm_obligations(todo[i:i + LLM_BATCH]))
+
+        # Pass 3: build mappings. Control-catalogue citations are rule-derived and always kept;
+        # the LLM may only prune extra retrieval hits and supply obligation wording.
+        for r, matched, cites, control_ids in plan:
+            ob = obligations.get(r.id)
+            if ob is not None:
+                rejected = [k for k in control_ids if k not in ob]
+                cites = {k: v for k, v in cites.items() if k in ob or k in control_ids}
+                if rejected:
+                    self.log("llm_disagrees_with_control_mapping", r.id, kb_ids=rejected)
             r.regulations = list(cites.values())
             r.controls = [c["id"] for c in matched]
             self.ctx.bump("citations_total", len(r.regulations))
             for c in matched:
                 refs = [cites[x] for x in c["kb_refs"] if x in cites] or list(cites.values())[:2]
-                ob = next((obligations[x] for x in c["kb_refs"] if obligations and x in obligations), None)
+                wording = next((ob[x] for x in c["kb_refs"] if ob and x in ob), None)
+                disputed = ob is not None and any(x in control_ids and x not in ob for x in c["kb_refs"])
                 conf = 0.85 if any(x.score >= RETRIEVAL_MIN for x in refs) else 0.65
+                if disputed:
+                    conf = min(conf, 0.6)
                 st.compliance.append(ComplianceMapping(
                     requirement_id=r.id, control_id=c["id"], control=c["title"], citations=refs,
-                    obligation=ob or (refs[0].excerpt if refs else c["title"]),
+                    obligation=wording or (refs[0].excerpt if refs else c["title"]),
                     jurisdiction=",".join(sorted({x.jurisdiction for x in refs})) or "GLOBAL",
                     needs_legal_review=c["risk"] == "critical" or conf < 0.7, confidence=conf))
             reg_backed = any(kb.get(ref) and kb.get(ref).type == "regulation" for c in matched for ref in c["kb_refs"])
@@ -80,28 +101,40 @@ class ComplianceAgent(Agent):
                 r.categories.append(Category.REGULATORY)
             self._rule_checks(r, matched)
         self._coverage(controls)
-        self.log("compliance_mapped", "project", mappings=len(st.compliance),
+        self.log("compliance_mapped", "project", mappings=len(st.compliance), llm_batches=-(-len(obligations) // LLM_BATCH) if obligations else 0,
                  gaps=sum(1 for c in st.coverage if c.status == "gap" and c.mandatory))
 
     # ---- LLM grounding -----------------------------------------------------------------
-    def _llm_obligations(self, r: Requirement, cites: dict[str, Citation]) -> dict[str, str] | None:
-        evidence = "\n".join(f"[{k}] {self.ctx.kb.get(k).title}: {self.ctx.kb.get(k).text}" for k in cites)
+    def _llm_obligations(self, batch: list[tuple[Requirement, dict[str, Citation]]]) -> dict[str, dict[str, str]]:
+        """Returns {requirement_id: {kb_id: obligation}} for requirements the model answered.
+        The model only selects applicable ids (few output tokens, so it is fast on local models).
+        Requirements missing from the reply keep the rule-only mapping."""
+        kb = self.ctx.kb
+        evidence_ids = sorted({k for _, cites in batch for k in cites})
+        evidence = "\n".join(f"[{k}] {kb.get(k).title}: {kb.get(k).text[:320]}" for k in evidence_ids)
+        reqs = "\n".join(f"{r.id}: {r.statement}\n  candidate evidence: {', '.join(cites)}" for r, cites in batch)
         data = self.ctx.llm.json(
             "compliance_mapping",
-            "Given a KYC requirement and retrieved regulatory/policy evidence, state for each evidence item whether it "
-            "applies to the requirement and the specific obligation it imposes. Cite only the bracketed kb ids provided. "
-            "Do not make legal determinations; describe obligations neutrally.",
-            f"Requirement {r.id}: {r.statement}\n\nRetrieved evidence:\n{evidence}", _OBLIGATION_SCHEMA)
+            "For each KYC requirement, consider ONLY its listed candidate evidence ids and return the ids that actually "
+            "apply to it. Return one item per requirement. Use only the bracketed kb ids provided; return an empty list "
+            "if none apply. Do not make legal determinations.",
+            f"Evidence library:\n{evidence}\n\nRequirements:\n<untrusted_document id=\"requirements\">\n{reqs}\n</untrusted_document>",
+            _BATCH_SCHEMA)
         if data is None:
-            return None
-        out = {}
-        for m in data["mappings"]:
-            if m["kb_id"] not in cites:
-                self.ctx.bump("hallucinated_citations")
-                self.log("dropped_citation", r.id, kb_id=m["kb_id"])
+            return {}
+        allowed = {r.id: cites for r, cites in batch}
+        out: dict[str, dict[str, str]] = {}
+        for item in data["items"]:
+            rid = item["requirement_id"]
+            if rid not in allowed:
                 continue
-            if m["supports"]:
-                out[m["kb_id"]] = m["obligation"]
+            ob = out.setdefault(rid, {})
+            for kb_id in item["applicable"]:
+                if kb_id not in allowed[rid]:
+                    self.ctx.bump("hallucinated_citations")
+                    self.log("dropped_citation", rid, kb_id=kb_id)
+                    continue
+                ob[kb_id] = allowed[rid][kb_id].excerpt  # obligation wording comes from the approved KB text
         return out
 
     # ---- deterministic regulatory checks --------------------------------------------------

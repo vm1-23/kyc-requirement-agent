@@ -138,6 +138,8 @@ class LocalLLM:
         else:
             self.base_url = (base_url or os.getenv("KYC_RE_LOCAL_URL", "http://localhost:8080/v1")).rstrip("/")
         self.timeout = timeout or float(os.getenv("KYC_RE_LOCAL_TIMEOUT", "600"))
+        # 4k context keeps a 7B Q4 model fully on a 6 GB GPU; raise it for longer documents.
+        self.num_ctx = int(os.getenv("KYC_RE_LOCAL_CTX", "4096"))
         self.name = f"{backend}:{self.model}"
         self.audit = audit
 
@@ -189,7 +191,7 @@ class LocalLLM:
             if self.backend == "ollama":
                 resp = self._post("/api/chat", {
                     "model": self.model, "messages": messages, "stream": False, "format": schema,
-                    "options": {"temperature": 0, "num_predict": num_predict, "num_ctx": 8192},
+                    "options": {"temperature": 0, "num_predict": num_predict, "num_ctx": self.num_ctx},
                 })
                 text = resp.get("message", {}).get("content", "")
                 usage = {"input_tokens": resp.get("prompt_eval_count"), "output_tokens": resp.get("eval_count")}

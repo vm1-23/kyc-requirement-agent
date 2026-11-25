@@ -23,10 +23,9 @@ class FakeLLM:
                  "priority": "could", "business_justification": "invented"},
             ]}
         if purpose == "compliance_mapping":
-            return {"mappings": [
-                {"kb_id": "FATF-R6", "obligation": "Screen against designated-persons lists.", "supports": True},
-                {"kb_id": "FAKE-REG-99", "obligation": "Invented rule.", "supports": True},
-            ]}
+            import re
+            ids = re.findall(r"^([A-Z]+-KYC-\d+):", user, re.M)
+            return {"items": [{"requirement_id": rid, "applicable": ["FATF-R6", "FAKE-REG-99"]} for rid in ids]}
         return None  # other purposes fall back to rules
 
 
@@ -54,3 +53,25 @@ def test_untrusted_content_is_delimited_and_masked():
     co.run()
     purpose, user = next(c for c in llm.calls if c[0] == "extract_requirements")
     assert "<untrusted_document" in user and "ABCDE1234F" not in user and "<PAN_1>" in user
+
+
+def test_compliance_calls_are_batched_and_cannot_drop_control_citations():
+    class RejectAll(FakeLLM):
+        def json(self, purpose, system, user, schema, effort="medium", max_tokens=16000):
+            self.calls.append((purpose, user))
+            if purpose == "compliance_mapping":
+                import re
+                return {"items": [{"requirement_id": rid, "applicable": []} for rid in re.findall(r"^([A-Z]+-KYC-\d+):", user, re.M)]}
+            return None
+
+    from kyc_re.cli import load_case
+    from tests.conftest import SAMPLES
+
+    llm = RejectAll()
+    co = load_case(SAMPLES / "kyc_onboarding", llm=llm)
+    co.run()
+    n_calls = sum(1 for p, _ in llm.calls if p == "compliance_mapping")
+    mapped = sum(1 for r in co.state.requirements if r.controls and r.origin != "derived_control")
+    assert 0 < n_calls <= -(-mapped // 8) + 1  # batched, not one call per requirement
+    sanctions = next(r for r in co.state.requirements if "sanctions lists" in r.statement and r.origin == "extracted")
+    assert "FATF-R6" in {c.kb_id for c in sanctions.regulations}  # rule-derived citation survives LLM rejection
