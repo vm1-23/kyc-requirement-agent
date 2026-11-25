@@ -65,7 +65,7 @@ class ApprovalAgent(Agent):
         item.status = outcome
         self._apply(item, outcome, modification, user)
         self.ctx.audit.record(f"user:{user}", f"approval_{decision}", item_id, role=role.value, gate=item.gate,
-                              subject=item.subject_id, comment=comment, resulting_status=outcome.value)
+                              approval_subject=item.subject_id, comment=comment, resulting_status=outcome.value)
         return item
 
     def _apply(self, item: ApprovalItem, outcome: S, modification: str | None, user: str) -> None:
