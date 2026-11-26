@@ -51,6 +51,7 @@ class ComplianceAgent(Agent):
         st.compliance = []
 
         # Pass 1: deterministic retrieval + control matching.
+        self.ctx.report(f"Retrieving regulations and matching {len(controls)} controls")
         plan: list[tuple[Requirement, list[dict[str, Any]], dict[str, Citation], set[str]]] = []
         for r in st.requirements:
             if r.origin == "derived_control":
@@ -70,6 +71,7 @@ class ComplianceAgent(Agent):
         if self.ctx.llm.available:
             todo = [(r, cites) for r, matched, cites, _ in plan if cites and (matched or Category.REGULATORY in r.categories)]
             for i in range(0, len(todo), LLM_BATCH):
+                self.ctx.report(f"Interpreting obligations for requirements {i + 1}–{min(i + LLM_BATCH, len(todo))} of {len(todo)}")
                 obligations.update(self._llm_obligations(todo[i:i + LLM_BATCH]))
 
         # Pass 3: build mappings. Control-catalogue citations are rule-derived and always kept;

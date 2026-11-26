@@ -25,7 +25,9 @@ class SDLCAgent(Agent):
         ranked = score_models(factors, self.ctx.kb.sdlc_models)
         top = ranked[0]
         explanation = self._template_explanation(factors, ranked)
+        self.ctx.report(f"Scored {len(ranked)} lifecycle models on {len(factors)} factors; top: {top.model}")
         if self.ctx.llm.available:
+            self.ctx.report(f"{top.model} ranks first. Writing the explanation with the language model")
             data = self.ctx.llm.json(
                 "sdlc_explanation",
                 "Write a concise (120-180 words) justification for the top-ranked SDLC model for this KYC project, "

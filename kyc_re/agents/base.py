@@ -22,6 +22,12 @@ class Context:
     masker: PIIMasker = field(default_factory=PIIMasker)
     counters: dict[str, int] = field(default_factory=dict)
     stats: dict[str, Any] = field(default_factory=dict)
+    progress: Any = None  # RunProgress while a pipeline run is in flight
+
+    def report(self, text: str) -> None:
+        """Tell the UI what the current stage is doing right now (e.g. which document)."""
+        if self.progress is not None:
+            self.progress.detail(text)
 
     def next_id(self, prefix: str) -> str:
         self.counters[prefix] = self.counters.get(prefix, 0) + 1

@@ -90,9 +90,10 @@ class ExtractionAgent(Agent):
 
     def run(self) -> None:
         self.need("read:masked_text", "write:requirements")
-        for doc in self.ctx.state.documents:
-            if not doc.masked_text:
-                continue
+        docs = [d for d in self.ctx.state.documents if d.masked_text]
+        for i, doc in enumerate(docs, 1):
+            self.ctx.report(f"Reading {doc.id} “{doc.title}” ({i} of {len(docs)})"
+                            + (" with the language model" if self.ctx.llm.available else ""))
             items = self._llm_extract(doc) if self.ctx.llm.available else None
             if items is None:
                 items = self._rule_extract(doc)

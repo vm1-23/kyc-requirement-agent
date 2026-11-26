@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -92,6 +93,23 @@ def cmd_evaluate(a) -> None:
         Path(a.output).write_text(json.dumps(report, indent=2))
 
 
+DEMO_FILE = "demo_state.json"
+
+
+def cmd_build_demos(a) -> None:
+    """Analyse every sample once and save the result, so the web UI can open demos instantly."""
+    root = Path(a.samples)
+    for case in sorted(d for d in root.iterdir() if (d / "project.json").exists()):
+        co = load_case(case, a.llm or "offline")
+        # evaluation labels such as "(held-out case)" mean nothing to an audience
+        co.state.project.name = re.sub(r"\s*\([^)]*held-out[^)]*\)", "", co.state.project.name).strip()
+        co.run("demo snapshot")
+        (case / DEMO_FILE).write_text(co.state.model_dump_json(indent=1))
+        m = co.state.metrics
+        print(f"{case.name:28s} {m['requirements_total']:3d} requirements · {m['open_questions']:2d} questions · "
+              f"{m['conflicts_total']} conflicts · engine {co.llm.name} -> {case / DEMO_FILE}")
+
+
 def cmd_serve(a) -> None:
     import uvicorn
 
@@ -118,6 +136,8 @@ def main(argv: list[str] | None = None) -> None:
     e = sub.add_parser("evaluate"); e.add_argument("case"); e.add_argument("-o", "--output"); e.set_defaults(fn=cmd_evaluate)
     s = sub.add_parser("serve"); s.add_argument("--host", default="127.0.0.1"); s.add_argument("--port", type=int, default=8000); s.set_defaults(fn=cmd_serve)
     k = sub.add_parser("kb"); k.set_defaults(fn=cmd_kb)
+    b = sub.add_parser("build-demos", help="pre-analyse the samples so the UI opens demos instantly (offline rules unless --llm is given)")
+    b.add_argument("--samples", default=str(Path(__file__).resolve().parents[1] / "samples")); b.set_defaults(fn=cmd_build_demos)
     a = p.parse_args(argv)
     a.fn(a)
 

@@ -1,0 +1,4355 @@
+{
+ "project": {
+  "name": "PayFlow EU Merchant Onboarding",
+  "domain": "kyc_onboarding",
+  "jurisdictions": [
+   "EU"
+  ],
+  "description": "Digital onboarding of small and medium merchants (legal entities) for a payment-acceptance product, including company verification, beneficial ownership, screening and risk rating.",
+  "channels": [
+   "web"
+  ],
+  "customer_types": [
+   "SME legal entities",
+   "sole traders"
+  ],
+  "legacy_systems": [],
+  "timeline_months": 9,
+  "team_size": 8,
+  "budget_flexibility": "medium"
+ },
+ "documents": [
+  {
+   "id": "DOC-001",
+   "title": "Interview - Head of Merchant Sales",
+   "type": "transcript",
+   "stakeholder": "Lena (Sales)",
+   "role": "product_owner",
+   "text": "",
+   "masked_text": "Lena: Merchants complain that onboarding takes two weeks.\nWe need merchants to be live within 24 hours of applying.\nMerchants must be able to upload company documents in PDF or image format.\nThe system should pre-fill company details from the business register using the registration number.\nWe should not ask small merchants for beneficial owner details because it slows them down.\nThe onboarding form should be simple and intuitive.\nWe plan to release new features every sprint because the market moves quickly.",
+   "pii_findings": [],
+   "injection_flags": [],
+   "quarantined": false
+  },
+  {
+   "id": "DOC-002",
+   "title": "Memo - MLRO onboarding requirements",
+   "type": "policy",
+   "stakeholder": "Tomas (MLRO)",
+   "role": "compliance",
+   "text": "",
+   "masked_text": "Memo: Merchant onboarding AML requirements\nThe system must identify and verify all beneficial owners holding 25% or more of the merchant entity.\nEvery merchant, director and beneficial owner must be screened against EU and UN sanctions lists and PEP databases.\nMerchants in high-risk sectors such as gambling or crypto must undergo enhanced due diligence before activation.\nEach merchant must receive a risk score that is reviewed at least annually for high-risk merchants.\nAll onboarding records must be kept for 5 years after the merchant relationship ends.\nThe system shall allow analysts to file suspicious activity reports to the FIU.",
+   "pii_findings": [],
+   "injection_flags": [],
+   "quarantined": false
+  },
+  {
+   "id": "DOC-003",
+   "title": "DPO review notes",
+   "type": "meeting_notes",
+   "stakeholder": "Ines (DPO)",
+   "role": "legal",
+   "text": "",
+   "masked_text": "DPO review\nDirectors' identity document images must be deleted 30 days after verification\nonly the verification result is kept.\nA DPIA must be completed before go-live because biometric face matching is used for directors.\nMerchants must be told how their data is used through a privacy notice at the start of onboarding.\nPersonal data must be stored in EU data centres only.\nAutomated rejections must be reviewable by a human on request.",
+   "pii_findings": [],
+   "injection_flags": [],
+   "quarantined": false
+  },
+  {
+   "id": "DOC-004",
+   "title": "Platform team constraints",
+   "type": "meeting_notes",
+   "stakeholder": "Marco (Platform lead)",
+   "role": "architect",
+   "text": "",
+   "masked_text": "Marco: The onboarding API must respond within 800 ms at the 95th percentile.\nThe service must be available 99.95% of the time.\nAll admin users must authenticate with MFA and access must be role-based.\nEvery change to a merchant's risk score must be written to an audit log.",
+   "pii_findings": [],
+   "injection_flags": [],
+   "quarantined": false
+  }
+ ],
+ "requirements": [
+  {
+   "id": "FR-KYC-001",
+   "statement": "We need merchants to be live within 24 hours of applying.",
+   "categories": [
+    "functional"
+   ],
+   "kind": "functional",
+   "source_stakeholder": "Lena (Sales)",
+   "source_role": "product_owner",
+   "evidence": [
+    {
+     "doc_id": "DOC-001",
+     "excerpt": "We need merchants to be live within 24 hours of applying.",
+     "stakeholder": "Lena (Sales)"
+    }
+   ],
+   "business_justification": "Stated by Lena (Sales) in Interview - Head of Merchant Sales.",
+   "priority": "should",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to We need merchants to be live within 24 hours of applying, then it does so and records the outcome.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [],
+   "controls": [],
+   "risk_level": "low",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-001"
+    }
+   ]
+  },
+  {
+   "id": "FR-KYC-002",
+   "statement": "Merchants must be able to upload company documents in PDF or image format.",
+   "categories": [
+    "functional"
+   ],
+   "kind": "functional",
+   "source_stakeholder": "Lena (Sales)",
+   "source_role": "product_owner",
+   "evidence": [
+    {
+     "doc_id": "DOC-001",
+     "excerpt": "Merchants must be able to upload company documents in PDF or image format.",
+     "stakeholder": "Lena (Sales)"
+    }
+   ],
+   "business_justification": "Stated by Lena (Sales) in Interview - Head of Merchant Sales.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to Merchants must be able to upload company documents in PDF or image format, then it does so and records the outcome.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [],
+   "controls": [],
+   "risk_level": "low",
+   "confidence": 0.52,
+   "quality_issues": [
+    {
+     "type": "missing_security_control",
+     "detail": "Handles uploaded identity media but states no protection (encryption, file validation, malware scan).",
+     "severity": "medium",
+     "suggestion": "Link to the corresponding security requirement or add the control."
+    }
+   ],
+   "status": "needs_clarification",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-002"
+    }
+   ]
+  },
+  {
+   "id": "FR-KYC-003",
+   "statement": "The system shall pre-fill company details from the business register using the registration number.",
+   "categories": [
+    "functional",
+    "regulatory"
+   ],
+   "kind": "functional",
+   "source_stakeholder": "Lena (Sales)",
+   "source_role": "product_owner",
+   "evidence": [
+    {
+     "doc_id": "DOC-001",
+     "excerpt": "The system should pre-fill company details from the business register using the registration number.",
+     "stakeholder": "Lena (Sales)"
+    }
+   ],
+   "business_justification": "Stated by Lena (Sales) in Interview - Head of Merchant Sales.",
+   "priority": "should",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to pre-fill company details from the business register using the registration number, then it does so and records the outcome.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "NIST-800-63A",
+     "title": "NIST SP 800-63A - Identity proofing (IAL2)",
+     "source": "NIST SP 800-63-3/-4",
+     "jurisdiction": "GLOBAL",
+     "version": "rev4-2025",
+     "excerpt": "Identity assurance level 2 requires evidence of real-world existence, validation of identity evidence against authoritative or issuing sources, and verification that the applicant is the genuine owner of the evidence…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C01",
+    "KYC-C02"
+   ],
+   "risk_level": "medium",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-003"
+    }
+   ]
+  },
+  {
+   "id": "REG-KYC-001",
+   "statement": "We should not ask small merchants for beneficial owner details because it slows them down.",
+   "categories": [
+    "regulatory"
+   ],
+   "kind": "functional",
+   "source_stakeholder": "Lena (Sales)",
+   "source_role": "product_owner",
+   "evidence": [
+    {
+     "doc_id": "DOC-001",
+     "excerpt": "We should not ask small merchants for beneficial owner details because it slows them down.",
+     "stakeholder": "Lena (Sales)"
+    }
+   ],
+   "business_justification": "Stated by Lena (Sales) in Interview - Head of Merchant Sales.",
+   "priority": "should",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an internal audit sample, when the control evidence is reviewed, then 100% of sampled cases show the control was applied with traceable evidence."
+   ],
+   "regulations": [
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C04"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.6,
+   "quality_issues": [
+    {
+     "type": "regulatory_violation",
+     "detail": "Requirement appears to waive a mandatory control: Beneficial ownership identification for legal entities.",
+     "severity": "critical",
+     "suggestion": "Compliance/legal must confirm the applicable minimum."
+    }
+   ],
+   "status": "needs_clarification",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-004"
+    }
+   ]
+  },
+  {
+   "id": "USA-KYC-001",
+   "statement": "The onboarding form should be simple and intuitive.",
+   "categories": [
+    "usability"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "Lena (Sales)",
+   "source_role": "product_owner",
+   "evidence": [
+    {
+     "doc_id": "DOC-001",
+     "excerpt": "The onboarding form should be simple and intuitive.",
+     "stakeholder": "Lena (Sales)"
+    }
+   ],
+   "business_justification": "Stated by Lena (Sales) in Interview - Head of Merchant Sales.",
+   "priority": "should",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to The onboarding form should be simple and intuitive, then it does so and records the outcome.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [],
+   "controls": [],
+   "risk_level": "medium",
+   "confidence": 0.52,
+   "quality_issues": [
+    {
+     "type": "ambiguity",
+     "detail": "Vague term(s): simple, intuitive.",
+     "severity": "medium",
+     "suggestion": "Replace with measurable criteria."
+    }
+   ],
+   "status": "needs_clarification",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-005"
+    }
+   ]
+  },
+  {
+   "id": "REG-KYC-002",
+   "statement": "The system shall identify and verify all beneficial owners holding 25% or more of the merchant entity.",
+   "categories": [
+    "regulatory",
+    "functional"
+   ],
+   "kind": "functional",
+   "source_stakeholder": "Tomas (MLRO)",
+   "source_role": "compliance",
+   "evidence": [
+    {
+     "doc_id": "DOC-002",
+     "excerpt": "The system must identify and verify all beneficial owners holding 25% or more of the merchant entity.",
+     "stakeholder": "Tomas (MLRO)"
+    }
+   ],
+   "business_justification": "Stated by Tomas (MLRO) in Memo - MLRO onboarding requirements.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to identify and verify all beneficial owners holding 25% or more of the merchant entity, then it does so and records the outcome.",
+    "Given an internal audit sample, when the control evidence is reviewed, then 100% of sampled cases show the control was applied with traceable evidence.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 11.159
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C04"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-006"
+    }
+   ]
+  },
+  {
+   "id": "DAT-KYC-001",
+   "statement": "Every merchant, director and beneficial owner must be screened against EU and UN sanctions lists and PEP databases.",
+   "categories": [
+    "data_management",
+    "regulatory"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "Tomas (MLRO)",
+   "source_role": "compliance",
+   "evidence": [
+    {
+     "doc_id": "DOC-002",
+     "excerpt": "Every merchant, director and beneficial owner must be screened against EU and UN sanctions lists and PEP databases.",
+     "stakeholder": "Tomas (MLRO)"
+    }
+   ],
+   "business_justification": "Stated by Tomas (MLRO) in Memo - MLRO onboarding requirements.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an internal audit sample, when the control evidence is reviewed, then 100% of sampled cases show the control was applied with traceable evidence."
+   ],
+   "regulations": [
+    {
+     "kb_id": "FATF-R6",
+     "title": "FATF Recommendation 6 - Targeted financial sanctions",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must screen customers against designated-persons lists and freeze without delay funds or assets of designated persons, and must not make funds available to them.",
+     "score": 19.355
+    },
+    {
+     "kb_id": "FATF-R12",
+     "title": "FATF Recommendation 12 - Politically exposed persons",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "For foreign PEPs (and domestic PEPs where higher risk), institutions should have risk-management systems to determine PEP status, obtain senior-management approval to establish the relationship, establish source of…",
+     "score": 13.368
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 9.488
+    },
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "POL-ORG-KYC-01",
+     "title": "Org KYC & Customer Acceptance Policy v3.2",
+     "source": "Internal - Compliance",
+     "jurisdiction": "ORG",
+     "version": "3.2",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C04",
+    "KYC-C05",
+    "KYC-C06"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-007"
+    }
+   ]
+  },
+  {
+   "id": "REG-KYC-003",
+   "statement": "Merchants in high-risk sectors such as gambling or crypto must undergo enhanced due diligence before activation.",
+   "categories": [
+    "regulatory"
+   ],
+   "kind": "functional",
+   "source_stakeholder": "Tomas (MLRO)",
+   "source_role": "compliance",
+   "evidence": [
+    {
+     "doc_id": "DOC-002",
+     "excerpt": "Merchants in high-risk sectors such as gambling or crypto must undergo enhanced due diligence before activation.",
+     "stakeholder": "Tomas (MLRO)"
+    }
+   ],
+   "business_justification": "Stated by Tomas (MLRO) in Memo - MLRO onboarding requirements.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an internal audit sample, when the control evidence is reviewed, then 100% of sampled cases show the control was applied with traceable evidence."
+   ],
+   "regulations": [
+    {
+     "kb_id": "FATF-R12",
+     "title": "FATF Recommendation 12 - Politically exposed persons",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "For foreign PEPs (and domestic PEPs where higher risk), institutions should have risk-management systems to determine PEP status, obtain senior-management approval to establish the relationship, establish source of…",
+     "score": 8.434
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 8.255
+    },
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 6.87
+    },
+    {
+     "kb_id": "FATF-R1",
+     "title": "FATF Recommendation 1 - Risk-based approach",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions should identify, assess and understand money-laundering and terrorist-financing risks and apply measures commensurate with those risks: enhanced measures where risk is higher, simplified measures may be…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "POL-ORG-KYC-01",
+     "title": "Org KYC & Customer Acceptance Policy v3.2",
+     "source": "Internal - Compliance",
+     "jurisdiction": "ORG",
+     "version": "3.2",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C08"
+   ],
+   "risk_level": "medium",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-008"
+    }
+   ]
+  },
+  {
+   "id": "FR-KYC-004",
+   "statement": "Each merchant must receive a risk score that is reviewed at least annually for high-risk merchants.",
+   "categories": [
+    "functional",
+    "regulatory"
+   ],
+   "kind": "functional",
+   "source_stakeholder": "Tomas (MLRO)",
+   "source_role": "compliance",
+   "evidence": [
+    {
+     "doc_id": "DOC-002",
+     "excerpt": "Each merchant must receive a risk score that is reviewed at least annually for high-risk merchants.",
+     "stakeholder": "Tomas (MLRO)"
+    }
+   ],
+   "business_justification": "Stated by Tomas (MLRO) in Memo - MLRO onboarding requirements.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to Each merchant must receive a risk score that is reviewed at least annually for high-risk merchants, then it does so and records the outcome.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [
+    {
+     "kb_id": "POL-ORG-SEC-03",
+     "title": "Org Identity & Access Management Standard v4.1",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "4.1",
+     "excerpt": "All staff access to customer PII requires role-based access, MFA and quarterly access recertification. Privileged access is just-in-time and session-recorded. Customer sessions time out after 15 minutes of inactivity.",
+     "score": 6.614
+    },
+    {
+     "kb_id": "FATF-R1",
+     "title": "FATF Recommendation 1 - Risk-based approach",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions should identify, assess and understand money-laundering and terrorist-financing risks and apply measures commensurate with those risks: enhanced measures where risk is higher, simplified measures may be…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "POL-ORG-KYC-01",
+     "title": "Org KYC & Customer Acceptance Policy v3.2",
+     "source": "Internal - Compliance",
+     "jurisdiction": "ORG",
+     "version": "3.2",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C07",
+    "KYC-C09"
+   ],
+   "risk_level": "medium",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-009"
+    }
+   ]
+  },
+  {
+   "id": "DAT-KYC-002",
+   "statement": "All onboarding records must be kept for 5 years after the merchant relationship ends.",
+   "categories": [
+    "data_management",
+    "regulatory"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "Tomas (MLRO)",
+   "source_role": "compliance",
+   "evidence": [
+    {
+     "doc_id": "DOC-002",
+     "excerpt": "All onboarding records must be kept for 5 years after the merchant relationship ends.",
+     "stakeholder": "Tomas (MLRO)"
+    }
+   ],
+   "business_justification": "Stated by Tomas (MLRO) in Memo - MLRO onboarding requirements.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to All onboarding records must be kept for 5 years after the merchant relationship ends, then it does so and records the outcome.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [
+    {
+     "kb_id": "FATF-R11",
+     "title": "FATF Recommendation 11 - Record keeping",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Records obtained through CDD, account files and business correspondence should be kept for at least five years after the business relationship ends, and transaction records for at least five years after the transaction,…",
+     "score": 18.613
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 11.431
+    },
+    {
+     "kb_id": "POL-ORG-DATA-02",
+     "title": "Org Data Classification & Retention Standard v2.0",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "2.0",
+     "excerpt": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C10"
+   ],
+   "risk_level": "medium",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-010"
+    }
+   ]
+  },
+  {
+   "id": "FR-KYC-005",
+   "statement": "The system shall allow analysts to file suspicious activity reports to the FIU.",
+   "categories": [
+    "functional",
+    "regulatory"
+   ],
+   "kind": "functional",
+   "source_stakeholder": "Tomas (MLRO)",
+   "source_role": "compliance",
+   "evidence": [
+    {
+     "doc_id": "DOC-002",
+     "excerpt": "The system shall allow analysts to file suspicious activity reports to the FIU.",
+     "stakeholder": "Tomas (MLRO)"
+    }
+   ],
+   "business_justification": "Stated by Tomas (MLRO) in Memo - MLRO onboarding requirements.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to allow analysts to file suspicious activity reports to the FIU, then it does so and records the outcome.",
+    "Given an internal audit sample, when the control evidence is reviewed, then 100% of sampled cases show the control was applied with traceable evidence.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [
+    {
+     "kb_id": "FATF-R20",
+     "title": "FATF Recommendation 20 - Reporting of suspicious transactions",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "If an institution suspects or has reasonable grounds to suspect funds are proceeds of crime or related to terrorist financing, it must promptly report to the financial intelligence unit. Tipping-off the customer is…",
+     "score": 16.414
+    }
+   ],
+   "controls": [
+    "KYC-C11"
+   ],
+   "risk_level": "medium",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-011"
+    }
+   ]
+  },
+  {
+   "id": "DAT-KYC-003",
+   "statement": "Directors' identity document images must be deleted 30 days after verification.",
+   "categories": [
+    "data_management",
+    "regulatory"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "Ines (DPO)",
+   "source_role": "legal",
+   "evidence": [
+    {
+     "doc_id": "DOC-003",
+     "excerpt": "Directors' identity document images must be deleted 30 days after verification",
+     "stakeholder": "Ines (DPO)"
+    }
+   ],
+   "business_justification": "Stated by Ines (DPO) in DPO review notes.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a closed relationship, when the retention period elapses, then the records are purged and the purge is logged; before that, records are retrievable within 1 business day."
+   ],
+   "regulations": [
+    {
+     "kb_id": "NIST-800-63A",
+     "title": "NIST SP 800-63A - Identity proofing (IAL2)",
+     "source": "NIST SP 800-63-3/-4",
+     "jurisdiction": "GLOBAL",
+     "version": "rev4-2025",
+     "excerpt": "Identity assurance level 2 requires evidence of real-world existence, validation of identity evidence against authoritative or issuing sources, and verification that the applicant is the genuine owner of the evidence…",
+     "score": 7.81
+    },
+    {
+     "kb_id": "POL-ORG-DATA-02",
+     "title": "Org Data Classification & Retention Standard v2.0",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "2.0",
+     "excerpt": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production…",
+     "score": 7.194
+    },
+    {
+     "kb_id": "EU-GDPR-5-6",
+     "title": "GDPR Articles 5-6 - Principles and lawful basis",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Personal data must be processed lawfully, fairly and transparently, collected for specified purposes, adequate and limited to what is necessary, accurate, kept no longer than necessary and secured. KYC processing…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C13"
+   ],
+   "risk_level": "high",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-012"
+    }
+   ]
+  },
+  {
+   "id": "BR-KYC-001",
+   "statement": "A DPIA must be completed before go-live because biometric face matching is used for directors.",
+   "categories": [
+    "business",
+    "regulatory"
+   ],
+   "kind": "business",
+   "source_stakeholder": "Ines (DPO)",
+   "source_role": "legal",
+   "evidence": [
+    {
+     "doc_id": "DOC-003",
+     "excerpt": "A DPIA must be completed before go-live because biometric face matching is used for directors.",
+     "stakeholder": "Ines (DPO)"
+    }
+   ],
+   "business_justification": "Stated by Ines (DPO) in DPO review notes.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to A DPIA must be completed before go-live because biometric face matching is used for directors, then it does so and records the outcome.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [
+    {
+     "kb_id": "EU-GDPR-9",
+     "title": "GDPR Article 9 - Special categories (biometric data)",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Biometric data processed to uniquely identify a person is special-category data; processing requires a condition such as explicit consent or a specific legal basis, with appropriate safeguards.",
+     "score": 11.558
+    },
+    {
+     "kb_id": "ISO-30107-3",
+     "title": "ISO/IEC 30107-3 - Biometric presentation attack detection",
+     "source": "ISO/IEC",
+     "jurisdiction": "GLOBAL",
+     "version": "2023",
+     "excerpt": "Defines testing and reporting of presentation-attack detection mechanisms, including attack presentation classification error rate (APCER) and bona fide presentation classification error rate (BPCER).",
+     "score": 0.0
+    },
+    {
+     "kb_id": "NIST-800-63A",
+     "title": "NIST SP 800-63A - Identity proofing (IAL2)",
+     "source": "NIST SP 800-63-3/-4",
+     "jurisdiction": "GLOBAL",
+     "version": "rev4-2025",
+     "excerpt": "Identity assurance level 2 requires evidence of real-world existence, validation of identity evidence against authoritative or issuing sources, and verification that the applicant is the genuine owner of the evidence…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "FATF-DIGID",
+     "title": "FATF Guidance on Digital Identity",
+     "source": "FATF Guidance on Digital ID (2020)",
+     "jurisdiction": "GLOBAL",
+     "version": "2020",
+     "excerpt": "Reliable, independent digital ID systems with appropriate assurance levels for identity proofing and authentication can be used for CDD in non-face-to-face onboarding; institutions should understand the assurance level…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C03"
+   ],
+   "risk_level": "high",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-013"
+    }
+   ]
+  },
+  {
+   "id": "PRV-KYC-001",
+   "statement": "Merchants must be told how their data is used through a privacy notice at the start of onboarding.",
+   "categories": [
+    "privacy",
+    "regulatory"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "Ines (DPO)",
+   "source_role": "legal",
+   "evidence": [
+    {
+     "doc_id": "DOC-003",
+     "excerpt": "Merchants must be told how their data is used through a privacy notice at the start of onboarding.",
+     "stakeholder": "Ines (DPO)"
+    }
+   ],
+   "business_justification": "Stated by Ines (DPO) in DPO review notes.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a data-protection review, when processing records are inspected, then the lawful basis or consent and the purpose are recorded for each data item."
+   ],
+   "regulations": [
+    {
+     "kb_id": "FATF-DIGID",
+     "title": "FATF Guidance on Digital Identity",
+     "source": "FATF Guidance on Digital ID (2020)",
+     "jurisdiction": "GLOBAL",
+     "version": "2020",
+     "excerpt": "Reliable, independent digital ID systems with appropriate assurance levels for identity proofing and authentication can be used for CDD in non-face-to-face onboarding; institutions should understand the assurance level…",
+     "score": 6.005
+    },
+    {
+     "kb_id": "EU-GDPR-5-6",
+     "title": "GDPR Articles 5-6 - Principles and lawful basis",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Personal data must be processed lawfully, fairly and transparently, collected for specified purposes, adequate and limited to what is necessary, accurate, kept no longer than necessary and secured. KYC processing…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "EU-GDPR-9",
+     "title": "GDPR Article 9 - Special categories (biometric data)",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Biometric data processed to uniquely identify a person is special-category data; processing requires a condition such as explicit consent or a specific legal basis, with appropriate safeguards.",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C12"
+   ],
+   "risk_level": "medium",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-014"
+    }
+   ]
+  },
+  {
+   "id": "PRV-KYC-002",
+   "statement": "Personal data must be stored in EU data centres only.",
+   "categories": [
+    "privacy",
+    "data_management"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "Ines (DPO)",
+   "source_role": "legal",
+   "evidence": [
+    {
+     "doc_id": "DOC-003",
+     "excerpt": "Personal data must be stored in EU data centres only.",
+     "stakeholder": "Ines (DPO)"
+    }
+   ],
+   "business_justification": "Stated by Ines (DPO) in DPO review notes.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a data-protection review, when processing records are inspected, then the lawful basis or consent and the purpose are recorded for each data item."
+   ],
+   "regulations": [
+    {
+     "kb_id": "POL-ORG-DATA-02",
+     "title": "Org Data Classification & Retention Standard v2.0",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "2.0",
+     "excerpt": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production…",
+     "score": 8.8
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 7.148
+    },
+    {
+     "kb_id": "EU-GDPR-5-6",
+     "title": "GDPR Articles 5-6 - Principles and lawful basis",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Personal data must be processed lawfully, fairly and transparently, collected for specified purposes, adequate and limited to what is necessary, accurate, kept no longer than necessary and secured. KYC processing…",
+     "score": 6.912
+    }
+   ],
+   "controls": [],
+   "risk_level": "low",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-015"
+    }
+   ]
+  },
+  {
+   "id": "FR-KYC-006",
+   "statement": "Automated rejections must be reviewable by a human on request.",
+   "categories": [
+    "functional",
+    "regulatory"
+   ],
+   "kind": "functional",
+   "source_stakeholder": "Ines (DPO)",
+   "source_role": "legal",
+   "evidence": [
+    {
+     "doc_id": "DOC-003",
+     "excerpt": "Automated rejections must be reviewable by a human on request.",
+     "stakeholder": "Ines (DPO)"
+    }
+   ],
+   "business_justification": "Stated by Ines (DPO) in DPO review notes.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to Automated rejections must be reviewable by a human on request, then it does so and records the outcome.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [
+    {
+     "kb_id": "EU-GDPR-22",
+     "title": "GDPR Article 22 - Automated individual decision-making",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Individuals have the right not to be subject to decisions based solely on automated processing that significantly affect them, subject to exceptions; where exceptions apply, safeguards include the right to obtain human…",
+     "score": 14.242
+    },
+    {
+     "kb_id": "POL-ORG-AI-04",
+     "title": "Org Responsible AI & Model Risk Policy v1.1",
+     "source": "Internal - Model Risk Management",
+     "jurisdiction": "ORG",
+     "version": "1.1",
+     "excerpt": "Models that influence customer decisions must be validated before use, monitored for drift and bias across protected groups, produce explainable outcomes, and keep a human in the loop for adverse decisions. LLM outputs…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C17"
+   ],
+   "risk_level": "high",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-016"
+    }
+   ]
+  },
+  {
+   "id": "PERF-KYC-001",
+   "statement": "The onboarding API must respond within 800 ms at the 95th percentile.",
+   "categories": [
+    "performance",
+    "integration"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "Marco (Platform lead)",
+   "source_role": "architect",
+   "evidence": [
+    {
+     "doc_id": "DOC-004",
+     "excerpt": "The onboarding API must respond within 800 ms at the 95th percentile.",
+     "stakeholder": "Marco (Platform lead)"
+    }
+   ],
+   "business_justification": "Stated by Marco (Platform lead) in Platform team constraints.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given peak production load, when the step is executed, then it completes within 800 ms at the 95th percentile."
+   ],
+   "regulations": [],
+   "controls": [],
+   "risk_level": "low",
+   "confidence": 0.52,
+   "quality_issues": [
+    {
+     "type": "missing_security_control",
+     "detail": "Defines an external integration without transport or authentication security.",
+     "severity": "medium",
+     "suggestion": "Link to the corresponding security requirement or add the control."
+    }
+   ],
+   "status": "needs_clarification",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-017"
+    }
+   ]
+  },
+  {
+   "id": "AVL-KYC-001",
+   "statement": "The service must be available 99.95% of the time.",
+   "categories": [
+    "availability"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "Marco (Platform lead)",
+   "source_role": "architect",
+   "evidence": [
+    {
+     "doc_id": "DOC-004",
+     "excerpt": "The service must be available 99.95% of the time.",
+     "stakeholder": "Marco (Platform lead)"
+    }
+   ],
+   "business_justification": "Stated by Marco (Platform lead) in Platform team constraints.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a calendar month, when availability is measured by synthetic monitoring, then it meets 99.95%."
+   ],
+   "regulations": [
+    {
+     "kb_id": "POL-ORG-OPS-05",
+     "title": "Org Service Level & Resilience Standard v1.4",
+     "source": "Internal - Operations",
+     "jurisdiction": "ORG",
+     "version": "1.4",
+     "excerpt": "Customer-facing tier-1 services target 99.9% monthly availability, RTO 4 hours and RPO 15 minutes, with active-passive disaster recovery tested twice a year and P1 incidents acknowledged within 15 minutes.",
+     "score": 8.509
+    }
+   ],
+   "controls": [],
+   "risk_level": "low",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-018"
+    }
+   ]
+  },
+  {
+   "id": "SEC-KYC-001",
+   "statement": "All admin users must authenticate with MFA and access must be role-based.",
+   "categories": [
+    "security",
+    "regulatory"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "Marco (Platform lead)",
+   "source_role": "architect",
+   "evidence": [
+    {
+     "doc_id": "DOC-004",
+     "excerpt": "All admin users must authenticate with MFA and access must be role-based.",
+     "stakeholder": "Marco (Platform lead)"
+    }
+   ],
+   "business_justification": "Stated by Marco (Platform lead) in Platform team constraints.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an unauthorised or unauthenticated actor, when they attempt to All admin users must authenticate with MFA and access must be role-based, then access is denied and a security event is logged."
+   ],
+   "regulations": [
+    {
+     "kb_id": "NIST-800-63B",
+     "title": "NIST SP 800-63B - Authentication (AAL2)",
+     "source": "NIST SP 800-63-3/-4",
+     "jurisdiction": "GLOBAL",
+     "version": "rev4-2025",
+     "excerpt": "Authenticator assurance level 2 requires proof of possession and control of two distinct authentication factors, with reauthentication and session-timeout requirements and resistance to replay attacks.",
+     "score": 12.087
+    },
+    {
+     "kb_id": "POL-ORG-SEC-03",
+     "title": "Org Identity & Access Management Standard v4.1",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "4.1",
+     "excerpt": "All staff access to customer PII requires role-based access, MFA and quarterly access recertification. Privileged access is just-in-time and session-recorded. Customer sessions time out after 15 minutes of inactivity.",
+     "score": 11.835
+    },
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "NIST-800-63A",
+     "title": "NIST SP 800-63A - Identity proofing (IAL2)",
+     "source": "NIST SP 800-63-3/-4",
+     "jurisdiction": "GLOBAL",
+     "version": "rev4-2025",
+     "excerpt": "Identity assurance level 2 requires evidence of real-world existence, validation of identity evidence against authoritative or issuing sources, and verification that the applicant is the genuine owner of the evidence…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "ISO-27001-A",
+     "title": "ISO/IEC 27001:2022 Annex A controls",
+     "source": "ISO/IEC",
+     "jurisdiction": "GLOBAL",
+     "version": "2022",
+     "excerpt": "Annex A includes controls on access control and least privilege, segregation of duties, cryptography, logging and monitoring, secure development life cycle, supplier relationships and information-security incident…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C02",
+    "KYC-C15"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-019"
+    }
+   ]
+  },
+  {
+   "id": "AUD-KYC-001",
+   "statement": "Every change to a merchant's risk score must be written to an audit log.",
+   "categories": [
+    "audit_reporting",
+    "regulatory"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "Marco (Platform lead)",
+   "source_role": "architect",
+   "evidence": [
+    {
+     "doc_id": "DOC-004",
+     "excerpt": "Every change to a merchant's risk score must be written to an audit log.",
+     "stakeholder": "Marco (Platform lead)"
+    }
+   ],
+   "business_justification": "Stated by Marco (Platform lead) in Platform team constraints.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given any KYC decision, when the audit trail is queried, then actor, timestamp, action, reason and evidence references are returned and the hash chain verifies."
+   ],
+   "regulations": [
+    {
+     "kb_id": "FATF-R1",
+     "title": "FATF Recommendation 1 - Risk-based approach",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions should identify, assess and understand money-laundering and terrorist-financing risks and apply measures commensurate with those risks: enhanced measures where risk is higher, simplified measures may be…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "POL-ORG-KYC-01",
+     "title": "Org KYC & Customer Acceptance Policy v3.2",
+     "source": "Internal - Compliance",
+     "jurisdiction": "ORG",
+     "version": "3.2",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "FATF-R11",
+     "title": "FATF Recommendation 11 - Record keeping",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Records obtained through CDD, account files and business correspondence should be kept for at least five years after the business relationship ends, and transaction records for at least five years after the transaction,…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "ISO-27001-A",
+     "title": "ISO/IEC 27001:2022 Annex A controls",
+     "source": "ISO/IEC",
+     "jurisdiction": "GLOBAL",
+     "version": "2022",
+     "excerpt": "Annex A includes controls on access control and least privilege, segregation of duties, cryptography, logging and monitoring, secure development life cycle, supplier relationships and information-security incident…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C07",
+    "KYC-C14"
+   ],
+   "risk_level": "medium",
+   "confidence": 0.6,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "extracted",
+   "history": [
+    {
+     "event": "id_assigned",
+     "from": "TMP-020"
+    }
+   ]
+  },
+  {
+   "id": "SEC-KYC-002",
+   "statement": "The system shall encrypt identity documents, biometric data and national identifiers at rest (AES-256, HSM-managed keys) and in transit (TLS 1.2 or higher).",
+   "categories": [
+    "security",
+    "privacy"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "",
+   "source_role": null,
+   "evidence": [
+    {
+     "doc_id": "POL-ORG-DATA-02",
+     "excerpt": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production…",
+     "stakeholder": ""
+    },
+    {
+     "doc_id": "EU-GDPR-25-32-35",
+     "excerpt": "Controllers must implement data protection by design and by default, appropriate technical and organisational security measures such as encryption and pseudonymisation, notify the supervisory authority of personal-data…",
+     "stakeholder": ""
+    }
+   ],
+   "business_justification": "Mandatory control KYC-C16 (Encryption of PII at rest and in transit) is not covered by any stakeholder requirement.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an unauthorised or unauthenticated actor, when they attempt to encrypt identity documents, biometric data and national identifiers at rest (AES, then access is denied and a security event is logged.",
+    "Given a data-protection review, when processing records are inspected, then the lawful basis or consent and the purpose are recorded for each data item."
+   ],
+   "regulations": [
+    {
+     "kb_id": "POL-ORG-DATA-02",
+     "title": "Org Data Classification & Retention Standard v2.0",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "2.0",
+     "excerpt": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "EU-GDPR-25-32-35",
+     "title": "GDPR Articles 25, 32, 33 and 35 - Privacy by design, security, breach notification, DPIA",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Controllers must implement data protection by design and by default, appropriate technical and organisational security measures such as encryption and pseudonymisation, notify the supervisory authority of personal-data…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "OWASP-ASVS",
+     "title": "OWASP Application Security Verification Standard 4.0",
+     "source": "OWASP",
+     "jurisdiction": "GLOBAL",
+     "version": "4.0.3",
+     "excerpt": "Provides verifiable security requirements for authentication, session management, access control, input validation, cryptography at rest, error handling and logging, data protection, communications security, file upload…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C16"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.75,
+   "quality_issues": [
+    {
+     "type": "undefined_term",
+     "detail": "Undefined term(s): AES-256, HSM-.",
+     "severity": "low",
+     "suggestion": "Add to the glossary or expand."
+    }
+   ],
+   "status": "pending_approval",
+   "origin": "derived_control",
+   "history": []
+  },
+  {
+   "id": "PRV-KYC-003",
+   "statement": "The system shall support detection and notification of personal-data breaches to the regulator and affected customers within statutory deadlines (for example 72 hours under GDPR).",
+   "categories": [
+    "privacy",
+    "operational",
+    "security"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "",
+   "source_role": null,
+   "evidence": [
+    {
+     "doc_id": "EU-GDPR-25-32-35",
+     "excerpt": "Controllers must implement data protection by design and by default, appropriate technical and organisational security measures such as encryption and pseudonymisation, notify the supervisory authority of personal-data…",
+     "stakeholder": ""
+    }
+   ],
+   "business_justification": "Mandatory control KYC-C19 (Personal-data breach notification) is not covered by any stakeholder requirement.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an unauthorised or unauthenticated actor, when they attempt to support detection and notification of personal-data breaches to the regulator an, then access is denied and a security event is logged.",
+    "Given a data-protection review, when processing records are inspected, then the lawful basis or consent and the purpose are recorded for each data item."
+   ],
+   "regulations": [
+    {
+     "kb_id": "EU-GDPR-25-32-35",
+     "title": "GDPR Articles 25, 32, 33 and 35 - Privacy by design, security, breach notification, DPIA",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Controllers must implement data protection by design and by default, appropriate technical and organisational security measures such as encryption and pseudonymisation, notify the supervisory authority of personal-data…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C19"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.75,
+   "quality_issues": [
+    {
+     "type": "undefined_term",
+     "detail": "Undefined term(s): GDPR.",
+     "severity": "low",
+     "suggestion": "Add to the glossary or expand."
+    }
+   ],
+   "status": "pending_approval",
+   "origin": "derived_control",
+   "history": []
+  },
+  {
+   "id": "FR-KYC-007",
+   "statement": "The system shall require maker-checker (four-eyes) approval with a recorded reason for any manual override of an automated KYC outcome.",
+   "categories": [
+    "functional",
+    "security",
+    "audit_reporting"
+   ],
+   "kind": "functional",
+   "source_stakeholder": "",
+   "source_role": null,
+   "evidence": [
+    {
+     "doc_id": "POL-ORG-KYC-01",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "stakeholder": ""
+    },
+    {
+     "doc_id": "ISO-27001-A",
+     "excerpt": "Annex A includes controls on access control and least privilege, segregation of duties, cryptography, logging and monitoring, secure development life cycle, supplier relationships and information-security incident…",
+     "stakeholder": ""
+    }
+   ],
+   "business_justification": "Mandatory control KYC-C20 (Maker-checker for manual KYC overrides) is not covered by any stakeholder requirement.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to require maker-checker (four-eyes) approval with a recorded reason for any manual override of an automated KYC outcome, then it does so and records the outcome.",
+    "Given an unauthorised or unauthenticated actor, when they attempt to require maker-checker (four-eyes) approval with a recorded reason for any manual, then access is denied and a security event is logged.",
+    "Given any KYC decision, when the audit trail is queried, then actor, timestamp, action, reason and evidence references are returned and the hash chain verifies.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [
+    {
+     "kb_id": "POL-ORG-KYC-01",
+     "title": "Org KYC & Customer Acceptance Policy v3.2",
+     "source": "Internal - Compliance",
+     "jurisdiction": "ORG",
+     "version": "3.2",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "ISO-27001-A",
+     "title": "ISO/IEC 27001:2022 Annex A controls",
+     "source": "ISO/IEC",
+     "jurisdiction": "GLOBAL",
+     "version": "2022",
+     "excerpt": "Annex A includes controls on access control and least privilege, segregation of duties, cryptography, logging and monitoring, secure development life cycle, supplier relationships and information-security incident…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "KYC-C20"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.75,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "derived_control",
+   "history": []
+  },
+  {
+   "id": "SEC-KYC-003",
+   "statement": "The system shall validate uploaded identity files by type, size and content signature, scan them for malware before processing, and store them outside the web root.",
+   "categories": [
+    "security"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "",
+   "source_role": null,
+   "evidence": [
+    {
+     "doc_id": "threat-model:T-DOC-UPLOAD",
+     "excerpt": "Malicious file uploaded as an identity document.",
+     "stakeholder": ""
+    }
+   ],
+   "business_justification": "Threat model (Tampering / Elevation): Malicious file uploaded as an identity document.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an unauthorised or unauthenticated actor, when they attempt to validate uploaded identity files by type, size and content signature, scan them , then access is denied and a security event is logged."
+   ],
+   "regulations": [
+    {
+     "kb_id": "OWASP-ASVS",
+     "title": "OWASP Application Security Verification Standard 4.0",
+     "source": "OWASP",
+     "jurisdiction": "GLOBAL",
+     "version": "4.0.3",
+     "excerpt": "Provides verifiable security requirements for authentication, session management, access control, input validation, cryptography at rest, error handling and logging, data protection, communications security, file upload…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "T-DOC-UPLOAD"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.67,
+   "quality_issues": [
+    {
+     "type": "incompleteness",
+     "detail": "Retention is stated without a period.",
+     "severity": "medium",
+     "suggestion": "State the retention period and its trigger (from account closure or from collection)."
+    }
+   ],
+   "status": "pending_approval",
+   "origin": "derived_control",
+   "history": []
+  },
+  {
+   "id": "SEC-KYC-004",
+   "statement": "The system shall detect presentation and video-injection attacks (ISO/IEC 30107-3 tested, APCER ≤ 5% at BPCER ≤ 5%) and block virtual-camera sources during remote verification.",
+   "categories": [
+    "security",
+    "regulatory"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "",
+   "source_role": null,
+   "evidence": [
+    {
+     "doc_id": "threat-model:T-SPOOF-BIO",
+     "excerpt": "Presentation or injection attacks (photos, masks, deepfakes, virtual cameras) during remote verification.",
+     "stakeholder": ""
+    }
+   ],
+   "business_justification": "Threat model (Spoofing): Presentation or injection attacks (photos, masks, deepfakes, virtual cameras) during remote verification.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an unauthorised or unauthenticated actor, when they attempt to detect presentation and video-injection attacks (ISO/IEC 30107-3 tested, APCER ≤, then access is denied and a security event is logged.",
+    "Given an internal audit sample, when the control evidence is reviewed, then 100% of sampled cases show the control was applied with traceable evidence."
+   ],
+   "regulations": [
+    {
+     "kb_id": "ISO-30107-3",
+     "title": "ISO/IEC 30107-3 - Biometric presentation attack detection",
+     "source": "ISO/IEC",
+     "jurisdiction": "GLOBAL",
+     "version": "2023",
+     "excerpt": "Defines testing and reporting of presentation-attack detection mechanisms, including attack presentation classification error rate (APCER) and bona fide presentation classification error rate (BPCER).",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "T-SPOOF-BIO"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.67,
+   "quality_issues": [
+    {
+     "type": "missing_security_control",
+     "detail": "Handles uploaded identity media but states no protection (encryption, file validation, malware scan).",
+     "severity": "medium",
+     "suggestion": "Link to the corresponding security requirement or add the control."
+    },
+    {
+     "type": "undefined_term",
+     "detail": "Undefined term(s): APCER, BPCER, IEC, ISO.",
+     "severity": "low",
+     "suggestion": "Add to the glossary or expand."
+    }
+   ],
+   "status": "pending_approval",
+   "origin": "derived_control",
+   "history": []
+  },
+  {
+   "id": "PRV-KYC-004",
+   "statement": "The system shall obtain explicit, separate consent for biometric processing, store only protected biometric templates (never raw images beyond the regulatory evidence requirement), and delete them at the end of the retention period.",
+   "categories": [
+    "privacy",
+    "security"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "",
+   "source_role": null,
+   "evidence": [
+    {
+     "doc_id": "threat-model:T-BIO-PRIV",
+     "excerpt": "Biometric data misuse or over-retention.",
+     "stakeholder": ""
+    }
+   ],
+   "business_justification": "Threat model (Information disclosure): Biometric data misuse or over-retention.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an unauthorised or unauthenticated actor, when they attempt to obtain explicit, separate consent for biometric processing, store only protected, then access is denied and a security event is logged.",
+    "Given a data-protection review, when processing records are inspected, then the lawful basis or consent and the purpose are recorded for each data item."
+   ],
+   "regulations": [
+    {
+     "kb_id": "EU-GDPR-9",
+     "title": "GDPR Article 9 - Special categories (biometric data)",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Biometric data processed to uniquely identify a person is special-category data; processing requires a condition such as explicit consent or a specific legal basis, with appropriate safeguards.",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "T-BIO-PRIV"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.67,
+   "quality_issues": [
+    {
+     "type": "incompleteness",
+     "detail": "Retention is stated without a period.",
+     "severity": "medium",
+     "suggestion": "State the retention period and its trigger (from account closure or from collection)."
+    }
+   ],
+   "status": "pending_approval",
+   "origin": "derived_control",
+   "history": []
+  },
+  {
+   "id": "SEC-KYC-005",
+   "statement": "The system shall authenticate all service-to-service calls with mutual TLS or OAuth 2.0 client credentials, sign and validate response payloads from verification vendors, and rate-limit public onboarding APIs.",
+   "categories": [
+    "security",
+    "integration"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "",
+   "source_role": null,
+   "evidence": [
+    {
+     "doc_id": "threat-model:T-API",
+     "excerpt": "Unauthenticated or tampered calls to identity, screening and core-banking APIs.",
+     "stakeholder": ""
+    }
+   ],
+   "business_justification": "Threat model (Spoofing / Tampering): Unauthenticated or tampered calls to identity, screening and core-banking APIs.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an unauthorised or unauthenticated actor, when they attempt to authenticate all service-to-service calls with mutual TLS or OAuth 2.0 client cr, then access is denied and a security event is logged."
+   ],
+   "regulations": [
+    {
+     "kb_id": "OWASP-ASVS",
+     "title": "OWASP Application Security Verification Standard 4.0",
+     "source": "OWASP",
+     "jurisdiction": "GLOBAL",
+     "version": "4.0.3",
+     "excerpt": "Provides verifiable security requirements for authentication, session management, access control, input validation, cryptography at rest, error handling and logging, data protection, communications security, file upload…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "ISO-27001-A",
+     "title": "ISO/IEC 27001:2022 Annex A controls",
+     "source": "ISO/IEC",
+     "jurisdiction": "GLOBAL",
+     "version": "2022",
+     "excerpt": "Annex A includes controls on access control and least privilege, segregation of duties, cryptography, logging and monitoring, secure development life cycle, supplier relationships and information-security incident…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "T-API"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.75,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "derived_control",
+   "history": []
+  },
+  {
+   "id": "SEC-KYC-006",
+   "statement": "The system shall apply fraud checks at onboarding (device fingerprint, velocity of applications per device/address/identifier, and synthetic-identity signals) and refer high-scoring applications for review.",
+   "categories": [
+    "security",
+    "functional"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "",
+   "source_role": null,
+   "evidence": [
+    {
+     "doc_id": "threat-model:T-SYNTHETIC",
+     "excerpt": "Synthetic identities and mule-account onboarding at scale.",
+     "stakeholder": ""
+    }
+   ],
+   "business_justification": "Threat model (Spoofing): Synthetic identities and mule-account onboarding at scale.",
+   "priority": "must",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a valid onboarding application, when the system is required to apply fraud checks at onboarding (device fingerprint, velocity of applications per device/address/identifier, and synthe, then it does so and records the outcome.",
+    "Given an unauthorised or unauthenticated actor, when they attempt to apply fraud checks at onboarding (device fingerprint, velocity of applications p, then access is denied and a security event is logged.",
+    "Given invalid or incomplete input, when the step is attempted, then the system rejects it with a specific error and no partial record is created."
+   ],
+   "regulations": [
+    {
+     "kb_id": "FATF-R15",
+     "title": "FATF Recommendation 15 - New technologies",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions should assess ML/TF risks of new products, business practices and delivery mechanisms, including non-face-to-face and digital onboarding, before launch, and take measures to manage and mitigate those risks.",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "T-SYNTHETIC"
+   ],
+   "risk_level": "critical",
+   "confidence": 0.75,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "derived_control",
+   "history": []
+  },
+  {
+   "id": "REG-KYC-004",
+   "statement": "Automated risk-scoring and face-match models shall be validated before deployment, monitored monthly for drift and demographic bias, and every automated decision shall store the model version and top contributing factors.",
+   "categories": [
+    "regulatory",
+    "operational"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "",
+   "source_role": null,
+   "evidence": [
+    {
+     "doc_id": "threat-model:T-AI",
+     "excerpt": "Opaque or biased automated KYC decisions.",
+     "stakeholder": ""
+    }
+   ],
+   "business_justification": "Threat model (Repudiation / Fairness): Opaque or biased automated KYC decisions.",
+   "priority": "should",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given an internal audit sample, when the control evidence is reviewed, then 100% of sampled cases show the control was applied with traceable evidence."
+   ],
+   "regulations": [
+    {
+     "kb_id": "POL-ORG-AI-04",
+     "title": "Org Responsible AI & Model Risk Policy v1.1",
+     "source": "Internal - Model Risk Management",
+     "jurisdiction": "ORG",
+     "version": "1.1",
+     "excerpt": "Models that influence customer decisions must be validated before use, monitored for drift and bias across protected groups, produce explainable outcomes, and keep a human in the loop for adverse decisions. LLM outputs…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "EU-GDPR-22",
+     "title": "GDPR Article 22 - Automated individual decision-making",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Individuals have the right not to be subject to decisions based solely on automated processing that significantly affect them, subject to exceptions; where exceptions apply, safeguards include the right to obtain human…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "T-AI"
+   ],
+   "risk_level": "high",
+   "confidence": 0.67,
+   "quality_issues": [
+    {
+     "type": "incompleteness",
+     "detail": "Retention is stated without a period.",
+     "severity": "medium",
+     "suggestion": "State the retention period and its trigger (from account closure or from collection)."
+    }
+   ],
+   "status": "pending_approval",
+   "origin": "derived_control",
+   "history": []
+  },
+  {
+   "id": "PRV-KYC-005",
+   "statement": "The system shall use synthetic or irreversibly masked data in non-production and analytics environments; production KYC data shall not be copied to lower environments.",
+   "categories": [
+    "privacy",
+    "data_management"
+   ],
+   "kind": "non_functional",
+   "source_stakeholder": "",
+   "source_role": null,
+   "evidence": [
+    {
+     "doc_id": "threat-model:T-NONPROD",
+     "excerpt": "Real KYC data leaking into test and analytics environments.",
+     "stakeholder": ""
+    }
+   ],
+   "business_justification": "Threat model (Information disclosure): Real KYC data leaking into test and analytics environments.",
+   "priority": "should",
+   "dependencies": [],
+   "assumptions": [],
+   "acceptance_criteria": [
+    "Given a data-protection review, when processing records are inspected, then the lawful basis or consent and the purpose are recorded for each data item."
+   ],
+   "regulations": [
+    {
+     "kb_id": "POL-ORG-DATA-02",
+     "title": "Org Data Classification & Retention Standard v2.0",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "2.0",
+     "excerpt": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production…",
+     "score": 0.0
+    }
+   ],
+   "controls": [
+    "T-NONPROD"
+   ],
+   "risk_level": "medium",
+   "confidence": 0.75,
+   "quality_issues": [],
+   "status": "pending_approval",
+   "origin": "derived_control",
+   "history": []
+  }
+ ],
+ "questions": [
+  {
+   "id": "Q-001",
+   "requirement_id": "FR-KYC-002",
+   "target_role": "security",
+   "question": "Regarding FR-KYC-002 (\"Merchants must be able to upload company documents in PDF or image format.\"): Handles uploaded identity media but states no protection (encryption, file validation, malware scan). Link to the corresponding security requirement or add the control.",
+   "reason": "missing_security_control",
+   "answer": null
+  },
+  {
+   "id": "Q-002",
+   "requirement_id": "REG-KYC-001",
+   "target_role": "product_owner",
+   "question": "Regarding REG-KYC-001 (\"We should not ask small merchants for beneficial owner details because it slows them down.\"): Requirement appears to waive a mandatory control: Beneficial ownership identification for legal entities. Compliance/legal must confirm the applicable minimum.",
+   "reason": "regulatory_violation",
+   "answer": null
+  },
+  {
+   "id": "Q-003",
+   "requirement_id": "USA-KYC-001",
+   "target_role": "product_owner",
+   "question": "Regarding USA-KYC-001 (\"The onboarding form should be simple and intuitive.\"): Vague term(s): simple, intuitive. Replace with measurable criteria.",
+   "reason": "ambiguity",
+   "answer": null
+  },
+  {
+   "id": "Q-004",
+   "requirement_id": "PERF-KYC-001",
+   "target_role": "security",
+   "question": "Regarding PERF-KYC-001 (\"The onboarding API must respond within 800 ms at the 95th percentile.\"): Defines an external integration without transport or authentication security. Link to the corresponding security requirement or add the control.",
+   "reason": "missing_security_control",
+   "answer": null
+  },
+  {
+   "id": "Q-005",
+   "requirement_id": "CON-001",
+   "target_role": "product_owner",
+   "question": "Opposing positions on control KYC-C04 (Beneficial ownership identification for legal entities): REG-KYC-001 (Lena (Sales)) vs REG-KYC-002 (Tomas (MLRO)). Which should prevail, or what is the agreed compromise?",
+   "reason": "conflict:contradiction",
+   "answer": null
+  },
+  {
+   "id": "Q-006",
+   "requirement_id": "CON-002",
+   "target_role": "product_owner",
+   "question": "Opposing positions on control KYC-C04 (Beneficial ownership identification for legal entities): REG-KYC-001 (Lena (Sales)) vs DAT-KYC-001 (Tomas (MLRO)). Which should prevail, or what is the agreed compromise?",
+   "reason": "conflict:contradiction",
+   "answer": null
+  },
+  {
+   "id": "Q-007",
+   "requirement_id": "CON-003",
+   "target_role": "product_owner",
+   "question": "REG-KYC-001: Requirement appears to waive a mandatory control: Beneficial ownership identification for legal entities. Which should prevail, or what is the agreed compromise?",
+   "reason": "conflict:regulatory",
+   "answer": null
+  },
+  {
+   "id": "Q-008",
+   "requirement_id": null,
+   "target_role": "business_analyst",
+   "question": "What business outcome should the new onboarding deliver, and how will you measure it (e.g. completion rate, time-to-onboard, cost per KYC)?",
+   "reason": "coverage:objectives",
+   "answer": null
+  },
+  {
+   "id": "Q-009",
+   "requirement_id": null,
+   "target_role": "business_analyst",
+   "question": "Walk me through how onboarding and KYC are done today. Where are the manual steps, hand-offs and delays?",
+   "reason": "coverage:workflow",
+   "answer": null
+  },
+  {
+   "id": "Q-010",
+   "requirement_id": null,
+   "target_role": "business_analyst",
+   "question": "What should happen when something goes wrong, such as a vendor timeout, name mismatch, blurred document or partial sanctions match?",
+   "reason": "coverage:exceptions",
+   "answer": null
+  },
+  {
+   "id": "Q-011",
+   "requirement_id": null,
+   "target_role": "business_analyst",
+   "question": "Are there account or transaction limits tied to the KYC level (for example minimum-KYC or small accounts) before full verification is complete?",
+   "reason": "coverage:limits",
+   "answer": null
+  },
+  {
+   "id": "Q-012",
+   "requirement_id": null,
+   "target_role": "business_analyst",
+   "question": "What are the response-time, throughput, peak-load and availability expectations for onboarding?",
+   "reason": "coverage:performance",
+   "answer": null
+  },
+  {
+   "id": "Q-013",
+   "requirement_id": null,
+   "target_role": "business_analyst",
+   "question": "Which internal systems and external services must onboarding integrate with (core banking, CRM, screening vendor, KYC registry, e-sign)?",
+   "reason": "coverage:integration",
+   "answer": null
+  }
+ ],
+ "conflicts": [
+  {
+   "id": "CON-001",
+   "requirement_ids": [
+    "REG-KYC-001",
+    "REG-KYC-002"
+   ],
+   "type": "contradiction",
+   "detail": "Opposing positions on control KYC-C04 (Beneficial ownership identification for legal entities): REG-KYC-001 (Lena (Sales)) vs REG-KYC-002 (Tomas (MLRO)).",
+   "severity": "high",
+   "resolution": null
+  },
+  {
+   "id": "CON-002",
+   "requirement_ids": [
+    "REG-KYC-001",
+    "DAT-KYC-001"
+   ],
+   "type": "contradiction",
+   "detail": "Opposing positions on control KYC-C04 (Beneficial ownership identification for legal entities): REG-KYC-001 (Lena (Sales)) vs DAT-KYC-001 (Tomas (MLRO)).",
+   "severity": "high",
+   "resolution": null
+  },
+  {
+   "id": "CON-003",
+   "requirement_ids": [
+    "REG-KYC-001",
+    "KYC-C04"
+   ],
+   "type": "regulatory",
+   "detail": "REG-KYC-001: Requirement appears to waive a mandatory control: Beneficial ownership identification for legal entities.",
+   "severity": "critical",
+   "resolution": null
+  }
+ ],
+ "compliance": [
+  {
+   "requirement_id": "FR-KYC-003",
+   "control_id": "KYC-C01",
+   "control": "Customer identification data capture",
+   "citations": [
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+   "jurisdiction": "GLOBAL",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.65
+  },
+  {
+   "requirement_id": "FR-KYC-003",
+   "control_id": "KYC-C02",
+   "control": "Identity document verification against independent sources",
+   "citations": [
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "NIST-800-63A",
+     "title": "NIST SP 800-63A - Identity proofing (IAL2)",
+     "source": "NIST SP 800-63-3/-4",
+     "jurisdiction": "GLOBAL",
+     "version": "rev4-2025",
+     "excerpt": "Identity assurance level 2 requires evidence of real-world existence, validation of identity evidence against authoritative or issuing sources, and verification that the applicant is the genuine owner of the evidence…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+   "jurisdiction": "GLOBAL",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.65
+  },
+  {
+   "requirement_id": "REG-KYC-001",
+   "control_id": "KYC-C04",
+   "control": "Beneficial ownership identification for legal entities",
+   "citations": [
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+   "jurisdiction": "EU,GLOBAL",
+   "gap": true,
+   "needs_legal_review": true,
+   "confidence": 0.65
+  },
+  {
+   "requirement_id": "REG-KYC-002",
+   "control_id": "KYC-C04",
+   "control": "Beneficial ownership identification for legal entities",
+   "citations": [
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 11.159
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+   "jurisdiction": "EU,GLOBAL",
+   "gap": false,
+   "needs_legal_review": false,
+   "confidence": 0.85
+  },
+  {
+   "requirement_id": "DAT-KYC-001",
+   "control_id": "KYC-C04",
+   "control": "Beneficial ownership identification for legal entities",
+   "citations": [
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 9.488
+    }
+   ],
+   "obligation": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+   "jurisdiction": "EU,GLOBAL",
+   "gap": false,
+   "needs_legal_review": false,
+   "confidence": 0.85
+  },
+  {
+   "requirement_id": "DAT-KYC-001",
+   "control_id": "KYC-C05",
+   "control": "Sanctions screening at onboarding and on list updates",
+   "citations": [
+    {
+     "kb_id": "FATF-R6",
+     "title": "FATF Recommendation 6 - Targeted financial sanctions",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must screen customers against designated-persons lists and freeze without delay funds or assets of designated persons, and must not make funds available to them.",
+     "score": 19.355
+    }
+   ],
+   "obligation": "Institutions must screen customers against designated-persons lists and freeze without delay funds or assets of designated persons, and must not make funds available to them.",
+   "jurisdiction": "GLOBAL",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.85
+  },
+  {
+   "requirement_id": "DAT-KYC-001",
+   "control_id": "KYC-C06",
+   "control": "PEP screening with enhanced due diligence",
+   "citations": [
+    {
+     "kb_id": "FATF-R12",
+     "title": "FATF Recommendation 12 - Politically exposed persons",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "For foreign PEPs (and domestic PEPs where higher risk), institutions should have risk-management systems to determine PEP status, obtain senior-management approval to establish the relationship, establish source of…",
+     "score": 13.368
+    },
+    {
+     "kb_id": "POL-ORG-KYC-01",
+     "title": "Org KYC & Customer Acceptance Policy v3.2",
+     "source": "Internal - Compliance",
+     "jurisdiction": "ORG",
+     "version": "3.2",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "For foreign PEPs (and domestic PEPs where higher risk), institutions should have risk-management systems to determine PEP status, obtain senior-management approval to establish the relationship, establish source of…",
+   "jurisdiction": "GLOBAL,ORG",
+   "gap": false,
+   "needs_legal_review": false,
+   "confidence": 0.85
+  },
+  {
+   "requirement_id": "REG-KYC-003",
+   "control_id": "KYC-C08",
+   "control": "Enhanced due diligence for high-risk customers",
+   "citations": [
+    {
+     "kb_id": "FATF-R1",
+     "title": "FATF Recommendation 1 - Risk-based approach",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions should identify, assess and understand money-laundering and terrorist-financing risks and apply measures commensurate with those risks: enhanced measures where risk is higher, simplified measures may be…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "FATF-R12",
+     "title": "FATF Recommendation 12 - Politically exposed persons",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "For foreign PEPs (and domestic PEPs where higher risk), institutions should have risk-management systems to determine PEP status, obtain senior-management approval to establish the relationship, establish source of…",
+     "score": 8.434
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 8.255
+    },
+    {
+     "kb_id": "POL-ORG-KYC-01",
+     "title": "Org KYC & Customer Acceptance Policy v3.2",
+     "source": "Internal - Compliance",
+     "jurisdiction": "ORG",
+     "version": "3.2",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Institutions should identify, assess and understand money-laundering and terrorist-financing risks and apply measures commensurate with those risks: enhanced measures where risk is higher, simplified measures may be…",
+   "jurisdiction": "EU,GLOBAL,ORG",
+   "gap": false,
+   "needs_legal_review": false,
+   "confidence": 0.85
+  },
+  {
+   "requirement_id": "FR-KYC-004",
+   "control_id": "KYC-C07",
+   "control": "Customer risk rating (risk-based approach)",
+   "citations": [
+    {
+     "kb_id": "FATF-R1",
+     "title": "FATF Recommendation 1 - Risk-based approach",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions should identify, assess and understand money-laundering and terrorist-financing risks and apply measures commensurate with those risks: enhanced measures where risk is higher, simplified measures may be…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "POL-ORG-KYC-01",
+     "title": "Org KYC & Customer Acceptance Policy v3.2",
+     "source": "Internal - Compliance",
+     "jurisdiction": "ORG",
+     "version": "3.2",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Institutions should identify, assess and understand money-laundering and terrorist-financing risks and apply measures commensurate with those risks: enhanced measures where risk is higher, simplified measures may be…",
+   "jurisdiction": "GLOBAL,ORG",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.65
+  },
+  {
+   "requirement_id": "FR-KYC-004",
+   "control_id": "KYC-C09",
+   "control": "Ongoing monitoring and periodic re-KYC",
+   "citations": [
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+   "jurisdiction": "GLOBAL",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.65
+  },
+  {
+   "requirement_id": "DAT-KYC-002",
+   "control_id": "KYC-C10",
+   "control": "Record retention",
+   "citations": [
+    {
+     "kb_id": "FATF-R11",
+     "title": "FATF Recommendation 11 - Record keeping",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Records obtained through CDD, account files and business correspondence should be kept for at least five years after the business relationship ends, and transaction records for at least five years after the transaction,…",
+     "score": 18.613
+    },
+    {
+     "kb_id": "EU-AMLD",
+     "title": "EU Anti-Money Laundering Directive (EU) 2015/849 as amended, and AML Regulation (EU) 2024/1624",
+     "source": "European Union",
+     "jurisdiction": "EU",
+     "version": "AMLR-2024",
+     "excerpt": "Obliged entities must apply CDD including identification and verification of customers and beneficial owners (electronic identification means under eIDAS are acceptable), apply enhanced due diligence for high-risk third…",
+     "score": 11.431
+    },
+    {
+     "kb_id": "POL-ORG-DATA-02",
+     "title": "Org Data Classification & Retention Standard v2.0",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "2.0",
+     "excerpt": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Records obtained through CDD, account files and business correspondence should be kept for at least five years after the business relationship ends, and transaction records for at least five years after the transaction,…",
+   "jurisdiction": "EU,GLOBAL,ORG",
+   "gap": false,
+   "needs_legal_review": false,
+   "confidence": 0.85
+  },
+  {
+   "requirement_id": "FR-KYC-005",
+   "control_id": "KYC-C11",
+   "control": "Suspicious activity / transaction reporting",
+   "citations": [
+    {
+     "kb_id": "FATF-R20",
+     "title": "FATF Recommendation 20 - Reporting of suspicious transactions",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "If an institution suspects or has reasonable grounds to suspect funds are proceeds of crime or related to terrorist financing, it must promptly report to the financial intelligence unit. Tipping-off the customer is…",
+     "score": 16.414
+    }
+   ],
+   "obligation": "If an institution suspects or has reasonable grounds to suspect funds are proceeds of crime or related to terrorist financing, it must promptly report to the financial intelligence unit. Tipping-off the customer is…",
+   "jurisdiction": "GLOBAL",
+   "gap": false,
+   "needs_legal_review": false,
+   "confidence": 0.85
+  },
+  {
+   "requirement_id": "DAT-KYC-003",
+   "control_id": "KYC-C13",
+   "control": "Data minimisation and purpose limitation",
+   "citations": [
+    {
+     "kb_id": "EU-GDPR-5-6",
+     "title": "GDPR Articles 5-6 - Principles and lawful basis",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Personal data must be processed lawfully, fairly and transparently, collected for specified purposes, adequate and limited to what is necessary, accurate, kept no longer than necessary and secured. KYC processing…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "POL-ORG-DATA-02",
+     "title": "Org Data Classification & Retention Standard v2.0",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "2.0",
+     "excerpt": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production…",
+     "score": 7.194
+    }
+   ],
+   "obligation": "Personal data must be processed lawfully, fairly and transparently, collected for specified purposes, adequate and limited to what is necessary, accurate, kept no longer than necessary and secured. KYC processing…",
+   "jurisdiction": "EU,ORG",
+   "gap": false,
+   "needs_legal_review": false,
+   "confidence": 0.85
+  },
+  {
+   "requirement_id": "BR-KYC-001",
+   "control_id": "KYC-C03",
+   "control": "Liveness / presentation-attack detection and face match for remote onboarding",
+   "citations": [
+    {
+     "kb_id": "ISO-30107-3",
+     "title": "ISO/IEC 30107-3 - Biometric presentation attack detection",
+     "source": "ISO/IEC",
+     "jurisdiction": "GLOBAL",
+     "version": "2023",
+     "excerpt": "Defines testing and reporting of presentation-attack detection mechanisms, including attack presentation classification error rate (APCER) and bona fide presentation classification error rate (BPCER).",
+     "score": 0.0
+    },
+    {
+     "kb_id": "NIST-800-63A",
+     "title": "NIST SP 800-63A - Identity proofing (IAL2)",
+     "source": "NIST SP 800-63-3/-4",
+     "jurisdiction": "GLOBAL",
+     "version": "rev4-2025",
+     "excerpt": "Identity assurance level 2 requires evidence of real-world existence, validation of identity evidence against authoritative or issuing sources, and verification that the applicant is the genuine owner of the evidence…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "FATF-DIGID",
+     "title": "FATF Guidance on Digital Identity",
+     "source": "FATF Guidance on Digital ID (2020)",
+     "jurisdiction": "GLOBAL",
+     "version": "2020",
+     "excerpt": "Reliable, independent digital ID systems with appropriate assurance levels for identity proofing and authentication can be used for CDD in non-face-to-face onboarding; institutions should understand the assurance level…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Defines testing and reporting of presentation-attack detection mechanisms, including attack presentation classification error rate (APCER) and bona fide presentation classification error rate (BPCER).",
+   "jurisdiction": "GLOBAL",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.65
+  },
+  {
+   "requirement_id": "PRV-KYC-001",
+   "control_id": "KYC-C12",
+   "control": "Consent and privacy notice",
+   "citations": [
+    {
+     "kb_id": "EU-GDPR-5-6",
+     "title": "GDPR Articles 5-6 - Principles and lawful basis",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Personal data must be processed lawfully, fairly and transparently, collected for specified purposes, adequate and limited to what is necessary, accurate, kept no longer than necessary and secured. KYC processing…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "EU-GDPR-9",
+     "title": "GDPR Article 9 - Special categories (biometric data)",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Biometric data processed to uniquely identify a person is special-category data; processing requires a condition such as explicit consent or a specific legal basis, with appropriate safeguards.",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Personal data must be processed lawfully, fairly and transparently, collected for specified purposes, adequate and limited to what is necessary, accurate, kept no longer than necessary and secured. KYC processing…",
+   "jurisdiction": "EU",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.65
+  },
+  {
+   "requirement_id": "FR-KYC-006",
+   "control_id": "KYC-C17",
+   "control": "Human review of automated adverse decisions",
+   "citations": [
+    {
+     "kb_id": "EU-GDPR-22",
+     "title": "GDPR Article 22 - Automated individual decision-making",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Individuals have the right not to be subject to decisions based solely on automated processing that significantly affect them, subject to exceptions; where exceptions apply, safeguards include the right to obtain human…",
+     "score": 14.242
+    },
+    {
+     "kb_id": "POL-ORG-AI-04",
+     "title": "Org Responsible AI & Model Risk Policy v1.1",
+     "source": "Internal - Model Risk Management",
+     "jurisdiction": "ORG",
+     "version": "1.1",
+     "excerpt": "Models that influence customer decisions must be validated before use, monitored for drift and bias across protected groups, produce explainable outcomes, and keep a human in the loop for adverse decisions. LLM outputs…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Individuals have the right not to be subject to decisions based solely on automated processing that significantly affect them, subject to exceptions; where exceptions apply, safeguards include the right to obtain human…",
+   "jurisdiction": "EU,ORG",
+   "gap": false,
+   "needs_legal_review": false,
+   "confidence": 0.85
+  },
+  {
+   "requirement_id": "SEC-KYC-001",
+   "control_id": "KYC-C02",
+   "control": "Identity document verification against independent sources",
+   "citations": [
+    {
+     "kb_id": "FATF-R10",
+     "title": "FATF Recommendation 10 - Customer due diligence",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "NIST-800-63A",
+     "title": "NIST SP 800-63A - Identity proofing (IAL2)",
+     "source": "NIST SP 800-63-3/-4",
+     "jurisdiction": "GLOBAL",
+     "version": "rev4-2025",
+     "excerpt": "Identity assurance level 2 requires evidence of real-world existence, validation of identity evidence against authoritative or issuing sources, and verification that the applicant is the genuine owner of the evidence…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Institutions must identify the customer and verify identity using reliable, independent source documents, data or information; identify and take reasonable measures to verify the beneficial owner; understand the purpose…",
+   "jurisdiction": "GLOBAL",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.65
+  },
+  {
+   "requirement_id": "SEC-KYC-001",
+   "control_id": "KYC-C15",
+   "control": "Strong authentication and least-privilege access",
+   "citations": [
+    {
+     "kb_id": "NIST-800-63B",
+     "title": "NIST SP 800-63B - Authentication (AAL2)",
+     "source": "NIST SP 800-63-3/-4",
+     "jurisdiction": "GLOBAL",
+     "version": "rev4-2025",
+     "excerpt": "Authenticator assurance level 2 requires proof of possession and control of two distinct authentication factors, with reauthentication and session-timeout requirements and resistance to replay attacks.",
+     "score": 12.087
+    },
+    {
+     "kb_id": "POL-ORG-SEC-03",
+     "title": "Org Identity & Access Management Standard v4.1",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "4.1",
+     "excerpt": "All staff access to customer PII requires role-based access, MFA and quarterly access recertification. Privileged access is just-in-time and session-recorded. Customer sessions time out after 15 minutes of inactivity.",
+     "score": 11.835
+    },
+    {
+     "kb_id": "ISO-27001-A",
+     "title": "ISO/IEC 27001:2022 Annex A controls",
+     "source": "ISO/IEC",
+     "jurisdiction": "GLOBAL",
+     "version": "2022",
+     "excerpt": "Annex A includes controls on access control and least privilege, segregation of duties, cryptography, logging and monitoring, secure development life cycle, supplier relationships and information-security incident…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Authenticator assurance level 2 requires proof of possession and control of two distinct authentication factors, with reauthentication and session-timeout requirements and resistance to replay attacks.",
+   "jurisdiction": "GLOBAL,ORG",
+   "gap": false,
+   "needs_legal_review": false,
+   "confidence": 0.85
+  },
+  {
+   "requirement_id": "AUD-KYC-001",
+   "control_id": "KYC-C07",
+   "control": "Customer risk rating (risk-based approach)",
+   "citations": [
+    {
+     "kb_id": "FATF-R1",
+     "title": "FATF Recommendation 1 - Risk-based approach",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Institutions should identify, assess and understand money-laundering and terrorist-financing risks and apply measures commensurate with those risks: enhanced measures where risk is higher, simplified measures may be…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "POL-ORG-KYC-01",
+     "title": "Org KYC & Customer Acceptance Policy v3.2",
+     "source": "Internal - Compliance",
+     "jurisdiction": "ORG",
+     "version": "3.2",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Institutions should identify, assess and understand money-laundering and terrorist-financing risks and apply measures commensurate with those risks: enhanced measures where risk is higher, simplified measures may be…",
+   "jurisdiction": "GLOBAL,ORG",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.65
+  },
+  {
+   "requirement_id": "AUD-KYC-001",
+   "control_id": "KYC-C14",
+   "control": "Audit trail of KYC decisions",
+   "citations": [
+    {
+     "kb_id": "FATF-R11",
+     "title": "FATF Recommendation 11 - Record keeping",
+     "source": "FATF Recommendations (2012, as amended)",
+     "jurisdiction": "GLOBAL",
+     "version": "2023-11",
+     "excerpt": "Records obtained through CDD, account files and business correspondence should be kept for at least five years after the business relationship ends, and transaction records for at least five years after the transaction,…",
+     "score": 0.0
+    },
+    {
+     "kb_id": "ISO-27001-A",
+     "title": "ISO/IEC 27001:2022 Annex A controls",
+     "source": "ISO/IEC",
+     "jurisdiction": "GLOBAL",
+     "version": "2022",
+     "excerpt": "Annex A includes controls on access control and least privilege, segregation of duties, cryptography, logging and monitoring, secure development life cycle, supplier relationships and information-security incident…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Records obtained through CDD, account files and business correspondence should be kept for at least five years after the business relationship ends, and transaction records for at least five years after the transaction,…",
+   "jurisdiction": "GLOBAL",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.65
+  },
+  {
+   "requirement_id": "SEC-KYC-002",
+   "control_id": "KYC-C16",
+   "control": "Encryption of PII at rest and in transit",
+   "citations": [
+    {
+     "kb_id": "POL-ORG-DATA-02",
+     "title": "Org Data Classification & Retention Standard v2.0",
+     "source": "Internal - CISO Office",
+     "jurisdiction": "ORG",
+     "version": "2.0",
+     "excerpt": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Identity documents, biometric templates and national identifiers are Restricted data: they must be encrypted at rest with AES-256 using HSM-managed keys and in transit with TLS 1.2 or higher, masked in non-production…",
+   "jurisdiction": "ORG",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.7
+  },
+  {
+   "requirement_id": "SEC-KYC-002",
+   "control_id": "KYC-C16",
+   "control": "Encryption of PII at rest and in transit",
+   "citations": [
+    {
+     "kb_id": "EU-GDPR-25-32-35",
+     "title": "GDPR Articles 25, 32, 33 and 35 - Privacy by design, security, breach notification, DPIA",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Controllers must implement data protection by design and by default, appropriate technical and organisational security measures such as encryption and pseudonymisation, notify the supervisory authority of personal-data…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Controllers must implement data protection by design and by default, appropriate technical and organisational security measures such as encryption and pseudonymisation, notify the supervisory authority of personal-data…",
+   "jurisdiction": "EU",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.7
+  },
+  {
+   "requirement_id": "SEC-KYC-002",
+   "control_id": "KYC-C16",
+   "control": "Encryption of PII at rest and in transit",
+   "citations": [
+    {
+     "kb_id": "OWASP-ASVS",
+     "title": "OWASP Application Security Verification Standard 4.0",
+     "source": "OWASP",
+     "jurisdiction": "GLOBAL",
+     "version": "4.0.3",
+     "excerpt": "Provides verifiable security requirements for authentication, session management, access control, input validation, cryptography at rest, error handling and logging, data protection, communications security, file upload…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Provides verifiable security requirements for authentication, session management, access control, input validation, cryptography at rest, error handling and logging, data protection, communications security, file upload…",
+   "jurisdiction": "GLOBAL",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.7
+  },
+  {
+   "requirement_id": "PRV-KYC-003",
+   "control_id": "KYC-C19",
+   "control": "Personal-data breach notification",
+   "citations": [
+    {
+     "kb_id": "EU-GDPR-25-32-35",
+     "title": "GDPR Articles 25, 32, 33 and 35 - Privacy by design, security, breach notification, DPIA",
+     "source": "Regulation (EU) 2016/679",
+     "jurisdiction": "EU",
+     "version": "2016/679",
+     "excerpt": "Controllers must implement data protection by design and by default, appropriate technical and organisational security measures such as encryption and pseudonymisation, notify the supervisory authority of personal-data…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Controllers must implement data protection by design and by default, appropriate technical and organisational security measures such as encryption and pseudonymisation, notify the supervisory authority of personal-data…",
+   "jurisdiction": "EU",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.7
+  },
+  {
+   "requirement_id": "FR-KYC-007",
+   "control_id": "KYC-C20",
+   "control": "Maker-checker for manual KYC overrides",
+   "citations": [
+    {
+     "kb_id": "POL-ORG-KYC-01",
+     "title": "Org KYC & Customer Acceptance Policy v3.2",
+     "source": "Internal - Compliance",
+     "jurisdiction": "ORG",
+     "version": "3.2",
+     "excerpt": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "No account may be opened for anonymous or fictitious names or shell entities. Customers are rated low, medium or high risk using the approved risk-scoring model. High-risk and PEP relationships require EDD and approval…",
+   "jurisdiction": "ORG",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.7
+  },
+  {
+   "requirement_id": "FR-KYC-007",
+   "control_id": "KYC-C20",
+   "control": "Maker-checker for manual KYC overrides",
+   "citations": [
+    {
+     "kb_id": "ISO-27001-A",
+     "title": "ISO/IEC 27001:2022 Annex A controls",
+     "source": "ISO/IEC",
+     "jurisdiction": "GLOBAL",
+     "version": "2022",
+     "excerpt": "Annex A includes controls on access control and least privilege, segregation of duties, cryptography, logging and monitoring, secure development life cycle, supplier relationships and information-security incident…",
+     "score": 0.0
+    }
+   ],
+   "obligation": "Annex A includes controls on access control and least privilege, segregation of duties, cryptography, logging and monitoring, secure development life cycle, supplier relationships and information-security incident…",
+   "jurisdiction": "GLOBAL",
+   "gap": false,
+   "needs_legal_review": true,
+   "confidence": 0.7
+  }
+ ],
+ "coverage": [
+  {
+   "control_id": "KYC-C01",
+   "title": "Customer identification data capture",
+   "mandatory": true,
+   "covered_by": [
+    "FR-KYC-003"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C02",
+   "title": "Identity document verification against independent sources",
+   "mandatory": true,
+   "covered_by": [
+    "FR-KYC-003",
+    "SEC-KYC-001"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C03",
+   "title": "Liveness / presentation-attack detection and face match for remote onboarding",
+   "mandatory": true,
+   "covered_by": [
+    "BR-KYC-001"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C04",
+   "title": "Beneficial ownership identification for legal entities",
+   "mandatory": true,
+   "covered_by": [
+    "DAT-KYC-001",
+    "REG-KYC-002"
+   ],
+   "status": "partial",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C05",
+   "title": "Sanctions screening at onboarding and on list updates",
+   "mandatory": true,
+   "covered_by": [
+    "DAT-KYC-001"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C06",
+   "title": "PEP screening with enhanced due diligence",
+   "mandatory": true,
+   "covered_by": [
+    "DAT-KYC-001"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C07",
+   "title": "Customer risk rating (risk-based approach)",
+   "mandatory": true,
+   "covered_by": [
+    "AUD-KYC-001",
+    "FR-KYC-004"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C08",
+   "title": "Enhanced due diligence for high-risk customers",
+   "mandatory": true,
+   "covered_by": [
+    "REG-KYC-003"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C09",
+   "title": "Ongoing monitoring and periodic re-KYC",
+   "mandatory": true,
+   "covered_by": [
+    "FR-KYC-004"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C10",
+   "title": "Record retention",
+   "mandatory": true,
+   "covered_by": [
+    "DAT-KYC-002"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C11",
+   "title": "Suspicious activity / transaction reporting",
+   "mandatory": true,
+   "covered_by": [
+    "FR-KYC-005"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C12",
+   "title": "Consent and privacy notice",
+   "mandatory": true,
+   "covered_by": [
+    "PRV-KYC-001"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C13",
+   "title": "Data minimisation and purpose limitation",
+   "mandatory": true,
+   "covered_by": [
+    "DAT-KYC-003"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C14",
+   "title": "Audit trail of KYC decisions",
+   "mandatory": true,
+   "covered_by": [
+    "AUD-KYC-001"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C15",
+   "title": "Strong authentication and least-privilege access",
+   "mandatory": true,
+   "covered_by": [
+    "SEC-KYC-001"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C16",
+   "title": "Encryption of PII at rest and in transit",
+   "mandatory": true,
+   "covered_by": [
+    "SEC-KYC-002"
+   ],
+   "status": "derived",
+   "derived_requirement": "SEC-KYC-002"
+  },
+  {
+   "control_id": "KYC-C17",
+   "title": "Human review of automated adverse decisions",
+   "mandatory": true,
+   "covered_by": [
+    "FR-KYC-006"
+   ],
+   "status": "covered",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C19",
+   "title": "Personal-data breach notification",
+   "mandatory": true,
+   "covered_by": [
+    "PRV-KYC-003"
+   ],
+   "status": "derived",
+   "derived_requirement": "PRV-KYC-003"
+  },
+  {
+   "control_id": "KYC-C20",
+   "title": "Maker-checker for manual KYC overrides",
+   "mandatory": true,
+   "covered_by": [
+    "FR-KYC-007"
+   ],
+   "status": "derived",
+   "derived_requirement": "FR-KYC-007"
+  },
+  {
+   "control_id": "KYC-C21",
+   "title": "New-product ML/TF risk assessment for digital onboarding",
+   "mandatory": false,
+   "covered_by": [],
+   "status": "gap",
+   "derived_requirement": null
+  },
+  {
+   "control_id": "KYC-C22",
+   "title": "AI/model governance for automated KYC decisions",
+   "mandatory": false,
+   "covered_by": [],
+   "status": "gap",
+   "derived_requirement": null
+  }
+ ],
+ "risks": [
+  {
+   "id": "RSK-001",
+   "title": "Mandatory KYC controls not requested by stakeholders",
+   "category": "compliance",
+   "description": "3 mandatory controls were absent from stakeholder input and were derived from the control catalogue: KYC-C16, KYC-C19, KYC-C20.",
+   "likelihood": 4,
+   "impact": 5,
+   "level": "critical",
+   "mitigation": "Compliance officer validates derived requirements before baseline; include them in sprint 0 scope.",
+   "owner": "compliance",
+   "linked_requirements": [
+    "SEC-KYC-002",
+    "PRV-KYC-003",
+    "FR-KYC-007"
+   ]
+  },
+  {
+   "id": "RSK-002",
+   "title": "Stakeholder contradiction (REG-KYC-001, REG-KYC-002)",
+   "category": "business",
+   "description": "Opposing positions on control KYC-C04 (Beneficial ownership identification for legal entities): REG-KYC-001 (Lena (Sales)) vs REG-KYC-002 (Tomas (MLRO)).",
+   "likelihood": 4,
+   "impact": 4,
+   "level": "critical",
+   "mitigation": "Facilitated decision by product owner; record the resolution in the conflict log.",
+   "owner": "product_owner",
+   "linked_requirements": [
+    "REG-KYC-001",
+    "REG-KYC-002"
+   ]
+  },
+  {
+   "id": "RSK-003",
+   "title": "Stakeholder contradiction (REG-KYC-001, DAT-KYC-001)",
+   "category": "business",
+   "description": "Opposing positions on control KYC-C04 (Beneficial ownership identification for legal entities): REG-KYC-001 (Lena (Sales)) vs DAT-KYC-001 (Tomas (MLRO)).",
+   "likelihood": 4,
+   "impact": 4,
+   "level": "critical",
+   "mitigation": "Facilitated decision by product owner; record the resolution in the conflict log.",
+   "owner": "product_owner",
+   "linked_requirements": [
+    "REG-KYC-001",
+    "DAT-KYC-001"
+   ]
+  },
+  {
+   "id": "RSK-004",
+   "title": "Regulatory conflict: KYC-C04",
+   "category": "compliance",
+   "description": "REG-KYC-001: Requirement appears to waive a mandatory control: Beneficial ownership identification for legal entities.",
+   "likelihood": 4,
+   "impact": 5,
+   "level": "critical",
+   "mitigation": "Legal/compliance interpretation and requirement rewrite before baseline.",
+   "owner": "legal",
+   "linked_requirements": [
+    "REG-KYC-001"
+   ]
+  },
+  {
+   "id": "RSK-005",
+   "title": "Threat T-DOC-UPLOAD",
+   "category": "security",
+   "description": "Tampering / Elevation: Malicious file uploaded as an identity document.",
+   "likelihood": 4,
+   "impact": 4,
+   "level": "critical",
+   "mitigation": "Implement linked security requirements; verify with threat-model review, SAST/DAST and penetration test.",
+   "owner": "security",
+   "linked_requirements": [
+    "SEC-KYC-003"
+   ]
+  },
+  {
+   "id": "RSK-006",
+   "title": "Threat T-SPOOF-BIO",
+   "category": "security",
+   "description": "Spoofing: Presentation or injection attacks (photos, masks, deepfakes, virtual cameras) during remote verification.",
+   "likelihood": 4,
+   "impact": 5,
+   "level": "critical",
+   "mitigation": "Implement linked security requirements; verify with threat-model review, SAST/DAST and penetration test.",
+   "owner": "security",
+   "linked_requirements": [
+    "SEC-KYC-004"
+   ]
+  },
+  {
+   "id": "RSK-007",
+   "title": "Threat T-BIO-PRIV",
+   "category": "security",
+   "description": "Information disclosure: Biometric data misuse or over-retention.",
+   "likelihood": 4,
+   "impact": 4,
+   "level": "critical",
+   "mitigation": "Implement linked security requirements; verify with threat-model review, SAST/DAST and penetration test.",
+   "owner": "security",
+   "linked_requirements": [
+    "PRV-KYC-004"
+   ]
+  },
+  {
+   "id": "RSK-008",
+   "title": "Threat T-API",
+   "category": "security",
+   "description": "Spoofing / Tampering: Unauthenticated or tampered calls to identity, screening and core-banking APIs.",
+   "likelihood": 4,
+   "impact": 4,
+   "level": "critical",
+   "mitigation": "Implement linked security requirements; verify with threat-model review, SAST/DAST and penetration test.",
+   "owner": "security",
+   "linked_requirements": [
+    "SEC-KYC-005"
+   ]
+  },
+  {
+   "id": "RSK-009",
+   "title": "Threat T-STAFF",
+   "category": "security",
+   "description": "Elevation of privilege / Repudiation: Insider misuse of customer identity data.",
+   "likelihood": 4,
+   "impact": 4,
+   "level": "critical",
+   "mitigation": "Implement linked security requirements; verify with threat-model review, SAST/DAST and penetration test.",
+   "owner": "security",
+   "linked_requirements": [
+    "SEC-KYC-001"
+   ]
+  },
+  {
+   "id": "RSK-010",
+   "title": "Threat T-ACCOUNT-TAKEOVER",
+   "category": "security",
+   "description": "Spoofing: OTP brute force, SIM-swap and account-takeover during onboarding.",
+   "likelihood": 4,
+   "impact": 4,
+   "level": "critical",
+   "mitigation": "Implement linked security requirements; verify with threat-model review, SAST/DAST and penetration test.",
+   "owner": "security",
+   "linked_requirements": [
+    "SEC-KYC-005"
+   ]
+  },
+  {
+   "id": "RSK-011",
+   "title": "Threat T-SYNTHETIC",
+   "category": "security",
+   "description": "Spoofing: Synthetic identities and mule-account onboarding at scale.",
+   "likelihood": 4,
+   "impact": 4,
+   "level": "critical",
+   "mitigation": "Implement linked security requirements; verify with threat-model review, SAST/DAST and penetration test.",
+   "owner": "security",
+   "linked_requirements": [
+    "SEC-KYC-006"
+   ]
+  },
+  {
+   "id": "RSK-012",
+   "title": "Threat T-DOS",
+   "category": "security",
+   "description": "Denial of service: Volumetric attacks exhausting verification-vendor quotas or onboarding capacity.",
+   "likelihood": 3,
+   "impact": 3,
+   "level": "medium",
+   "mitigation": "Implement linked security requirements; verify with threat-model review, SAST/DAST and penetration test.",
+   "owner": "security",
+   "linked_requirements": [
+    "SEC-KYC-005"
+   ]
+  },
+  {
+   "id": "RSK-013",
+   "title": "Threat T-AI",
+   "category": "security",
+   "description": "Repudiation / Fairness: Opaque or biased automated KYC decisions.",
+   "likelihood": 3,
+   "impact": 3,
+   "level": "medium",
+   "mitigation": "Implement linked security requirements; verify with threat-model review, SAST/DAST and penetration test.",
+   "owner": "security",
+   "linked_requirements": [
+    "REG-KYC-004"
+   ]
+  },
+  {
+   "id": "RSK-014",
+   "title": "Threat T-NONPROD",
+   "category": "security",
+   "description": "Information disclosure: Real KYC data leaking into test and analytics environments.",
+   "likelihood": 3,
+   "impact": 3,
+   "level": "medium",
+   "mitigation": "Implement linked security requirements; verify with threat-model review, SAST/DAST and penetration test.",
+   "owner": "security",
+   "linked_requirements": [
+    "PRV-KYC-005"
+   ]
+  },
+  {
+   "id": "RSK-015",
+   "title": "Verification-vendor dependency",
+   "category": "operational",
+   "description": "Outage or degradation of identity, screening or registry vendors stops onboarding.",
+   "likelihood": 3,
+   "impact": 4,
+   "level": "high",
+   "mitigation": "Dual-vendor strategy or graceful queueing; vendor SLAs and exit plan; circuit breakers.",
+   "owner": "operations",
+   "linked_requirements": [
+    "SEC-KYC-005"
+   ]
+  },
+  {
+   "id": "RSK-016",
+   "title": "Biometric data breach",
+   "category": "privacy",
+   "description": "Compromise of face images or templates is irreversible for customers.",
+   "likelihood": 2,
+   "impact": 5,
+   "level": "high",
+   "mitigation": "Template protection, encryption with HSM keys, minimal retention, DPIA.",
+   "owner": "security",
+   "linked_requirements": [
+    "BR-KYC-001",
+    "SEC-KYC-002",
+    "SEC-KYC-004",
+    "PRV-KYC-004",
+    "REG-KYC-004"
+   ]
+  },
+  {
+   "id": "RSK-017",
+   "title": "Ambiguous or untestable requirements",
+   "category": "business",
+   "description": "4 requirements are vague or incomplete, which risks scope creep and failed UAT.",
+   "likelihood": 3,
+   "impact": 3,
+   "level": "medium",
+   "mitigation": "Resolve the clarification questions before the baseline gate.",
+   "owner": "business_analyst",
+   "linked_requirements": [
+    "USA-KYC-001",
+    "SEC-KYC-003",
+    "PRV-KYC-004",
+    "REG-KYC-004"
+   ]
+  },
+  {
+   "id": "RSK-018",
+   "title": "Automated adverse decisions without human review",
+   "category": "compliance",
+   "description": "Fully automated rejection may breach automated-decision rules and fairness expectations.",
+   "likelihood": 3,
+   "impact": 4,
+   "level": "high",
+   "mitigation": "Human review for rejections; reason codes; contest channel.",
+   "owner": "compliance",
+   "linked_requirements": [
+    "FR-KYC-006",
+    "FR-KYC-007",
+    "REG-KYC-004"
+   ]
+  }
+ ],
+ "sdlc": {
+  "factors": [
+   {
+    "name": "requirement_stability",
+    "score": 3,
+    "rationale": "3 contradictions, 4/30 ambiguous or incomplete requirements, 0 volatility cues."
+   },
+   {
+    "name": "regulatory_criticality",
+    "score": 5,
+    "rationale": "53% of requirements are regulatory; 19 mandatory KYC controls apply."
+   },
+   {
+    "name": "security_risk",
+    "score": 5,
+    "rationale": "40% security/privacy requirements; biometric processing=yes; restricted identity data in scope."
+   },
+   {
+    "name": "complexity",
+    "score": 4,
+    "rationale": "0 external integrations, 12 requirement dimensions, 30 requirements."
+   },
+   {
+    "name": "system_size",
+    "score": 3,
+    "rationale": "30 requirements across 4 sources."
+   },
+   {
+    "name": "legacy_dependence",
+    "score": 1,
+    "rationale": "0 legacy-dependency signals; declared legacy systems: none."
+   },
+   {
+    "name": "change_frequency",
+    "score": 4,
+    "rationale": "1 change-frequency cues; regulatory content changes with new circulars."
+   },
+   {
+    "name": "continuous_delivery_need",
+    "score": 2,
+    "rationale": "0 continuous-delivery cues."
+   },
+   {
+    "name": "stakeholder_availability",
+    "score": 4,
+    "rationale": "4 distinct stakeholders contributed input; 0 availability constraints mentioned."
+   },
+   {
+    "name": "documentation_need",
+    "score": 5,
+    "rationale": "Regulator inspection and audit evidence required; 2 audit/reporting requirements."
+   },
+   {
+    "name": "budget_schedule_pressure",
+    "score": 3,
+    "rationale": "Timeline 9 months; 2 deadline cues; budget flexibility medium."
+   },
+   {
+    "name": "formal_verification_need",
+    "score": 3,
+    "rationale": "1 formal verification/certification cues; regulatory criticality 5."
+   },
+   {
+    "name": "failure_consequence",
+    "score": 4,
+    "rationale": "53% high/critical-risk requirements; failures expose the firm to AML penalties and licence risk."
+   },
+   {
+    "name": "technical_uncertainty",
+    "score": 4,
+    "rationale": "5 novel-technology cues; 13 open clarification questions."
+   }
+  ],
+  "ranked": [
+   {
+    "model": "Hybrid Agile-V-Model",
+    "score": 94.6,
+    "reasons": [
+     "Fits: regulatory criticality = 5 (ideal 5), change frequency = 4 (ideal 4), formal verification need = 3 (ideal 4), documentation need = 5 (ideal 4)",
+     "+5: high regulation with evolving requirements favours a regulated hybrid"
+    ]
+   },
+   {
+    "model": "Hybrid Agile-DevSecOps",
+    "score": 94.6,
+    "reasons": [
+     "Fits: regulatory criticality = 5 (ideal 5), security risk = 5 (ideal 5), change frequency = 4 (ideal 4)",
+     "+5: high regulation with evolving requirements favours a regulated hybrid"
+    ]
+   },
+   {
+    "model": "V-Model",
+    "score": 75.0,
+    "reasons": [
+     "Fits: requirement stability = 3 (ideal 4), failure consequence = 4 (ideal 5), documentation need = 5 (ideal 5), regulatory criticality = 5 (ideal 5)"
+    ]
+   },
+   {
+    "model": "Spiral",
+    "score": 72.5,
+    "reasons": [
+     "Fits: technical uncertainty = 4 (ideal 5), complexity = 4 (ideal 5)",
+     "+5: high technical uncertainty favours risk-driven cycles"
+    ]
+   },
+   {
+    "model": "DevSecOps",
+    "score": 72.2,
+    "reasons": [
+     "Fits: security risk = 5 (ideal 5), change frequency = 4 (ideal 4)",
+     "Misfits: continuous delivery need = 2 vs ideal 5"
+    ]
+   },
+   {
+    "model": "Agile (Scrum)",
+    "score": 53.3,
+    "reasons": [
+     "Fits: change frequency = 4 (ideal 5), stakeholder availability = 4 (ideal 5)",
+     "-5: no built-in security activities for a high-risk system"
+    ]
+   },
+   {
+    "model": "Waterfall",
+    "score": 46.8,
+    "reasons": [
+     "Fits: continuous delivery need = 2 (ideal 1), documentation need = 5 (ideal 5)",
+     "Misfits: change frequency = 4 vs ideal 1, technical uncertainty = 4 vs ideal 1",
+     "-5: no built-in security activities for a high-risk system"
+    ]
+   }
+  ],
+  "selected": "Hybrid Agile-V-Model",
+  "explanation": "Hybrid Agile-V-Model ranks first (94.6%) ahead of Hybrid Agile-DevSecOps (94.6%). The project scores high on regulatory criticality, security risk, documentation need, complexity, change frequency and low on legacy dependence, continuous delivery need. Engine reasons: Fits: regulatory criticality = 5 (ideal 5), change frequency = 4 (ideal 4), formal verification need = 3 (ideal 4), documentation need = 5 (ideal 4); +5: high regulation with evolving requirements favours a regulated hybrid. This is a recommendation; the project manager, architect, security lead and compliance officer must jointly approve the final SDLC choice.",
+  "workflow": [
+   {
+    "name": "Inception & regulatory scoping",
+    "activities": [
+     "Confirm jurisdictions, customer segments and channels",
+     "ML/TF risk assessment of the digital onboarding channel (FATF R.15)",
+     "DPIA kick-off for biometric and identity data",
+     "Stakeholder map and interview plan"
+    ],
+    "roles": [
+     "Product owner",
+     "Compliance officer",
+     "Business analyst",
+     "Project manager"
+    ],
+    "deliverables": [
+     "Project charter",
+     "Regulatory applicability register",
+     "Initial risk register"
+    ],
+    "security_activities": [
+     "Data classification of KYC data elements"
+    ],
+    "testing": [],
+    "compliance_checkpoints": [
+     "Applicable regulations confirmed by compliance"
+    ],
+    "approval_gate": "Scope & applicability approval (product owner + compliance)",
+    "entry_criteria": [
+     "Business case approved"
+    ],
+    "exit_criteria": [
+     "Jurisdictions and mandatory controls confirmed"
+    ],
+    "traceability": [
+     "Regulation -> control register created"
+    ]
+   },
+   {
+    "name": "Requirements engineering & baseline",
+    "activities": [
+     "Agent-assisted elicitation and extraction",
+     "Clarification of ambiguous or conflicting requirements",
+     "Compliance mapping and gap closure",
+     "Acceptance criteria definition"
+    ],
+    "roles": [
+     "Business analyst",
+     "Product owner",
+     "Compliance officer",
+     "Security architect"
+    ],
+    "deliverables": [
+     "SRS",
+     "User stories & use cases",
+     "Requirements traceability matrix",
+     "Compliance-control matrix"
+    ],
+    "security_activities": [
+     "Security & privacy requirement derivation (threat model v0)"
+    ],
+    "testing": [
+     "Requirement testability review",
+     "Acceptance test plan derived from requirements (V: left <-> right pairing)"
+    ],
+    "compliance_checkpoints": [
+     "Mandatory control coverage: KYC-C01 Customer identification data capture, KYC-C02 Identity document verification against independent sources, KYC-C03 Liveness / presentation-attack detection and face match for remote onboarding, KYC-C04 Beneficial ownership identification for legal entities, KYC-C05 Sanctions screening at onboarding and on list updates, KYC-C06 PEP screening with enhanced due diligence, KYC-C07 Customer risk rating (risk-based approach), KYC-C08 Enhanced due diligence for high-risk customers"
+    ],
+    "approval_gate": "Requirements baseline approval (product owner, BA; compliance for regulatory items)",
+    "entry_criteria": [
+     "Stakeholder inputs ingested and masked"
+    ],
+    "exit_criteria": [
+     "0 open critical conflicts",
+     "100% mandatory control coverage",
+     "All MUST requirements testable"
+    ],
+    "traceability": [
+     "Stakeholder statement -> requirement -> regulation/control"
+    ]
+   },
+   {
+    "name": "Architecture & secure design",
+    "activities": [
+     "Target architecture (onboarding orchestration, vendor adapters, CBS integration)",
+     "Data model with retention schedule",
+     "Threat modelling (STRIDE) of onboarding flows",
+     "Privacy by design review"
+    ],
+    "roles": [
+     "Solution architect",
+     "Security architect",
+     "Data protection officer"
+    ],
+    "deliverables": [
+     "Architecture decision records",
+     "Threat model",
+     "Interface specifications",
+     "DPIA"
+    ],
+    "security_activities": [
+     "Threat modelling",
+     "Cryptography and key-management design (HSM)",
+     "IAM / RBAC design"
+    ],
+    "testing": [
+     "Design review against OWASP ASVS L2",
+     "System/integration test plan derived from design"
+    ],
+    "compliance_checkpoints": [
+     "DPIA sign-off",
+     "Retention schedule approved by compliance"
+    ],
+    "approval_gate": "Architecture & security design approval (architect + security)",
+    "entry_criteria": [
+     "Requirements baseline approved"
+    ],
+    "exit_criteria": [
+     "Threat model with mitigations mapped to requirements"
+    ],
+    "traceability": [
+     "Requirement -> design element -> threat mitigation"
+    ]
+   },
+   {
+    "name": "Iterative build (sprints)",
+    "activities": [
+     "Sprint planning from prioritised backlog",
+     "Implement user stories with acceptance tests",
+     "Sprint review with business and compliance"
+    ],
+    "roles": [
+     "Scrum team",
+     "Product owner",
+     "Compliance champion"
+    ],
+    "deliverables": [
+     "Working increment",
+     "Updated RTM",
+     "Definition-of-done evidence"
+    ],
+    "security_activities": [
+     "SAST and secret scanning on every commit",
+     "Software composition analysis (SCA)",
+     "Secure code review for PII paths",
+     "Pipeline compliance gates on every merge"
+    ],
+    "testing": [
+     "Unit and contract tests (vendor/CBS simulators)",
+     "Automated acceptance tests"
+    ],
+    "compliance_checkpoints": [
+     "Compliance champion reviews stories touching KYC controls"
+    ],
+    "approval_gate": "Sprint review acceptance (product owner)",
+    "entry_criteria": [
+     "Stories meet definition of ready"
+    ],
+    "exit_criteria": [
+     "Definition of done incl. security checks passed"
+    ],
+    "traceability": [
+     "Story -> commit -> test case"
+    ]
+   },
+   {
+    "name": "System verification & validation",
+    "activities": [
+     "System integration testing with vendors, CKYCR and CBS",
+     "Transaction-integrity and data-reconciliation tests",
+     "Performance & resilience testing at peak load",
+     "UAT with operations and compliance"
+    ],
+    "roles": [
+     "QA lead",
+     "Operations",
+     "Compliance officer",
+     "Security tester"
+    ],
+    "deliverables": [
+     "Test summary report",
+     "Penetration-test report",
+     "Liveness/PAD test evidence",
+     "UAT sign-off"
+    ],
+    "security_activities": [
+     "Independent penetration test",
+     "PAD testing (ISO/IEC 30107-3)",
+     "Access-control verification"
+    ],
+    "testing": [
+     "SIT",
+     "Transaction-integrity tests",
+     "Load/soak tests",
+     "DR failover test",
+     "Bias testing of face-match and risk models"
+    ],
+    "compliance_checkpoints": [
+     "High-risk requirements verified: REG-KYC-001, REG-KYC-002, DAT-KYC-001, DAT-KYC-003, BR-KYC-001, FR-KYC-006, SEC-KYC-001, SEC-KYC-002, PRV-KYC-003, FR-KYC-007",
+     "Control testing evidence for every mandatory KYC control"
+    ],
+    "approval_gate": "Verification & UAT sign-off (QA, operations, compliance)",
+    "entry_criteria": [
+     "Feature complete",
+     "Test environments with masked data"
+    ],
+    "exit_criteria": [
+     "No open critical/high defects",
+     "All MUST acceptance criteria passed"
+    ],
+    "traceability": [
+     "Requirement -> test case -> result (RTM complete)"
+    ]
+   },
+   {
+    "name": "Release & production readiness",
+    "activities": [
+     "Production readiness review",
+     "Runbooks and monitoring dashboards",
+     "Phased rollout (pilot cohort, then general availability)"
+    ],
+    "roles": [
+     "Project manager",
+     "Operations",
+     "Security",
+     "Compliance officer"
+    ],
+    "deliverables": [
+     "Go-live checklist",
+     "Runbooks",
+     "Rollback plan"
+    ],
+    "security_activities": [
+     "Security sign-off",
+     "Key ceremony / HSM configuration check"
+    ],
+    "testing": [
+     "Smoke tests in production",
+     "Monitoring alert tests"
+    ],
+    "compliance_checkpoints": [
+     "Compliance approval before deployment",
+     "Regulatory notification if required"
+    ],
+    "approval_gate": "Production-readiness approval (PM, security, compliance, operations; unanimous)",
+    "entry_criteria": [
+     "Verification sign-off"
+    ],
+    "exit_criteria": [
+     "Go-live approved"
+    ],
+    "traceability": [
+     "Release notes -> requirement IDs"
+    ]
+   },
+   {
+    "name": "Operate, monitor & re-certify",
+    "activities": [
+     "Monitor onboarding KPIs, false positives and drop-off",
+     "Model drift and bias monitoring",
+     "Regulatory change watch -> change requests"
+    ],
+    "roles": [
+     "Operations",
+     "Model risk management",
+     "Compliance officer"
+    ],
+    "deliverables": [
+     "MIS and regulator reports",
+     "Periodic control-testing reports"
+    ],
+    "security_activities": [
+     "SIEM monitoring",
+     "Quarterly access recertification",
+     "Annual penetration test"
+    ],
+    "testing": [
+     "Periodic control testing"
+    ],
+    "compliance_checkpoints": [
+     "Annual KYC policy review",
+     "Audit evidence retained per retention schedule"
+    ],
+    "approval_gate": "Change approval for regulatory updates (compliance + product owner)",
+    "entry_criteria": [
+     "Go-live"
+    ],
+    "exit_criteria": [
+     "Continuous"
+    ],
+    "traceability": [
+     "Regulatory change -> impacted requirements -> regression tests"
+    ]
+   }
+  ],
+  "status": "pending_approval"
+ },
+ "approvals": [
+  {
+   "id": "APR-001",
+   "gate": "regulatory_interpretation",
+   "subject_id": "FR-KYC-003:KYC-C01",
+   "summary": "Confirm that FR-KYC-003 satisfies KYC-C01 (Customer identification data capture) under GLOBAL.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-002",
+   "gate": "regulatory_interpretation",
+   "subject_id": "FR-KYC-003:KYC-C02",
+   "summary": "Confirm that FR-KYC-003 satisfies KYC-C02 (Identity document verification against independent sources) under GLOBAL.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-003",
+   "gate": "regulatory_interpretation",
+   "subject_id": "REG-KYC-001:KYC-C04",
+   "summary": "Confirm that REG-KYC-001 satisfies KYC-C04 (Beneficial ownership identification for legal entities) under EU,GLOBAL.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-004",
+   "gate": "regulatory_interpretation",
+   "subject_id": "DAT-KYC-001:KYC-C05",
+   "summary": "Confirm that DAT-KYC-001 satisfies KYC-C05 (Sanctions screening at onboarding and on list updates) under GLOBAL.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-005",
+   "gate": "regulatory_interpretation",
+   "subject_id": "FR-KYC-004:KYC-C07",
+   "summary": "Confirm that FR-KYC-004 satisfies KYC-C07 (Customer risk rating (risk-based approach)) under GLOBAL,ORG.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-006",
+   "gate": "regulatory_interpretation",
+   "subject_id": "FR-KYC-004:KYC-C09",
+   "summary": "Confirm that FR-KYC-004 satisfies KYC-C09 (Ongoing monitoring and periodic re-KYC) under GLOBAL.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-007",
+   "gate": "regulatory_interpretation",
+   "subject_id": "BR-KYC-001:KYC-C03",
+   "summary": "Confirm that BR-KYC-001 satisfies KYC-C03 (Liveness / presentation-attack detection and face match for remote onboarding) under GLOBAL.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-008",
+   "gate": "regulatory_interpretation",
+   "subject_id": "PRV-KYC-001:KYC-C12",
+   "summary": "Confirm that PRV-KYC-001 satisfies KYC-C12 (Consent and privacy notice) under EU.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-009",
+   "gate": "regulatory_interpretation",
+   "subject_id": "SEC-KYC-001:KYC-C02",
+   "summary": "Confirm that SEC-KYC-001 satisfies KYC-C02 (Identity document verification against independent sources) under GLOBAL.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-010",
+   "gate": "regulatory_interpretation",
+   "subject_id": "AUD-KYC-001:KYC-C07",
+   "summary": "Confirm that AUD-KYC-001 satisfies KYC-C07 (Customer risk rating (risk-based approach)) under GLOBAL,ORG.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-011",
+   "gate": "regulatory_interpretation",
+   "subject_id": "AUD-KYC-001:KYC-C14",
+   "summary": "Confirm that AUD-KYC-001 satisfies KYC-C14 (Audit trail of KYC decisions) under GLOBAL.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-012",
+   "gate": "regulatory_interpretation",
+   "subject_id": "SEC-KYC-002:KYC-C16",
+   "summary": "Confirm that SEC-KYC-002 satisfies KYC-C16 (Encryption of PII at rest and in transit) under ORG.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-013",
+   "gate": "regulatory_interpretation",
+   "subject_id": "PRV-KYC-003:KYC-C19",
+   "summary": "Confirm that PRV-KYC-003 satisfies KYC-C19 (Personal-data breach notification) under EU.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-014",
+   "gate": "regulatory_interpretation",
+   "subject_id": "FR-KYC-007:KYC-C20",
+   "summary": "Confirm that FR-KYC-007 satisfies KYC-C20 (Maker-checker for manual KYC overrides) under ORG.",
+   "required_roles": [
+    "compliance",
+    "legal"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-015",
+   "gate": "architecture",
+   "subject_id": "PERF-KYC-001",
+   "summary": "Architecture-critical requirement: The onboarding API must respond within 800 ms at the 95th percentile.",
+   "required_roles": [
+    "architect"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-016",
+   "gate": "architecture",
+   "subject_id": "AVL-KYC-001",
+   "summary": "Architecture-critical requirement: The service must be available 99.95% of the time.",
+   "required_roles": [
+    "architect"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-017",
+   "gate": "high_risk_security",
+   "subject_id": "SEC-KYC-001",
+   "summary": "High-risk security requirement: All admin users must authenticate with MFA and access must be role-based.",
+   "required_roles": [
+    "security"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-018",
+   "gate": "high_risk_security",
+   "subject_id": "SEC-KYC-002",
+   "summary": "High-risk security requirement: The system shall encrypt identity documents, biometric data and national identifiers at rest (AES-256, HSM-managed keys) and in transit (TLS",
+   "required_roles": [
+    "security"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-019",
+   "gate": "high_risk_security",
+   "subject_id": "PRV-KYC-003",
+   "summary": "High-risk security requirement: The system shall support detection and notification of personal-data breaches to the regulator and affected customers within statutory deadl",
+   "required_roles": [
+    "security"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-020",
+   "gate": "high_risk_security",
+   "subject_id": "FR-KYC-007",
+   "summary": "High-risk security requirement: The system shall require maker-checker (four-eyes) approval with a recorded reason for any manual override of an automated KYC outcome.",
+   "required_roles": [
+    "security"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-021",
+   "gate": "high_risk_security",
+   "subject_id": "SEC-KYC-003",
+   "summary": "High-risk security requirement: The system shall validate uploaded identity files by type, size and content signature, scan them for malware before processing, and store th",
+   "required_roles": [
+    "security"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-022",
+   "gate": "high_risk_security",
+   "subject_id": "SEC-KYC-004",
+   "summary": "High-risk security requirement: The system shall detect presentation and video-injection attacks (ISO/IEC 30107-3 tested, APCER ≤ 5% at BPCER ≤ 5%) and block virtual-camera",
+   "required_roles": [
+    "security"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-023",
+   "gate": "high_risk_security",
+   "subject_id": "PRV-KYC-004",
+   "summary": "High-risk security requirement: The system shall obtain explicit, separate consent for biometric processing, store only protected biometric templates (never raw images beyo",
+   "required_roles": [
+    "security"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-024",
+   "gate": "high_risk_security",
+   "subject_id": "SEC-KYC-005",
+   "summary": "High-risk security requirement: The system shall authenticate all service-to-service calls with mutual TLS or OAuth 2.0 client credentials, sign and validate response paylo",
+   "required_roles": [
+    "security"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-025",
+   "gate": "high_risk_security",
+   "subject_id": "SEC-KYC-006",
+   "summary": "High-risk security requirement: The system shall apply fraud checks at onboarding (device fingerprint, velocity of applications per device/address/identifier, and synthetic",
+   "required_roles": [
+    "security"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-026",
+   "gate": "conflict",
+   "subject_id": "CON-001",
+   "summary": "Opposing positions on control KYC-C04 (Beneficial ownership identification for legal entities): REG-KYC-001 (Lena (Sales)) vs REG-KYC-002 (Tomas (MLRO)).",
+   "required_roles": [
+    "product_owner",
+    "project_manager"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-027",
+   "gate": "conflict",
+   "subject_id": "CON-002",
+   "summary": "Opposing positions on control KYC-C04 (Beneficial ownership identification for legal entities): REG-KYC-001 (Lena (Sales)) vs DAT-KYC-001 (Tomas (MLRO)).",
+   "required_roles": [
+    "product_owner",
+    "project_manager"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-028",
+   "gate": "conflict",
+   "subject_id": "CON-003",
+   "summary": "REG-KYC-001: Requirement appears to waive a mandatory control: Beneficial ownership identification for legal entities.",
+   "required_roles": [
+    "product_owner",
+    "project_manager"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-029",
+   "gate": "sdlc",
+   "subject_id": "sdlc",
+   "summary": "Adopt Hybrid Agile-V-Model (94.6%) as the project SDLC.",
+   "required_roles": [
+    "architect",
+    "compliance",
+    "project_manager",
+    "security"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  },
+  {
+   "id": "APR-030",
+   "gate": "baseline",
+   "subject_id": "baseline",
+   "summary": "Approve requirements baseline of 30 requirements.",
+   "required_roles": [
+    "business_analyst",
+    "product_owner",
+    "project_manager"
+   ],
+   "decisions": [],
+   "status": "pending_approval"
+  }
+ ],
+ "open_issues": [],
+ "metrics": {
+  "timing_s": {
+   "ingestion": 0.0,
+   "topic_coverage": 0.0001,
+   "extraction": 0.0015,
+   "classification": 0.0022,
+   "quality": 0.0027,
+   "conflict": 0.0231,
+   "compliance": 0.0056,
+   "security_privacy": 0.0016,
+   "quality_derived": 0.0016,
+   "clarification": 0.0001,
+   "risk": 0.0007,
+   "sdlc": 0.0029,
+   "validation": 0.0001,
+   "approval": 0.0002
+  },
+  "requirements_total": 30,
+  "requirements_extracted": 20,
+  "requirements_derived": 10,
+  "with_quality_issues": 10,
+  "needs_clarification": 4,
+  "ambiguity_flags": 1,
+  "conflicts_total": 3,
+  "conflicts_open_high": 3,
+  "mandatory_controls": 19,
+  "control_coverage_stakeholder": 0.789,
+  "control_coverage_after_derivation": 1.0,
+  "citations_total": 64,
+  "citation_validity": 1.0,
+  "hallucinated_extractions": 0,
+  "hallucinated_citations": 0,
+  "traceability_coverage": 1.0,
+  "acceptance_criteria_coverage": 1.0,
+  "avg_confidence": 0.631,
+  "low_confidence": 0,
+  "open_questions": 13,
+  "risks": 18,
+  "pii_masked": 0,
+  "injection_quarantined": 0,
+  "by_category": {
+   "business": 1,
+   "stakeholder": 0,
+   "functional": 9,
+   "security": 9,
+   "privacy": 6,
+   "regulatory": 16,
+   "performance": 1,
+   "availability": 1,
+   "usability": 1,
+   "data_management": 5,
+   "integration": 2,
+   "audit_reporting": 2,
+   "operational": 2
+  },
+  "baseline_ready": false,
+  "gates": {
+   "no_open_high_conflicts": false,
+   "full_mandatory_coverage": true,
+   "all_citations_valid": true,
+   "no_pending_clarifications": false,
+   "traceability_complete": true
+  },
+  "agent_stats": {
+   "pii_masked": 0,
+   "injection_quarantined": 0,
+   "uncovered_topics": [
+    "objectives",
+    "workflow",
+    "exceptions",
+    "limits",
+    "performance",
+    "integration"
+   ],
+   "citations_total": 49,
+   "threat_model": [
+    {
+     "id": "T-DOC-UPLOAD",
+     "stride": "Tampering / Elevation",
+     "threat": "Malicious file uploaded as an identity document.",
+     "level": "high",
+     "covered_by": []
+    },
+    {
+     "id": "T-SPOOF-BIO",
+     "stride": "Spoofing",
+     "threat": "Presentation or injection attacks (photos, masks, deepfakes, virtual cameras) during remote verification.",
+     "level": "critical",
+     "covered_by": []
+    },
+    {
+     "id": "T-BIO-PRIV",
+     "stride": "Information disclosure",
+     "threat": "Biometric data misuse or over-retention.",
+     "level": "high",
+     "covered_by": []
+    },
+    {
+     "id": "T-API",
+     "stride": "Spoofing / Tampering",
+     "threat": "Unauthenticated or tampered calls to identity, screening and core-banking APIs.",
+     "level": "high",
+     "covered_by": []
+    },
+    {
+     "id": "T-STAFF",
+     "stride": "Elevation of privilege / Repudiation",
+     "threat": "Insider misuse of customer identity data.",
+     "level": "high",
+     "covered_by": [
+      "SEC-KYC-001"
+     ]
+    },
+    {
+     "id": "T-ACCOUNT-TAKEOVER",
+     "stride": "Spoofing",
+     "threat": "OTP brute force, SIM-swap and account-takeover during onboarding.",
+     "level": "high",
+     "covered_by": [
+      "SEC-KYC-005"
+     ]
+    },
+    {
+     "id": "T-SYNTHETIC",
+     "stride": "Spoofing",
+     "threat": "Synthetic identities and mule-account onboarding at scale.",
+     "level": "high",
+     "covered_by": []
+    },
+    {
+     "id": "T-DOS",
+     "stride": "Denial of service",
+     "threat": "Volumetric attacks exhausting verification-vendor quotas or onboarding capacity.",
+     "level": "medium",
+     "covered_by": [
+      "SEC-KYC-005"
+     ]
+    },
+    {
+     "id": "T-AI",
+     "stride": "Repudiation / Fairness",
+     "threat": "Opaque or biased automated KYC decisions.",
+     "level": "medium",
+     "covered_by": []
+    },
+    {
+     "id": "T-NONPROD",
+     "stride": "Information disclosure",
+     "threat": "Real KYC data leaking into test and analytics environments.",
+     "level": "medium",
+     "covered_by": []
+    }
+   ]
+  },
+  "processing_time_s": 0.043,
+  "last_run": {
+   "trigger": "demo snapshot",
+   "llm": "offline-rules",
+   "elapsed": 0.043,
+   "llm_calls": 0,
+   "llm_failed": 0,
+   "stages": [
+    {
+     "id": "ingestion",
+     "label": "Security gate",
+     "about": "Masks PII and quarantines prompt-injection attempts",
+     "status": "done",
+     "seconds": 0.0,
+     "note": "4 sources screened · 0 PII values masked · 0 injection attempts quarantined",
+     "llm_calls": 0
+    },
+    {
+     "id": "topic_coverage",
+     "label": "Topic coverage",
+     "about": "Checks which interview topics the inputs already cover",
+     "status": "done",
+     "seconds": 0.0,
+     "note": "6 interview topics not covered yet",
+     "llm_calls": 0
+    },
+    {
+     "id": "extraction",
+     "label": "Requirement extraction",
+     "about": "Pulls requirement statements out of each input",
+     "status": "done",
+     "seconds": 0.002,
+     "note": "20 requirements",
+     "llm_calls": 0
+    },
+    {
+     "id": "classification",
+     "label": "Classification",
+     "about": "Assigns multi-label categories and requirement IDs",
+     "status": "done",
+     "seconds": 0.002,
+     "note": "20 requirements across 11 categories",
+     "llm_calls": 0
+    },
+    {
+     "id": "quality",
+     "label": "Quality checks",
+     "about": "Flags ambiguity, incompleteness and untestable wording",
+     "status": "done",
+     "seconds": 0.003,
+     "note": "3 requirements with quality issues",
+     "llm_calls": 0
+    },
+    {
+     "id": "conflict",
+     "label": "Conflict detection",
+     "about": "Finds contradictions and duplicates between stakeholders",
+     "status": "done",
+     "seconds": 0.023,
+     "note": "2 conflicts or duplicates · 2 high-severity open",
+     "llm_calls": 0
+    },
+    {
+     "id": "compliance",
+     "label": "Compliance mapping",
+     "about": "Maps requirements to regulations and mandatory controls",
+     "status": "done",
+     "seconds": 0.006,
+     "note": "26 control mappings · 3 requirements derived for missing controls · 0 gaps",
+     "llm_calls": 0
+    },
+    {
+     "id": "security_privacy",
+     "label": "Security & privacy",
+     "about": "Threat-models the scope and derives missing controls",
+     "status": "done",
+     "seconds": 0.002,
+     "note": "10 threats modelled",
+     "llm_calls": 0
+    },
+    {
+     "id": "quality_derived",
+     "label": "Quality (derived)",
+     "about": "Checks the requirements the compliance agent added",
+     "status": "done",
+     "seconds": 0.002,
+     "note": "10 requirements with quality issues",
+     "llm_calls": 0
+    },
+    {
+     "id": "clarification",
+     "label": "Clarification",
+     "about": "Writes questions for stakeholders about weak requirements",
+     "status": "done",
+     "seconds": 0.0,
+     "note": "13 open clarification questions",
+     "llm_calls": 0
+    },
+    {
+     "id": "risk",
+     "label": "Risk analysis",
+     "about": "Builds the risk register from requirements and gaps",
+     "status": "done",
+     "seconds": 0.001,
+     "note": "18 risks · 14 high or critical",
+     "llm_calls": 0
+    },
+    {
+     "id": "sdlc",
+     "label": "SDLC selection",
+     "about": "Scores project factors and recommends a lifecycle",
+     "status": "done",
+     "seconds": 0.003,
+     "note": "Recommends Hybrid Agile-V-Model",
+     "llm_calls": 0
+    },
+    {
+     "id": "validation",
+     "label": "Validation",
+     "about": "Evaluates baseline quality gates",
+     "status": "done",
+     "seconds": 0.0,
+     "note": "3 of 5 quality gates passing · baseline blocked",
+     "llm_calls": 0
+    },
+    {
+     "id": "approval",
+     "label": "Approval routing",
+     "about": "Creates human-approval items for critical decisions",
+     "status": "done",
+     "seconds": 0.0,
+     "note": "30 decisions waiting for people",
+     "llm_calls": 0
+    }
+   ],
+   "finished": 1795670676.308012
+  }
+ },
+ "created_at": "2026-11-26T05:24:36+00:00"
+}

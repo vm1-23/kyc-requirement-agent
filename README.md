@@ -29,13 +29,18 @@ kyc-re --llm offline run samples/kyc_onboarding -o output
 # Metrics vs gold annotations
 kyc-re --llm offline evaluate samples/kyc_onboarding
 
+# Pre-analyse the samples so the web UI opens them instantly as demo projects
+# (already done for the committed samples; re-run after changing agents or samples)
+kyc-re build-demos
+
 # Web UI + REST API at http://127.0.0.1:8000
+# (drag-and-drop .txt/.md/.eml/.docx files; for PDFs: pip install -e ".[docs]")
 kyc-re serve
 
 # Adaptive interview in the terminal
 kyc-re interview --role compliance --name "Arjun"
 
-pytest -q      # 30 tests
+pytest -q
 ```
 
 ### Local LLM mode (recommended for sensitive data)
@@ -152,8 +157,14 @@ expert panel. Full details and caveats: [`docs/evaluation/RESULTS.md`](docs/eval
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/api/health`, `/api/kb`, `/api/agents`, `/api/samples` | System info, KB manifest and control catalogue |
-| POST | `/api/projects` · `/api/projects/from-sample/{case}` | Create a project / load and analyse a case study |
+| POST | `/api/projects` · `/api/projects/from-sample/{case}` | Create a project / load and analyse a sample from scratch |
+| GET, POST | `/api/demos` · `/api/demos/{case}?reset=` | List / open a pre-analysed demo project instantly (no agents run) |
+| POST | `/api/split-speakers` | Preview who said what in a pasted text (nothing stored) |
+| POST | `/api/projects/{id}/conversation` | Add a pasted text as one input per person, with role corrections, and analyse |
+| GET | `/api/progress` · `/api/projects/{id}/progress` | Live progress of a run: current agent, what each step found, model calls |
 | POST | `/api/projects/{id}/documents` · `/run` | Add input (masked on arrival) / run agents |
+| POST | `/api/projects/{id}/documents/batch` | Add several inputs and analyse once (`run: false` to defer) |
+| POST | `/api/extract-text` | Extract text from an uploaded `.docx` / `.pdf` / text file for review (nothing stored) |
 | POST | `/api/projects/{id}/interviews` · `/{sid}/answer` · `/{sid}/finish` | Adaptive interview |
 | POST | `/api/projects/{id}/questions/{qid}/answer` | Answer a clarification (triggers re-analysis) |
 | POST | `/api/projects/{id}/approvals/{aid}` | Decide a gate (`X-User`, `X-Role` headers; RBAC enforced) |
