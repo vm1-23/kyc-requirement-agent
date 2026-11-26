@@ -25,7 +25,7 @@ analytics), KYC is the best first use case because:
 | Principle | How it is realised |
 |---|---|
 | Deterministic orchestration | A code-driven **coordinator** runs agents in a fixed DAG with approval gates. The LLM never decides control flow. |
-| LLM is optional and fenced | Every agent has a **rule-based baseline**, so the system runs offline and stays testable. When an LLM is configured (Claude), it *augments* extraction, classification, clarification and explanations, and its output is schema-validated and checked against the retrieved evidence. |
+| LLM is optional and fenced | Every agent has a **rule-based baseline**, so the system runs offline and stays testable. When a local LLM is available (Ollama or an OpenAI-compatible server), it *augments* extraction, classification, clarification and explanations, and its output is schema-validated and checked against the retrieved evidence. |
 | Retrieval-grounded | A version-controlled KYC knowledge base (regulations, internal policies, security standards, SDLC rules). Each item carries source, jurisdiction, effective date, version and applicability. Compliance mappings may only cite retrieved items; any other citation counts as a hallucination and is dropped. |
 | Rules before generation | Compliance coverage (mandatory KYC controls), requirement-quality checks, and SDLC scoring are deterministic rule and MCDA engines. The LLM only explains them. |
 | Privacy by default | PII is detected and masked (Aadhaar, PAN, passport, SSN, IBAN, card numbers with Luhn check, phone, e-mail, DOB) **before** any text reaches an LLM or the log. |

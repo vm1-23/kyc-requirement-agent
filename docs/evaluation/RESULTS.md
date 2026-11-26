@@ -15,13 +15,13 @@ Generated with `kyc-re --llm offline evaluate <case>`; the raw JSON reports are 
 ## Observations
 
 - **Extraction** of explicit need statements works well with rules alone (F1 0.98–1.0), because stakeholders state needs with modal verbs.
-- **Implicit conflicts** need semantic understanding. Example from Summit: "open instantly without repeating identity checks" vs "verify identity within 5 business days". Rule mode misses these (Summit conflict recall 0). This is where the Claude mode is meant to add value. Its LLM output still passes through the same grounding checks.
+- **Implicit conflicts** need semantic understanding. Example from Summit: "open instantly without repeating identity checks" vs "verify identity within 5 business days". Rule mode misses these (Summit conflict recall 0). This is where the local-model mode is meant to add value. Its LLM output still passes through the same grounding checks.
 - **Gap detection** recall is high, but precision depends on vocabulary. A control phrased in unfamiliar words is reported as a gap, which is the safe failure: a human reviews it, and nothing is silently dropped.
 - **SDLC**: two of three cases match an acceptable expert choice. On Summit the engine picked Spiral, influenced by the novel-technology and legacy-mainframe factors, while the gold expects a regulated hybrid. Factor weights should be calibrated against a larger set of architect decisions.
-- **Hallucination rate** is 0 by construction in offline mode, because no generative output is produced. In Claude mode the same metric counts ungrounded extractions and out-of-evidence citations that the guards dropped.
+- **Hallucination rate** is 0 by construction in offline mode, because no generative output is produced. In local-model mode the same metric counts ungrounded extractions and out-of-evidence citations that the guards dropped.
 - **Time**: the pipeline runs in under 0.1 s offline. The manual baseline in each report is an assumption, not a measurement, so it is not presented as a finding.
 
 ## Not yet evaluated
 
-- Claude (LLM-augmented) mode: no API credentials were available in the build environment. Run `KYC_RE_LLM=claude kyc-re evaluate samples/<case>` to produce the comparison.
+- Local-model (LLM-augmented) mode: not yet evaluated. Run `kyc-re --llm ollama evaluate samples/<case>` to produce the comparison.
 - Stakeholder satisfaction, and human correction rate in live use. These need a user study.

@@ -21,7 +21,7 @@ hash-chained audit trail.
 
 ```bash
 python -m venv .venv && . .venv/bin/activate
-pip install -e ".[llm,dev]"
+pip install -e ".[dev]"
 
 # Full pipeline on the NeoBank case study -> artefacts in ./output
 kyc-re --llm offline run samples/kyc_onboarding -o output
@@ -43,9 +43,12 @@ kyc-re interview --role compliance --name "Arjun"
 pytest -q
 ```
 
-### Local LLM mode (recommended for sensitive data)
+### Language model: local only
 
-Run a model on your own machine so that no stakeholder or customer text leaves it.
+The language model runs **on your own machine**, so no stakeholder or customer text ever
+leaves it. There is no cloud LLM backend. Without a local model, the system runs fully
+**offline** on deterministic rule-based agents, which is how the tests and the reported
+evaluation run.
 
 ```bash
 # Arch: sudo pacman -S ollama-cuda && sudo systemctl enable --now ollama
@@ -56,33 +59,25 @@ kyc-re --llm ollama run samples/kyc_onboarding -o output
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `KYC_RE_LLM` | `auto` | `ollama`, `openai_compat`, `claude`, `offline`, or `auto` |
+| `KYC_RE_LLM` | `auto` | `ollama`, `openai_compat`, `offline`, or `auto` |
 | `KYC_RE_LOCAL_MODEL` | `qwen2.5:7b-instruct` | Model name on the local server |
 | `OLLAMA_HOST` | `http://localhost:11434` | Ollama endpoint |
 | `KYC_RE_LOCAL_URL` | `http://localhost:8080/v1` | OpenAI-compatible endpoint (llama.cpp `llama-server`, LM Studio, vLLM) |
 | `KYC_RE_LOCAL_TIMEOUT` | `600` | Seconds per call |
 
-`auto` tries a reachable local server first, then Claude if credentials are set, and
-otherwise falls back to offline rules. Local output is constrained to a JSON schema
-(Ollama `format` / `response_format`), checked structurally, and passed through the
-same grounding guards as Claude. Any failure falls back to the rule baseline for that step.
+`auto` uses a reachable local server (Ollama first, then an OpenAI-compatible one) and
+otherwise falls back to the offline rules. The local model is used for extraction,
+classification, clarification questions, interview follow-ups, compliance obligations and
+the SDLC explanation.
 
-### Cloud LLM mode (Claude)
-
-The system runs fully **offline** with deterministic rule-based agents, which is how the
-tests and the reported evaluation run. With Anthropic credentials (`ANTHROPIC_API_KEY`
-set, or `--llm claude`), the agents use Claude (`claude-opus-5-5` by default, override
-with `KYC_RE_MODEL`) for extraction, classification, clarification questions, interview
-follow-ups, compliance obligations and the SDLC narrative.
-
-Claude outputs are **fenced**:
+Model output is **fenced**:
 
 * Inputs are PII-masked and wrapped in `<untrusted_document>` tags, never placed in the system prompt.
-* Output is constrained to a JSON schema (structured outputs). A refusal falls back server-side (`fallbacks: "default"`), and any error falls back to the rule baseline.
+* Output is constrained to a JSON schema (Ollama `format` / `response_format`) and checked structurally. Any failure falls back to the rule baseline for that step.
 * Every extracted requirement must quote a verbatim source excerpt; ungrounded items are dropped and counted as hallucinations.
 * Compliance citations must be KB ids that the retriever actually returned; anything else is dropped and counted.
-* SDLC scores always come from the deterministic engine. The LLM only writes the explanation.
-* Each call's model, purpose, prompt hash, outcome and token usage go to the audit log.
+* SDLC scores always come from the deterministic engine. The model only writes the explanation.
+* Each call's model, purpose, prompt hash and outcome go to the audit log.
 
 ## How it maps to the problem statement
 
@@ -91,8 +86,8 @@ Claude outputs are **fenced**:
 | 1 | Scope & outputs | KYC/onboarding domain. Outputs: SRS, stories, use cases, acceptance criteria, compliance matrix, risk register, RTM, SDLC (`kyc_re/artefacts/writers.py`) |
 | 2 | Stakeholders & role templates | 12 roles; role-specific topic focus in `knowledge/data/interview.json` |
 | 3 | Inputs + sensitive-data protection | 12 source types; PII classification and masking before any agent sees text (`security/pii.py`, `agents/ingestion.py`); raw text discarded after masking |
-| 4 | Multi-agent architecture | 13 agents + coordinator (`kyc_re/agents/*`, `coordinator.py`); deterministic orchestration, shared `ProjectState`, approval gates |
-| 5 | Financial knowledge base | Versioned JSON KB: FATF, RBI KYC MD / V-CIP / re-KYC / CKYCR, PMLA, DPDP, EU AMLD/AMLR, GDPR, US CIP/CDD/OFAC/BSA, NIST 800-63, ISO 30107-3, OWASP ASVS, ISO 27001, internal policies, 22 mandatory controls, SDLC profiles, glossary. Each item has source, jurisdiction, effective date, version and applicability |
+| 4 | Multi-agent architecture | 14 agents + coordinator (`kyc_re/agents/*`, `coordinator.py`); deterministic orchestration, shared `ProjectState`, approval gates |
+| 5 | Financial knowledge base | Versioned JSON KB: FATF, RBI KYC MD / V-CIP / re-KYC / CKYCR, PMLA, DPDP, EU AMLD/AMLR, GDPR, US CIP/CDD/OFAC/BSA, NIST 800-63, ISO 30107-3, OWASP ASVS, ISO 27001, internal policies, 22 controls (20 mandatory), SDLC profiles, glossary. Each item has source, jurisdiction, effective date, version and applicability |
 | 6 | Retrieval-grounded generation | BM25 retriever with jurisdiction and effective-date filtering (`knowledge/kb.py`), citations with scores, confidence scoring, low-confidence → legal-review gate |
 | 7 | Adaptive interviews | `agents/interaction.py`: picks topics by role, follows up on vague/short answers (LLM or rules), skips covered topics; web and CLI front-ends |
 | 8 | Standard requirement structure | `models.Requirement`: ID, statement, categories, source stakeholder, evidence, justification, priority, dependencies, assumptions, acceptance criteria, regulations, risk, confidence, approval status, history |
@@ -149,7 +144,7 @@ change request.
 
 The held-out Summit case is the most honest number. Rules catch explicit needs and
 explicit contradictions, but miss implicit semantic conflicts, which is the gap the
-Claude mode targets. Gold labels were written by the project team, not an independent
+local-model mode targets. Gold labels were written by the project team, not an independent
 expert panel. Full details and caveats: [`docs/evaluation/RESULTS.md`](docs/evaluation/RESULTS.md).
 
 ## REST API
@@ -186,7 +181,7 @@ kyc_re/
   evaluation/      gold-based evaluation harness
   api/             FastAPI app + single-page web UI
   coordinator.py   orchestrator and human-in-the-loop operations
-  llm.py           Claude client (schema-constrained, audited) and offline fallback
+  llm.py           local model client (Ollama / OpenAI-compatible; schema-constrained, audited) and offline fallback
   audit.py         hash-chained audit log
 samples/           3 annotated case studies (IN / EU / US)
 docs/              approach, evaluation results, sample output

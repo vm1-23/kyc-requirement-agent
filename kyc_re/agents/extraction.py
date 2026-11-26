@@ -4,7 +4,7 @@ Rule baseline: sentence-level detection of need statements (modal verbs and need
 phrases), normalised to "The system shall ..." form, with the source excerpt kept
 as evidence.
 
-LLM mode: Claude extracts atomic requirements from each masked document. Every
+LLM mode: the local model extracts atomic requirements from each masked document. Every
 extracted item must quote a `source_excerpt` that appears in the document. Items
 that do not are counted as hallucinations and dropped.
 """
