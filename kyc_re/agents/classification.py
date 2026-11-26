@@ -79,6 +79,8 @@ class ClassificationAgent(Agent):
     def run(self) -> None:
         self.need("read:requirements", "write:requirements")
         reqs = [r for r in self.ctx.state.requirements if r.id.startswith("TMP-") or not r.categories]
+        if self.ctx.llm.available and reqs:
+            self.ctx.report(f"Classifying {len(reqs)} new requirements with the language model")
         llm_out = self._llm(reqs) if (self.ctx.llm.available and reqs) else {}
         for r in reqs:
             rule = rule_labels(r.statement)

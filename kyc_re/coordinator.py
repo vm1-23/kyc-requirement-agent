@@ -30,6 +30,7 @@ from .audit import AuditLog
 from .knowledge.kb import KnowledgeBase, default_kb
 from .llm import LLM, make_llm
 from .models import ApprovalStatus, ProjectContext, ProjectState, SourceDocument, SourceType, StakeholderRole
+from .progress import ANALYSIS, FULL_RUN, ProgressLLM, RunProgress
 
 AGENT_REGISTRY = [
     ("Coordinator", "Controls the workflow, shared context and approval gates"),
@@ -57,7 +58,9 @@ class Coordinator:
         self.llm = llm if (llm is not None and not isinstance(llm, str)) else make_llm(llm, self.audit)
         if getattr(self.llm, "audit", None) is None:
             self.llm.audit = self.audit  # type: ignore[attr-defined]
-        self.ctx = Context(state=state or ProjectState(project=project), kb=kb or default_kb(), llm=self.llm, audit=self.audit)
+        self.progress = RunProgress()
+        self.ctx = Context(state=state or ProjectState(project=project), kb=kb or default_kb(), llm=ProgressLLM(self.llm, self.progress),
+                           audit=self.audit, progress=self.progress)
         self._sync_counters()
         if state is not None:  # resuming: restore agent stats and masking-token counters
             self.ctx.stats = dict(state.metrics.get("agent_stats", {}))
@@ -100,21 +103,80 @@ class Coordinator:
 
     # ---- pipeline ----------------------------------------------------------------------
     def _stage(self, name: str, fn) -> None:
+        self.progress.stage_start(name)
         t0 = time.perf_counter()
         fn()
-        self.state.metrics.setdefault("timing_s", {})[name] = round(time.perf_counter() - t0, 4)
+        dt = time.perf_counter() - t0
+        self.state.metrics.setdefault("timing_s", {})[name] = round(dt, 4)
+        self.progress.stage_end(name, dt, self._note(name))
 
-    def run(self) -> ProjectState:
-        t0 = time.perf_counter()
-        c = self.ctx
-        self._stage("ingestion", IngestionAgent(c).run)
-        self._stage("topic_coverage", InteractionAgent(c).run)
-        self._stage("extraction", ExtractionAgent(c).run)
-        self._analyse()
-        self.state.metrics["processing_time_s"] = round(time.perf_counter() - t0, 3)
-        self.audit.record("coordinator", "pipeline_complete", self.state.project.name,
-                          requirements=len(self.state.requirements), baseline_ready=self.state.metrics.get("baseline_ready"))
+    def _note(self, name: str) -> str:
+        """One-line, human-readable outcome of a stage for the progress view."""
+        st, stats = self.state, self.ctx.stats
+        n = len(st.requirements)
+
+        def pl(k: int, word: str, plural: str | None = None) -> str:
+            return f"{k} {word if k == 1 else (plural or word + 's')}"
+
+        if name == "ingestion":
+            return (f"{pl(len(st.documents), 'source')} screened · {pl(stats.get('pii_masked', 0), 'PII value')} masked · "
+                    f"{pl(stats.get('injection_quarantined', 0), 'injection attempt')} quarantined")
+        if name == "topic_coverage":
+            gaps = stats.get("uncovered_topics", [])
+            return f"{pl(len(gaps), 'interview topic')} not covered yet" if gaps else "All interview topics covered"
+        if name == "extraction":
+            dropped = stats.get("hallucinated_extractions", 0)
+            return pl(n, "requirement") + (f" · {pl(dropped, 'ungrounded statement')} dropped" if dropped else "")
+        if name == "classification":
+            return f"{n} requirements across {len({c for r in st.requirements for c in r.categories})} categories"
+        if name in ("quality", "quality_derived"):
+            return f"{sum(1 for r in st.requirements if r.quality_issues)} requirements with quality issues"
+        if name == "conflict":
+            hi = sum(1 for c in st.conflicts if c.resolution is None and c.severity.value in ("high", "critical"))
+            return f"{len(st.conflicts)} conflicts or duplicates · {hi} high-severity open"
+        if name == "compliance":
+            gaps = sum(1 for c in st.coverage if c.mandatory and c.status == "gap")
+            derived = sum(1 for r in st.requirements if r.origin == "derived_control")
+            return f"{len(st.compliance)} control mappings · {derived} requirements derived for missing controls · {gaps} gaps"
+        if name == "security_privacy":
+            return f"{pl(len(stats.get('threat_model', [])), 'threat')} modelled"
+        if name == "clarification":
+            return f"{sum(1 for q in st.questions if q.answer is None)} open clarification questions"
+        if name == "risk":
+            return f"{len(st.risks)} risks · {sum(1 for r in st.risks if r.level.value in ('high', 'critical'))} high or critical"
+        if name == "sdlc":
+            return f"Recommends {st.sdlc.selected}" if st.sdlc else "No recommendation"
+        if name == "validation":
+            g = st.metrics.get("gates", {})
+            return f"{sum(g.values())} of {len(g)} quality gates passing" + (" · baseline blocked" if not st.metrics.get("baseline_ready") else "")
+        if name == "approval":
+            return f"{pl(sum(1 for a in st.approvals if a.status.value == 'pending_approval'), 'decision')} waiting for people"
+        return ""
+
+    def _tracked(self, trigger: str, stages: list[str], body) -> ProjectState:
+        self.progress.start(trigger, stages, self.llm.name)
+        try:
+            body()
+        except Exception as e:
+            self.progress.finish(error=str(e) or type(e).__name__)
+            raise
+        self.progress.finish()
+        snap = self.progress.snapshot() or {}
+        self.state.metrics["last_run"] = {k: snap.get(k) for k in ("trigger", "llm", "elapsed", "llm_calls", "llm_failed", "stages", "finished")}
         return self.state
+
+    def run(self, trigger: str = "full analysis") -> ProjectState:
+        def body() -> None:
+            t0 = time.perf_counter()
+            c = self.ctx
+            self._stage("ingestion", IngestionAgent(c).run)
+            self._stage("topic_coverage", InteractionAgent(c).run)
+            self._stage("extraction", ExtractionAgent(c).run)
+            self._analyse()
+            self.state.metrics["processing_time_s"] = round(time.perf_counter() - t0, 3)
+            self.audit.record("coordinator", "pipeline_complete", self.state.project.name,
+                              requirements=len(self.state.requirements), baseline_ready=self.state.metrics.get("baseline_ready"))
+        return self._tracked(trigger, FULL_RUN, body)
 
     def _analyse(self) -> None:
         c = self.ctx
@@ -131,9 +193,8 @@ class Coordinator:
         self._stage("approval", ApprovalAgent(c).run)
         self.state.metrics["agent_stats"] = {k: v for k, v in c.stats.items()}
 
-    def reanalyse(self) -> ProjectState:
-        self._analyse()
-        return self.state
+    def reanalyse(self, trigger: str = "re-analysis") -> ProjectState:
+        return self._tracked(trigger, ANALYSIS, self._analyse)
 
     # ---- human in the loop -------------------------------------------------------------
     def answer(self, question_id: str, answer: str, user: str = "stakeholder") -> ProjectState:
@@ -144,7 +205,7 @@ class Coordinator:
         conflict = next((x for x in self.state.conflicts if x.id == q.requirement_id), None)
         if conflict and conflict.resolution is None:
             conflict.resolution = f"stakeholder answer: {masked}"
-        return self.reanalyse()
+        return self.reanalyse(f"answer to {question_id}")
 
     def decide(self, approval_id: str, user: str, role: StakeholderRole | str, decision: str, comment: str = "",
                modification: str | None = None) -> Any:
@@ -152,7 +213,7 @@ class Coordinator:
         item = agent.decide(approval_id, user, StakeholderRole(role), decision, comment,
                             self.mask(modification) if modification else None)
         if item.status in (ApprovalStatus.MODIFIED, ApprovalStatus.REGENERATE) or (item.gate == "conflict" and item.status == ApprovalStatus.APPROVED):
-            self.reanalyse()
+            self.reanalyse(f"{decision} on {approval_id}")
         else:
             ValidationAgent(self.ctx).run()
         return item
@@ -175,7 +236,7 @@ class Coordinator:
                                                      summary=f"Change to approved requirement {req_id}: {masked[:140]}",
                                                      required_roles=sorted(GATE_APPROVERS["change"], key=lambda x: x.value)))
         self.audit.record(f"user:{user}", "change_requirement", req_id, role=str(role), was_approved=was_approved)
-        return self.reanalyse()
+        return self.reanalyse(f"change to {req_id}")
 
     # ---- outputs -----------------------------------------------------------------------
     def export(self, out_dir: str | Path) -> dict[str, str]:

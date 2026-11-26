@@ -47,6 +47,7 @@ class ClarificationAgent(Agent):
         pending = [r for r in st.requirements if r.status == ApprovalStatus.NEEDS_CLARIFICATION and r.id not in asked]
         llm_q: dict[str, str] = {}
         if self.ctx.llm.available and pending:
+            self.ctx.report(f"Wording {len(pending)} clarification questions with the language model")
             listing = "\n".join(f"{r.id}: {r.statement} | issues: " + "; ".join(i.detail for i in r.quality_issues) for r in pending)
             data = self.ctx.llm.json(
                 "clarification_questions",

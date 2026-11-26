@@ -12,6 +12,7 @@ dependencies = [
 
 [project.optional-dependencies]
 llm = ["anthropic>=1.0"]
+docs = ["pypdf>=4"]
 dev = ["pytest>=8", "httpx"]
 
 [project.scripts]

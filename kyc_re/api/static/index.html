@@ -4,185 +4,1271 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KYC Requirement Studio</title>
+<script>try{const t=localStorage.getItem("kycre.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch{}</script>
 <style>
-:root{--bg:#f6f7f9;--panel:#fff;--ink:#1c2330;--muted:#5d6878;--line:#e2e6ec;--accent:#2457c5;--accent-ink:#fff;
---ok:#1f7a4d;--warn:#a45d00;--bad:#b42318;--chip:#eef2f8;--code:#f1f3f6}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1318;--panel:#171c23;--ink:#e6e9ee;--muted:#9aa4b2;--line:#2a313b;--accent:#6f9bff;--accent-ink:#0b0f14;--ok:#4cc38a;--warn:#f0a43a;--bad:#ff7a6e;--chip:#202733;--code:#1d232c}}
-:root[data-theme="dark"]{--bg:#0f1318;--panel:#171c23;--ink:#e6e9ee;--muted:#9aa4b2;--line:#2a313b;--accent:#6f9bff;--accent-ink:#0b0f14;--ok:#4cc38a;--warn:#f0a43a;--bad:#ff7a6e;--chip:#202733;--code:#1d232c}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5}
-h1{font-size:16px;margin:0}h2{font-size:15px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 6px}
-.sub{color:var(--muted);font-size:12px}
-main{max-width:1280px;margin:0 auto;padding:16px}
-nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
-nav button{white-space:nowrap}
-button,select,input,textarea{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px}
-button{cursor:pointer}button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-nav button.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-textarea{width:100%;min-height:110px}input[type=text]{width:100%}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px;overflow-x:auto}
-.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
-.kpi .v{font-size:22px;font-weight:650}.kpi .l{color:var(--muted);font-size:12px}
-table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
-th{color:var(--muted);font-weight:600;font-size:12px}
-.chip{display:inline-block;background:var(--chip);border-radius:999px;padding:1px 8px;margin:1px 2px;font-size:11.5px;white-space:nowrap}
-.s-approved,.ok{color:var(--ok)}.s-needs_clarification,.warn{color:var(--warn)}.s-rejected,.bad{color:var(--bad)}
-.lvl-critical{color:var(--bad);font-weight:600}.lvl-high{color:var(--bad)}.lvl-medium{color:var(--warn)}
-.bar{height:10px;background:var(--chip);border-radius:6px;overflow:hidden}.bar>span{display:block;height:100%;background:var(--accent)}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.muted{color:var(--muted)}.small{font-size:12px}
-pre{background:var(--code);padding:8px;border-radius:6px;white-space:pre-wrap;font-size:12px;max-height:340px;overflow:auto}
-.hidden{display:none}
-#toast{position:fixed;bottom:16px;right:16px;max-width:420px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:8px;opacity:0;transition:opacity .2s}
-#toast.show{opacity:1}
-@media (max-width:640px){main{padding:12px}header{padding:10px 12px}}
+/* ---- design tokens ------------------------------------------------------------------------- */
+:root{
+  --bg:#f6f7f9;--surface:#fff;--surface-2:#f2f4f7;--surface-3:#eaecf0;--sidebar:#fbfbfc;
+  --border:#e4e7ec;--border-strong:#d0d5dd;
+  --text:#101828;--text-2:#475467;--text-3:#667085;
+  --accent:#4f46e5;--accent-hover:#4338ca;--accent-soft:#eef2ff;--accent-text:#4338ca;--on-accent:#fff;
+  --ok:#067647;--ok-soft:#ecfdf3;--warn:#b54708;--warn-soft:#fffaeb;--bad:#b42318;--bad-soft:#fef3f2;--info:#175cd3;--info-soft:#eff8ff;
+  --heat-1:#ecfdf3;--heat-2:#fef7c3;--heat-3:#fedf89;--heat-4:#fda29b;--heat-5:#f04438;
+  --shadow-sm:0 1px 2px rgba(16,24,40,.05);--shadow:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.04);
+  --shadow-lg:0 20px 40px -12px rgba(16,24,40,.25);
+  --r:12px;--sans:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b0d12;--surface:#12151c;--surface-2:#181c25;--surface-3:#202533;--sidebar:#0e1117;
+  --border:#232836;--border-strong:#323949;--text:#eef0f4;--text-2:#b4bac6;--text-3:#8a91a0;
+  --accent:#818cf8;--accent-hover:#a5b4fc;--accent-soft:rgba(129,140,248,.14);--accent-text:#a5b4fc;--on-accent:#0b0d12;
+  --ok:#47cd89;--ok-soft:rgba(71,205,137,.12);--warn:#fdb022;--warn-soft:rgba(253,176,34,.12);--bad:#f97066;--bad-soft:rgba(249,112,102,.13);--info:#53b1fd;--info-soft:rgba(83,177,253,.12);
+  --heat-1:rgba(71,205,137,.14);--heat-2:rgba(250,225,90,.2);--heat-3:rgba(253,176,34,.32);--heat-4:rgba(249,112,102,.45);--heat-5:rgba(240,68,56,.75);
+  --shadow-sm:none;--shadow:0 1px 2px rgba(0,0,0,.4);--shadow-lg:0 24px 48px -12px rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b0d12;--surface:#12151c;--surface-2:#181c25;--surface-3:#202533;--sidebar:#0e1117;
+  --border:#232836;--border-strong:#323949;--text:#eef0f4;--text-2:#b4bac6;--text-3:#8a91a0;
+  --accent:#818cf8;--accent-hover:#a5b4fc;--accent-soft:rgba(129,140,248,.14);--accent-text:#a5b4fc;--on-accent:#0b0d12;
+  --ok:#47cd89;--ok-soft:rgba(71,205,137,.12);--warn:#fdb022;--warn-soft:rgba(253,176,34,.12);--bad:#f97066;--bad-soft:rgba(249,112,102,.13);--info:#53b1fd;--info-soft:rgba(83,177,253,.12);
+  --heat-1:rgba(71,205,137,.14);--heat-2:rgba(250,225,90,.2);--heat-3:rgba(253,176,34,.32);--heat-4:rgba(249,112,102,.45);--heat-5:rgba(240,68,56,.75);
+  --shadow-sm:none;--shadow:0 1px 2px rgba(0,0,0,.4);--shadow-lg:0 24px 48px -12px rgba(0,0,0,.6);color-scheme:dark}
+
+/* ---- base ---------------------------------------------------------------------------------- */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 var(--sans);-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01"}
+h1,h2,h3,h4{margin:0;line-height:1.3;letter-spacing:-.01em}
+h1{font-size:22px;font-weight:650}h2{font-size:15px;font-weight:600}h3{font-size:14px;font-weight:600}
+p{margin:0}
+a{color:var(--accent-text)}
+code,.mono{font-family:var(--mono);font-size:12.5px}
+button{font:inherit;color:inherit}
+.i{flex:none;display:block}
+.hidden{display:none!important}
+.muted{color:var(--text-3)}.sm{font-size:12.5px}.xs{font-size:11.5px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}.end{justify-content:flex-end}
+.stack{display:flex;flex-direction:column;gap:16px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g-side{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::selection{background:var(--accent-soft)}
+
+/* ---- app shell ----------------------------------------------------------------------------- */
+.app{display:grid;grid-template-columns:256px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px;background:var(--sidebar);border-right:1px solid var(--border);padding:16px 12px;overflow-y:auto;z-index:55}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 14px}
+.logo{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#6366f1,#4338ca);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.brand b{display:block;font-size:14px;letter-spacing:-.01em}.brand span{display:block;font-size:11.5px;color:var(--text-3)}
+.proj{display:flex;gap:6px;padding:0 4px 6px}
+.proj select{flex:1;min-width:0}
+.nav-group{padding:10px 0 2px}
+.nav-group h6{margin:0 10px 6px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+.nav-item{width:100%;display:flex;align-items:center;gap:10px;padding:7px 10px;border:0;border-radius:8px;background:none;color:var(--text-2);font-weight:500;font-size:13.5px;text-align:left;cursor:pointer}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item[aria-current="page"]{background:var(--accent-soft);color:var(--accent-text)}
+.nav-item .count{margin-left:auto;min-width:20px;padding:0 6px;border-radius:10px;background:var(--surface-3);color:var(--text-2);font-size:11px;font-weight:600;text-align:center;line-height:18px}
+.nav-item .count.hot{background:var(--warn-soft);color:var(--warn)}
+.nav-item[aria-current="page"] .count{background:var(--surface);color:var(--accent-text)}
+.side-foot{margin-top:auto;padding:12px 6px 0;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px}
+.engine{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);min-width:0}
+.engine b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.live{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft);flex:none}
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 32px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--border)}
+.crumbs{display:flex;align-items:center;gap:6px;min-width:0;font-size:13px;color:var(--text-3)}
+.crumbs b{color:var(--text);font-weight:600;white-space:nowrap}
+.crumbs span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.identity{margin-left:auto;display:flex;align-items:center;gap:8px}
+.avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:650;color:var(--accent-text);background:var(--accent-soft);flex:none}
+.topbar .menu-btn{display:none}
+.content{width:100%;max-width:1280px;margin:0 auto;padding:28px 32px 64px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.page-head p{margin-top:4px;color:var(--text-2);max-width:760px}
+.page-head .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ---- busy state ---------------------------------------------------------------------------- */
+.progress-line{position:fixed;inset:0 0 auto 0;height:2px;z-index:80;overflow:hidden;display:none}
+.progress-line::after{content:"";position:absolute;left:-35%;width:35%;height:100%;background:var(--accent);animation:slide 1.3s ease-in-out infinite}
+@keyframes slide{to{left:100%}}
+body.busy .progress-line,body.running .progress-line{display:block}
+.busy-pill{display:none;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent-text);font-size:12.5px;font-weight:500;max-width:min(520px,50vw)}
+.busy-pill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.busy .busy-pill{display:inline-flex}
+body.busy :is(#view,#drawer) :is(button,input,select,textarea,.drop){pointer-events:none;opacity:.55}
+body.busy :is(#view,#drawer) button.is-running{opacity:1}
+body.busy #view .keep{pointer-events:auto;opacity:1}
+.spin{width:14px;height:14px;flex:none;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---- controls ------------------------------------------------------------------------------ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);font-weight:550;font-size:13.5px;line-height:1;white-space:nowrap;cursor:pointer;box-shadow:var(--shadow-sm);transition:background .12s,border-color .12s,color .12s;text-decoration:none}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.ghost{border-color:transparent;background:transparent;box-shadow:none;color:var(--text-2)}
+.btn.ghost:hover{background:var(--surface-2);color:var(--text)}
+.btn.danger{color:var(--bad)}.btn.danger:hover{background:var(--bad-soft);border-color:var(--bad)}
+.btn.ok{color:var(--ok)}
+.btn.sm{height:30px;padding:0 10px;font-size:12.5px;border-radius:8px}
+.btn.icon{width:36px;padding:0}.btn.sm.icon{width:30px}
+.btn:disabled{cursor:not-allowed;opacity:.55}
+.linkbtn{border:0;background:none;padding:0;color:var(--accent-text);font-weight:550;cursor:pointer}
+.linkbtn:hover{text-decoration:underline}
+.input,select.input,textarea.input{width:100%;height:36px;padding:0 11px;border:1px solid var(--border-strong);border-radius:9px;background:var(--surface);color:var(--text);font:inherit;font-size:13.5px;box-shadow:var(--shadow-sm);transition:border-color .12s,box-shadow .12s}
+textarea.input{height:auto;min-height:96px;padding:9px 11px;line-height:1.5;resize:vertical}
+select.input{padding-right:30px;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.input::placeholder{color:var(--text-3)}
+.input.sm{height:30px;font-size:12.5px;border-radius:8px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label,.label{font-size:12.5px;font-weight:550;color:var(--text-2)}
+.field .hint{font-size:12px;color:var(--text-3)}
+.search{position:relative;flex:1;min-width:200px;max-width:340px}
+.search .i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-3)}
+.search .input{padding-left:34px}
+.check{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border:1px solid var(--border-strong);border-radius:9px;background:var(--surface);font-size:13px;cursor:pointer;user-select:none}
+.check:has(input:checked){border-color:var(--accent);background:var(--accent-soft);color:var(--accent-text)}
+.check input{accent-color:var(--accent);margin:0}
+.seg{display:inline-flex;padding:3px;gap:2px;border-radius:10px;background:var(--surface-3)}
+.seg button{border:0;background:none;padding:5px 12px;border-radius:8px;font-size:13px;font-weight:550;color:var(--text-2);cursor:pointer;white-space:nowrap}
+.seg button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.seg button .n{margin-left:6px;color:var(--text-3);font-weight:500}
+kbd{font:11px var(--mono);padding:1px 5px;border:1px solid var(--border-strong);border-bottom-width:2px;border-radius:5px;background:var(--surface);color:var(--text-2)}
+
+/* ---- surfaces ------------------------------------------------------------------------------ */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);min-width:0}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid var(--border)}
+.card-h p{font-size:12.5px;color:var(--text-3);margin-top:2px}
+.card-b{padding:20px}
+.card-f{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;background:var(--surface-2);border-radius:0 0 var(--r) var(--r)}
+.stat{padding:18px 20px;display:flex;gap:14px;align-items:flex-start}
+.stat .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--accent-soft);color:var(--accent-text)}
+.stat .ic.warn{background:var(--warn-soft);color:var(--warn)}.stat .ic.bad{background:var(--bad-soft);color:var(--bad)}.stat .ic.ok{background:var(--ok-soft);color:var(--ok)}
+.stat .v{font-size:26px;font-weight:650;line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat .l{font-size:13px;color:var(--text-2);font-weight:500;margin-top:2px}
+.stat .s{font-size:12px;color:var(--text-3);margin-top:2px}
+
+/* ---- pills, tags --------------------------------------------------------------------------- */
+.pill{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:550;white-space:nowrap;background:var(--surface-3);color:var(--text-2)}
+.pill i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.info{background:var(--info-soft);color:var(--info)}
+.pill.accent{background:var(--accent-soft);color:var(--accent-text)}
+.pill.solid-bad{background:var(--bad);color:#fff}
+.tag{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:6px;font-size:12px;font-weight:500;white-space:nowrap;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2)}
+.tag.mono{font-family:var(--mono);font-size:11.5px}
+button.tag{cursor:pointer}button.tag:hover{border-color:var(--accent);color:var(--accent-text)}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.chipbar{display:flex;gap:6px;flex-wrap:wrap}
+.chipbar button{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text-2);font-size:12.5px;font-weight:500;cursor:pointer}
+.chipbar button:hover{border-color:var(--border-strong);color:var(--text)}
+.chipbar button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-text)}
+.chipbar .n{color:var(--text-3);font-variant-numeric:tabular-nums}
+
+/* ---- tables -------------------------------------------------------------------------------- */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+th{position:sticky;top:0;z-index:1;text-align:left;font-weight:600;font-size:12px;color:var(--text-3);background:var(--surface-2);padding:9px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--surface-2)}
+td.id{font-family:var(--mono);font-size:12px;font-weight:600;white-space:nowrap;color:var(--text)}
+.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meter{display:flex;align-items:center;gap:8px;min-width:90px}
+.meter .bar{flex:1;height:6px;border-radius:4px;background:var(--surface-3);overflow:hidden}
+.meter .bar span{display:block;height:100%;border-radius:4px;background:var(--accent)}
+.meter small{font-variant-numeric:tabular-nums;color:var(--text-2);font-size:12px;min-width:30px}
+.hbar{height:8px;border-radius:5px;background:var(--surface-3);overflow:hidden}
+.hbar span{display:block;height:100%;border-radius:5px;background:var(--accent)}
+.dots{display:inline-flex;gap:3px}.dots i{width:9px;height:9px;border-radius:3px;background:var(--surface-3)}.dots i.on{background:var(--accent)}
+
+/* ---- misc components ----------------------------------------------------------------------- */
+.ring{--s:72px;width:var(--s);height:var(--s);border-radius:50%;display:grid;place-items:center;flex:none;background:conic-gradient(var(--ring-c,var(--accent)) calc(var(--v)*1%),var(--surface-3) 0)}
+.ring span{width:calc(var(--s) - 14px);height:calc(var(--s) - 14px);border-radius:50%;display:grid;place-items:center;background:var(--surface);font-weight:650;font-size:max(11.5px,calc(var(--s)*.2));font-variant-numeric:tabular-nums}
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:48px 20px;color:var(--text-3)}
+.empty .i{color:var(--text-3);margin-bottom:4px}
+.empty h3{color:var(--text)}.empty p{max-width:420px}
+.empty .btn{margin-top:8px}
+.list>*{padding:14px 20px;border-bottom:1px solid var(--border)}.list>*:last-child{border-bottom:0}
+.step{display:flex;align-items:center;gap:14px}
+.step .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;flex:none}
+.step .ic.warn{background:var(--warn-soft);color:var(--warn)}.step .ic.bad{background:var(--bad-soft);color:var(--bad)}
+.step .ic.ok{background:var(--ok-soft);color:var(--ok)}.step .ic.info{background:var(--accent-soft);color:var(--accent-text)}
+.step .t{flex:1;min-width:0}.step .t b{display:block;font-weight:600}.step .t span{font-size:12.5px;color:var(--text-3)}
+.kv{margin:0;display:grid;grid-template-columns:auto 1fr;gap:10px 16px;font-size:13px}
+.kv dt{color:var(--text-3)}.kv dd{margin:0;text-align:right;font-weight:550;font-variant-numeric:tabular-nums}
+.gate{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13.5px}
+.gate .i{flex:none}.gate.ok .i{color:var(--ok)}.gate.no .i{color:var(--bad)}
+.callout{display:flex;gap:12px;padding:12px 14px;border-radius:10px;font-size:13px;background:var(--info-soft);color:var(--text)}
+.callout .i{color:var(--info);margin-top:1px}
+.callout.warn{background:var(--warn-soft)}.callout.warn .i{color:var(--warn)}
+.callout.ok{background:var(--ok-soft)}.callout.ok .i{color:var(--ok)}
+.callout.bad{background:var(--bad-soft)}.callout.bad .i{color:var(--bad)}
+.quote{border-left:3px solid var(--border-strong);padding:4px 0 4px 12px;color:var(--text-2);font-size:13px}
+.quote small{display:block;color:var(--text-3);margin-top:2px}
+pre.code{margin:0;padding:12px 14px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);font:12px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto;color:var(--text-2)}
+details.disc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px}
+details.disc>summary::-webkit-details-marker{display:none}
+details.disc>summary>svg.i{transition:transform .15s;color:var(--text-3)}
+details.disc[open]>summary>svg.i{transform:rotate(90deg)}
+
+/* ---- welcome ------------------------------------------------------------------------------- */
+.hero{position:relative;overflow:hidden;padding:36px 36px 32px;border-radius:16px;border:1px solid var(--border);background:radial-gradient(1000px 300px at 100% -40%,var(--accent-soft),transparent 60%),var(--surface);margin-bottom:24px}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--accent-text);letter-spacing:.02em;margin-bottom:12px}
+.hero h1{font-size:30px;letter-spacing:-.025em;max-width:720px}
+.hero p{margin-top:10px;font-size:15px;color:var(--text-2);max-width:680px}
+.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:24px}
+.flow>div{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:12px;background:var(--surface-2)}
+.flow .n{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12.5px;font-weight:700;background:var(--surface);color:var(--accent-text);border:1px solid var(--border);flex:none}
+.flow b{display:block;font-size:13.5px}.flow span{font-size:12.5px;color:var(--text-3)}
+.sample{display:flex;flex-direction:column;gap:10px;padding:18px;transition:border-color .15s,box-shadow .15s}
+.sample:hover{border-color:var(--border-strong);box-shadow:var(--shadow)}
+.sample p{color:var(--text-2);font-size:13px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.sample .btn{margin-top:auto;align-self:flex-start}
+
+/* ---- inputs -------------------------------------------------------------------------------- */
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:200px;padding:24px;border:1.5px dashed var(--border-strong);border-radius:12px;background:var(--surface-2);text-align:center;color:var(--text-2);cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--surface);color:var(--accent-text);border:1px solid var(--border);margin-bottom:6px;box-shadow:var(--shadow-sm)}
+.drop b{color:var(--text)}
+.qitem{padding:16px 20px;border-bottom:1px solid var(--border)}
+.qitem:last-child{border-bottom:0}
+.qgrid{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr auto;gap:10px;align-items:end}
+.guess{font-weight:500;color:var(--accent-text);font-size:11px;margin-left:4px}
+.filetype{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-text);flex:none}
+
+/* ---- home ------------------------------------------------------------------------------------ */
+.home{max-width:960px;margin:0 auto}
+.home-head{text-align:center;max-width:720px;margin:4px auto 22px}
+.home-head h1{font-size:32px;letter-spacing:-.025em}
+.home-head p{margin-top:10px;color:var(--text-2);font-size:15px}
+.compose{overflow:hidden;box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s}
+.compose:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft),var(--shadow)}
+.compose-top{display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;padding:12px 18px;border-bottom:1px solid var(--border)}
+.compose-top input.input{flex:1;min-width:220px;border:0;box-shadow:none;font-weight:600;font-size:15px;padding:0 2px;background:transparent}
+.compose-top input.input:focus{box-shadow:none}
+.compose textarea.paste{display:block;border:0;border-radius:0;box-shadow:none;min-height:300px!important;font-size:15.5px!important;padding:18px 20px!important;background:var(--surface);resize:vertical}
+.compose textarea.paste:focus{box-shadow:none}
+.compose-mid{padding:4px 20px 16px;display:flex;flex-direction:column;gap:12px}
+.check.sm{padding:3px 9px;font-size:12px;border-radius:7px}
+.btn.lg{height:44px;padding:0 22px;font-size:15px;border-radius:11px}
+.demos{margin-top:32px}
+.demos-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.demo{display:flex;flex-direction:column;gap:8px;padding:16px}
+.demo h3{font-size:13.5px;line-height:1.35}
+.demo .stats{font-size:12px;color:var(--text-3)}
+.demo .row{margin-top:auto}
+
+/* ---- paste & people preview ------------------------------------------------------------------ */
+.paste{min-height:240px!important;font-size:14.5px!important;line-height:1.6!important;padding:14px 16px!important}
+.formats{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--text-3)}
+.formats code{font-size:12px;color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px}
+.people{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.person{display:grid;grid-template-columns:36px minmax(0,1fr) 200px;gap:6px 12px;align-items:center;padding:12px 14px;border-top:1px solid var(--border);background:var(--surface)}
+.person:first-child{border-top:0}
+.person .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:12.5px;font-weight:650;background:var(--accent-soft);color:var(--accent-text)}
+.person.anon .av{background:var(--surface-3);color:var(--text-3)}
+.person .who b{display:block;font-size:13.5px}.person .who span{font-size:12px;color:var(--text-3)}
+.person .said{grid-column:2/-1;font-size:12.5px;color:var(--text-2)}
+.person .said summary{color:var(--text-3)}
+.person .said pre{margin-top:6px}
+.role-src{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);margin-top:4px}
+.role-src.ok{color:var(--ok)}.role-src.warn{color:var(--warn)}
+.people-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+@media (max-width:700px){.person{grid-template-columns:36px minmax(0,1fr)}.person .rolebox{grid-column:2/-1}}
+
+/* ---- interview ----------------------------------------------------------------------------- */
+.chat{display:flex;flex-direction:column;gap:14px;padding:20px;max-height:calc(100vh - 340px);min-height:280px;overflow-y:auto}
+.msg{display:flex;gap:10px;max-width:86%}
+.msg .av{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;background:var(--accent-soft);color:var(--accent-text)}
+.msg .bubble{padding:10px 14px;border-radius:4px 14px 14px 14px;background:var(--surface-2);border:1px solid var(--border)}
+.msg .meta{display:flex;gap:6px;margin-bottom:4px}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg.me .av{background:var(--surface-3);color:var(--text-2);font-size:11px;font-weight:650}
+.msg.me .bubble{border-radius:14px 4px 14px 14px;background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.composer{padding:14px 20px;border-top:1px solid var(--border);background:var(--surface-2);border-radius:0 0 var(--r) var(--r)}
+.composer textarea{min-height:72px;background:var(--surface)}
+.topic-list{display:flex;flex-direction:column;gap:2px}
+.topic-list div{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;color:var(--text-3)}
+.topic-list div.done{color:var(--text)}.topic-list div.done .i{color:var(--ok)}
+
+/* ---- risk heatmap -------------------------------------------------------------------------- */
+.heat{display:grid;grid-template-columns:22px repeat(5,minmax(0,1fr));gap:4px;font-size:12px}
+.heat .ax{display:grid;place-items:center;color:var(--text-3);font-size:11.5px;font-weight:600}
+.heat button{aspect-ratio:2;min-height:34px;border:1px solid transparent;border-radius:7px;font-weight:650;font-size:14px;color:var(--text);cursor:pointer;font-variant-numeric:tabular-nums}
+.heat button:disabled{cursor:default;color:transparent}
+.heat button[aria-pressed="true"]{border-color:var(--text);box-shadow:0 0 0 2px var(--surface) inset}
+.h1{background:var(--heat-1)}.h2{background:var(--heat-2)}.h3{background:var(--heat-3)}.h4{background:var(--heat-4)}.h5{background:var(--heat-5)}.h5:not(:disabled){color:#fff}
+
+/* ---- SDLC ---------------------------------------------------------------------------------- */
+.option{display:grid;grid-template-columns:minmax(0,1fr) 56px;gap:6px 14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.option:last-child{border-bottom:0}
+.option .score{text-align:right;font-weight:650;font-variant-numeric:tabular-nums}
+.option .hbar{grid-column:1/-1}
+.option.top .hbar span{background:linear-gradient(90deg,#6366f1,var(--accent))}
+.option .why{grid-column:1/-1;font-size:12.5px;color:var(--text-3)}
+.timeline{position:relative;display:flex;flex-direction:column}
+.phase{position:relative;padding:0 0 18px 44px}
+.phase::before{content:"";position:absolute;left:15px;top:32px;bottom:0;width:2px;background:var(--border)}
+.phase:last-child::before{display:none}
+.phase .num{position:absolute;left:0;top:0;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--accent-soft);color:var(--accent-text);border:1px solid var(--border)}
+.phase summary{padding:5px 0}
+.phase .body{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 24px;padding:12px 0 4px}
+.phase .body h4{font-size:12px;color:var(--text-3);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.phase .body ul{margin:0;padding-left:18px;font-size:13px;color:var(--text-2)}
+.phase .body li{margin:2px 0}
+
+/* ---- approvals ----------------------------------------------------------------------------- */
+.roles{display:flex;flex-wrap:wrap;gap:6px}
+.role{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px 0 7px;border-radius:999px;border:1px solid var(--border);font-size:12.5px;color:var(--text-2);background:var(--surface)}
+.role.done{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.role.me{border-color:var(--accent);color:var(--accent-text)}
+.history{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--text-2)}
+
+/* ---- drawer -------------------------------------------------------------------------------- */
+.scrim{position:fixed;inset:0;background:rgba(10,13,20,.42);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(600px,100vw);display:flex;flex-direction:column;background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);transform:translateX(104%);transition:transform .22s cubic-bezier(.2,.8,.2,1);z-index:70}
+.drawer.open{transform:none}
+.drawer-h{display:flex;align-items:flex-start;gap:12px;padding:18px 22px;border-bottom:1px solid var(--border)}
+.drawer-b{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:22px}
+.drawer-b>*{flex-shrink:0}
+.drawer section h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:8px}
+.drawer .statement{font-size:16px;line-height:1.55;font-weight:500}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.facts>div{background:var(--surface);padding:10px 12px}
+.facts dt{font-size:11.5px;color:var(--text-3)}.facts dd{margin:2px 0 0;font-weight:550;font-size:13px}
+.issue{display:flex;gap:10px;padding:10px 12px;border-radius:10px;background:var(--warn-soft);font-size:13px}
+.issue .i{color:var(--warn);margin-top:2px}
+.cite{padding:10px 12px;border:1px solid var(--border);border-radius:10px}
+.cite b{font-family:var(--mono);font-size:12px}
+ul.ac{margin:0;padding-left:18px;color:var(--text-2);font-size:13px}ul.ac li{margin:4px 0}
+
+/* ---- run panel ----------------------------------------------------------------------------- */
+.runpanel{position:fixed;right:20px;bottom:20px;width:410px;max-height:min(660px,calc(100vh - 96px));display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-lg);z-index:75;overflow:hidden;animation:pop .2s ease-out}
+.run-h{display:flex;gap:12px;align-items:flex-start;padding:14px 14px 12px 16px;border-bottom:1px solid var(--border)}
+.run-h .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;flex:none;background:var(--accent-soft);color:var(--accent-text)}
+.run-h .ic.ok{background:var(--ok-soft);color:var(--ok)}.run-h .ic.bad{background:var(--bad-soft);color:var(--bad)}
+.run-h .t{flex:1;min-width:0}.run-h .t b{display:block;font-size:14px}.run-h .t span{font-size:12px;color:var(--text-3)}
+.run-b{overflow-y:auto;padding:14px 16px 16px;display:flex;flex-direction:column;gap:14px}
+.run-b>*{flex-shrink:0}
+.run-now{padding:12px 14px;border-radius:10px;background:var(--accent-soft)}
+.run-now b{display:block;color:var(--accent-text)}
+.run-now .about{font-size:12.5px;color:var(--text-2);margin-top:2px}
+.run-now .detail{font-size:12.5px;margin-top:6px;color:var(--text)}
+.llm-wait{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-2)}
+.llm-wait .spin{width:12px;height:12px;color:var(--accent-text)}
+.run-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-3)}
+.run-meta b{color:var(--text);font-variant-numeric:tabular-nums}
+.stages{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.st{display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--border)}
+.st:first-child{border-top:0}
+.st-ic{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none;margin-top:1px}
+.st.done .st-ic{background:var(--ok-soft);color:var(--ok)}
+.st.pending .st-ic{border:1.5px solid var(--border-strong)}
+.st.running .st-ic{color:var(--accent-text)}.st.running .st-ic .spin{width:14px;height:14px}
+.st.failed .st-ic{background:var(--bad-soft);color:var(--bad)}
+.st-t{flex:1;min-width:0;font-size:13px}.st-t .n{font-size:12px;color:var(--text-3);margin-top:1px}
+.st.pending .st-t b{color:var(--text-3);font-weight:500}.st.running .st-t b{color:var(--accent-text)}
+.st .secs{font:11.5px var(--mono);color:var(--text-3);white-space:nowrap}
+.llm-tag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:5px;background:var(--accent-soft);color:var(--accent-text);font-size:10.5px;font-weight:600;margin-left:6px;vertical-align:1px}
+.outcomes{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.outcomes li{display:flex;gap:10px;font-size:13px}.outcomes li .i{color:var(--ok);margin-top:2px}
+.outcomes li b{font-weight:600}
+.runpanel.min{width:auto;border-radius:999px}
+.run-mini{display:flex;align-items:center;gap:10px;padding:10px 16px;border:0;background:none;font-weight:550;font-size:13px;cursor:pointer;color:var(--text)}
+.run-mini .spin{color:var(--accent-text)}
+.run-mini .mbar{width:70px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden}.run-mini .mbar span{display:block;height:100%;background:var(--accent)}
+.lastrun{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
+.lastrun .st{border-top:1px solid var(--border)}
+@media (max-width:960px){.lastrun{grid-template-columns:1fr}}
+@media (max-width:600px){.runpanel{left:12px;right:12px;bottom:12px;width:auto}.runpanel.min{left:auto}}
+
+/* ---- toasts -------------------------------------------------------------------------------- */
+.toasts{position:fixed;right:20px;top:72px;display:flex;flex-direction:column;gap:8px;z-index:90;max-width:min(420px,calc(100vw - 32px))}
+.toast{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-lg);font-size:13px;animation:pop .18s ease-out}
+.toast .i{margin-top:1px}.toast.ok .i{color:var(--ok)}.toast.bad .i{color:var(--bad)}.toast.info .i{color:var(--accent-text)}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}}
+
+/* ---- responsive ---------------------------------------------------------------------------- */
+@media (max-width:1100px){.phase .body{grid-template-columns:repeat(2,minmax(0,1fr))}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g-side{grid-template-columns:1fr}.qgrid{grid-template-columns:1fr 1fr}.qgrid>:last-child{grid-column:1/-1;justify-self:end}}
+@media (max-width:960px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:276px;z-index:65;transform:translateX(-102%);transition:transform .22s ease;box-shadow:var(--shadow-lg)}
+  .sidebar.open{transform:none}
+  .topbar .menu-btn{display:inline-flex}
+  .topbar{padding:8px 16px}.content{padding:20px 16px 56px}
+  .g2,.g3{grid-template-columns:1fr}.flow{grid-template-columns:1fr}
+  .hero{padding:24px 20px}.hero h1{font-size:24px}
+  .identity .input{max-width:130px}
+  .phase .body{grid-template-columns:1fr}
+}
+@media (max-width:600px){.g4{grid-template-columns:1fr}.identity .who,.identity .avatar,#user{display:none}.identity select{max-width:150px}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.busy-pill{max-width:40vw}.crumbs .proj-name{display:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}.spin{animation-duration:1.5s!important}}
 </style>
 </head>
 <body>
-<header>
-  <div><h1>KYC Requirement Studio</h1><div class="sub" id="health">Multi-agent requirement engineering for customer onboarding & KYC</div></div>
-  <div class="row">
-    <select id="project"></select>
-    <label class="small muted">Acting as</label>
-    <input id="user" type="text" value="demo.user" style="width:120px" aria-label="user">
-    <select id="role" aria-label="role"></select>
+<div class="progress-line" aria-hidden="true"></div>
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="brand"><div class="logo" id="logo"></div><div><b>Requirement Studio</b><span>KYC & onboarding</span></div></div>
+    <div class="proj">
+      <select id="project" class="input sm" aria-label="Project"></select>
+      <button class="btn sm icon" id="new-project" title="New project" aria-label="New project"></button>
+    </div>
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <div class="engine" id="engine"><span class="live"></span><span class="muted">Connecting…</span></div>
+      <div class="row between"><span class="xs muted" id="kbv"></span><button class="btn sm ghost" id="theme" aria-label="Toggle colour theme"></button></div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <button class="btn sm icon ghost menu-btn" id="menu" aria-label="Open navigation"></button>
+      <div class="crumbs" id="crumbs"></div>
+      <div class="busy-pill" role="status" aria-live="polite"><span class="spin"></span><span id="busy-text"></span></div>
+      <div class="identity">
+        <div class="avatar" id="avatar" aria-hidden="true"></div>
+        <span class="xs muted who">Acting as</span>
+        <input id="user" class="input sm" style="width:118px" aria-label="Your user name">
+        <select id="role" class="input sm" style="width:auto" aria-label="Your role"></select>
+      </div>
+    </header>
+    <main class="content" id="view"></main>
   </div>
-</header>
-<main>
-  <nav id="tabs"></nav>
-  <section id="view"></section>
-</main>
-<div id="toast"></div>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Requirement details" aria-hidden="true"></aside>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<section class="runpanel hidden" id="runpanel" aria-label="Analysis progress"></section>
+<input id="file-pick" type="file" multiple accept=".txt,.md,.eml,.csv,.json,.yaml,.yml,.xml,.html,.htm,.log,.docx,.pdf" class="hidden">
 <script>
+/* ======================================================================================== */
+/* constants & tiny helpers                                                                 */
+/* ======================================================================================== */
 const ROLES=["product_owner","business_analyst","compliance","legal","security","architect","project_manager","operations","risk","auditor","developer","customer"];
-const TABS=["Overview","Inputs","Interview","Requirements","Clarifications","Conflicts","Compliance","Risks","SDLC","Approvals","Audit"];
-let S={pid:null,data:null,tab:"Overview",interview:null};
-const $=s=>document.querySelector(s);
-const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3500)}
-async function api(path,opt={}){const h={"Content-Type":"application/json","X-User":$("#user").value||"anonymous","X-Role":$("#role").value};
-  const r=await fetch(path,{...opt,headers:{...h,...(opt.headers||{})}});if(!r.ok){let d;try{d=(await r.json()).detail}catch{d=r.statusText}throw new Error(typeof d==="string"?d:JSON.stringify(d))}
-  return r.headers.get("content-type")?.includes("json")?r.json():r}
-const pct=x=>Math.round((x||0)*100)+"%";
-const chips=a=>(a||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join("");
+const TYPES=["meeting_notes","transcript","conversation","email","questionnaire","requirement_doc","policy","regulation","legacy_doc","api_spec","incident_report","audit_finding"];
+const NAV=[["Workspace",[["Overview","grid"],["Inputs","fileplus"],["Interview","chat"]]],
+  ["Analysis",[["Requirements","list"],["Clarifications","help"],["Conflicts","alert"],["Compliance","shield"],["Risks","pulse"],["SDLC","flow"]]],
+  ["Governance",[["Approvals","stamp"],["Audit","history"],["Knowledge","book"]]]];
+const PAGES=NAV.flatMap(g=>g[1].map(x=>x[0]));
+const LABEL={Audit:"Audit trail",Knowledge:"Knowledge base",SDLC:"SDLC"};
+const NO_PROJECT_OK=new Set(["Overview","Knowledge"]);
+const TOPICS=["Business objectives","Users and roles","Existing workflow","Inputs, outputs and rules","Exceptions","Data and retention","Authentication","Transaction limits","Audit and reporting","Performance and availability","Integrations","Regulatory and security","Schedule and budget"];
+const STAGE_LABEL={ingestion:"Security gate",topic_coverage:"Topic coverage",extraction:"Extraction",classification:"Classification",quality:"Quality",conflict:"Conflicts",compliance:"Compliance",security_privacy:"Security & privacy",quality_derived:"Quality (derived)",clarification:"Clarification",risk:"Risk",sdlc:"SDLC",validation:"Validation",approval:"Approval gates"};
 
-async function init(){
-  $("#role").innerHTML=ROLES.map(r=>`<option>${r}</option>`).join("");
-  try{const h=await api("/api/health");$("#health").textContent=`LLM: ${h.llm} · Knowledge base v${h.kb_version}`}catch(e){}
-  $("#tabs").innerHTML=TABS.map(t=>`<button data-t="${t}">${t}</button>`).join("");
-  $("#tabs").onclick=e=>{if(e.target.dataset.t){S.tab=e.target.dataset.t;render()}};
-  $("#project").onchange=async e=>{S.pid=e.target.value||null;await load()};
-  await refreshProjects();render();
+const ICONS={
+grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+fileplus:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 12v6M9 15h6"/>',
+file:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
+chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+list:'<path d="m3 6 2 2 3-3M3 13l2 2 3-3"/><path d="M12 6h9M12 13h9M12 20h9"/>',
+help:'<circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',
+alert:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+pulse:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+flow:'<rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="15" y="15" width="6" height="6" rx="1.5"/><path d="M6 9v4a2 2 0 0 0 2 2h7"/>',
+stamp:'<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+history:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>',
+book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>',
+download:'<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+refresh:'<path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/>',
+x:'<path d="M18 6 6 18M6 6l12 12"/>',
+menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+monitor:'<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
+upload:'<path d="M12 15V3M7 8l5-5 5 5"/><path d="M20 15v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"/>',
+search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+lock:'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+chev:'<path d="m9 6 6 6-6 6"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',
+trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
+check:'<path d="m5 12 5 5 9-10"/>',
+checkc:'<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+xc:'<circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/>',
+info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',
+edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+clip:'<path d="m21 11-8.6 8.6a5 5 0 0 1-7-7l8.6-8.6a3.3 3.3 0 0 1 4.7 4.7L10 17.4a1.7 1.7 0 0 1-2.4-2.4l8-8"/>',
+link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+users:'<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 3.1a4 4 0 0 1 0 7.8M22 21a7 7 0 0 0-4-6.3"/>',
+};
+const I=(n,s=16)=>`<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]||""}</svg>`;
+
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const human=s=>String(s??"").replaceAll("_"," ");
+const cap=s=>{s=human(s);return s.charAt(0).toUpperCase()+s.slice(1)};
+const pct=x=>Math.round((x||0)*100)+"%";
+const plural=(n,w,p=w+"s")=>`${n} ${n===1?w:p}`;
+const opts=(list,sel,blank)=>(blank!=null?`<option value="">${esc(blank)}</option>`:"")+list.map(x=>`<option value="${esc(x)}"${x===sel?" selected":""}>${esc(cap(x))}</option>`).join("");
+const pref={get(k){try{return localStorage.getItem("kycre."+k)}catch{return null}},set(k,v){try{localStorage.setItem("kycre."+k,v)}catch{}}};
+
+const STATUS_K={approved:"ok",needs_clarification:"warn",pending_approval:"info",rejected:"bad",modified:"accent",regenerate:"warn",draft:""};
+const LEVEL_K={critical:"solid-bad",high:"bad",medium:"warn",low:""};
+const pill=(t,k="")=>`<span class="pill ${k}"><i></i>${esc(cap(t))}</span>`;
+const statusPill=s=>pill(s,STATUS_K[s]??"");
+const levelPill=l=>pill(l,LEVEL_K[l]??"");
+const tag=(t,cls="")=>`<span class="tag ${cls}">${esc(t)}</span>`;
+const reqTag=id=>`<button class="tag mono" data-req="${esc(id)}" title="Open ${esc(id)}">${esc(id)}</button>`;
+const tags=(a,cls="")=>`<div class="tags">${(a||[]).map(x=>tag(cls==="cat"?cap(x):x,cls==="cat"?"":cls)).join("")}</div>`;
+const ring=(v,s=72,c)=>`<div class="ring" style="--v:${Math.round((v||0)*100)};--s:${s}px${c?`;--ring-c:${c}`:""}"><span>${pct(v)}</span></div>`;
+const meter=v=>`<div class="meter"><div class="bar"><span style="width:${Math.round((v||0)*100)}%"></span></div><small>${(v||0).toFixed(2)}</small></div>`;
+const empty=(icon,title,text,action="")=>`<div class="empty">${I(icon,30)}<h3>${title}</h3><p>${text}</p>${action}</div>`;
+const pageHead=(title,sub="",actions="")=>`<div class="page-head"><div><h1>${title}</h1>${sub?`<p>${sub}</p>`:""}</div>${actions?`<div class="actions">${actions}</div>`:""}</div>`;
+const seg=(key,options)=>`<div class="seg" role="tablist" data-seg="${key}">${options.map(([v,l,n])=>`<button role="tab" aria-selected="${S.f[key]===v}" data-v="${v}">${l}${n!=null?`<span class="n">${n}</span>`:""}</button>`).join("")}</div>`;
+const fmtTime=ts=>{const d=new Date(ts);return isNaN(d)?esc(ts):d.toLocaleString(undefined,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"})};
+const initials=s=>(String(s||"?").split(/[\s._-]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("")||"?").toUpperCase();
+
+/* ======================================================================================== */
+/* state                                                                                    */
+/* ======================================================================================== */
+let S={pid:null,data:null,page:"Overview",interview:null,busy:null,demos:[],queue:[],qseq:0,defaults:{stakeholder:"",role:""},
+  paste:"",pasteTitle:"",speakers:[],roleOv:{},nameOv:{},splitSeq:0,
+  kb:null,health:null,drawer:null,
+  f:{rqView:"reqs",rqCat:"",rqSt:"",rqQ:"",rqPri:"",cl:"open",clMine:false,cf:"open",cmp:"all",risk:"",ap:pref.get("ap")||"mine",au:"",kbView:"items",kbQ:"",kbJ:""}};
+
+function toast(msg,kind="info",ms){const t=document.createElement("div");t.className="toast "+kind;
+  t.innerHTML=`${I(kind==="ok"?"checkc":kind==="bad"?"xc":"info",18)}<div>${esc(msg)}</div>`;$("#toasts").appendChild(t);
+  setTimeout(()=>{t.style.transition="opacity .25s";t.style.opacity="0";setTimeout(()=>t.remove(),260)},ms||(kind==="bad"?7000:4200))}
+
+// Every action that calls the server goes through busy(): only one runs at a time, further clicks are ignored,
+// controls are locked, and the top bar shows what is running and for how long (a local-LLM analysis can take minutes).
+// Navigation stays usable so the user can browse while waiting; render() re-locks controls in the newly drawn view.
+function lockView(on){$$("#view :is(button,input,select,textarea), #drawer :is(button,input,select,textarea), #project, #new-project").forEach(el=>{if(!el.closest("[data-seg]")&&!el.closest(".chipbar")&&!el.classList.contains("keep")&&!el.hasAttribute("data-req")&&!el.hasAttribute("data-close"))el.disabled=on})}
+// slow=true: the request runs the agent pipeline, so the live run panel follows it; slow="any" for a project
+// whose id isn't known yet (created as part of the same action).
+async function busy(btn,msg,fn,slow=false){
+  if(S.busy){toast(`Please wait: ${S.busy.toLowerCase()} is still running.`);return}
+  S.busy=msg;const t0=Date.now(),old=btn?.innerHTML;document.body.classList.add("busy");lockView(true);btn?.classList.add("is-running");
+  if(slow)watchRun(slow==="any"?null:S.pid);
+  const tick=()=>{const s=Math.round((Date.now()-t0)/1000),r=RUN.snap?.running?RUN.snap:null,cur=r&&r.stages.find(x=>x.status==="running");
+    $("#busy-text").textContent=cur?`${cur.label} · step ${r.stages.indexOf(cur)+1} of ${r.stages.length} · ${s}s`:`${msg}… ${s}s`;
+    if(btn?.isConnected)btn.innerHTML=`<span class="spin"></span>${esc(cur?cur.label:msg)}… ${s}s`};
+  tick();const iv=setInterval(tick,500);
+  try{return await fn()}catch(e){toast(e.message,"bad")}
+  finally{clearInterval(iv);S.busy=null;document.body.classList.remove("busy");lockView(false);if(btn?.isConnected){btn.innerHTML=old;btn.classList.remove("is-running")}
+    if(slow){RUN.ending=true;pollRun()}}}
+
+/* ---- live run progress -------------------------------------------------------------------- */
+const RUN={timer:null,pid:null,snap:null,ignore:new Set(),ending:false,misses:0,view:pref.get("runview")||"open",dismissed:false,onDone:null};
+const fmtDur=t=>t==null?"":t<1?Math.round(t*1000)+" ms":t<60?t.toFixed(1)+" s":`${Math.floor(t/60)} m ${String(Math.round(t%60)).padStart(2,"0")} s`;
+async function watchRun(pid,onDone=null){
+  clearInterval(RUN.timer);Object.assign(RUN,{pid,snap:null,ending:false,misses:0,dismissed:false,onDone,ignore:new Set()});
+  // remember runs that had already finished, so an old result isn't shown as this run's
+  try{(await api("/api/progress")).forEach(x=>{if(!x.running)RUN.ignore.add(x.project+"@"+x.started)})}catch{}
+  pollRun();RUN.timer=setInterval(pollRun,800);
 }
+async function pollRun(){
+  let snap=null;
+  try{const all=await api("/api/progress");
+    const fresh=all.filter(x=>!RUN.ignore.has(x.project+"@"+x.started));
+    snap=(RUN.pid&&fresh.find(x=>x.project===RUN.pid))||fresh.find(x=>x.running)||fresh.sort((a,b)=>(b.finished||0)-(a.finished||0))[0]||null}catch{}
+  const wasRunning=RUN.snap?.running;
+  if(snap){RUN.snap=snap;RUN.misses=0;renderRun()}else RUN.misses++;
+  if(snap&&!snap.running&&(RUN.ending||wasRunning)){clearInterval(RUN.timer);RUN.timer=null;if(RUN.onDone){const f=RUN.onDone;RUN.onDone=null;f()}}
+  else if(RUN.ending&&!snap&&RUN.misses>2){clearInterval(RUN.timer);RUN.timer=null}  // the action didn't trigger a run
+}
+function renderRun(){
+  const p=$("#runpanel"),s=RUN.snap;
+  document.body.classList.toggle("running",!!s?.running);
+  if(!s||RUN.dismissed){p.className="runpanel hidden";p.innerHTML="";return}
+  const n=s.stages.length,done=s.stages.filter(x=>x.status==="done").length,cur=s.stages.find(x=>x.status==="running"),failed=!!s.error,ok=!s.running&&!failed;
+  const title=s.running?"Agents are working":failed?"Analysis failed":"Analysis complete";
+  const sub=`${esc(cap(s.trigger||"analysis"))}${s.name?" · "+esc(s.name):""}`;
+  if(RUN.view==="min"){p.className="runpanel min";
+    p.innerHTML=`<button class="run-mini" id="run-expand" aria-label="Show analysis progress">${s.running?'<span class="spin"></span>':I(ok?"checkc":"xc",16)}
+      <span>${s.running?esc(cur?.label||"Starting")+` · ${done}/${n}`:esc(title)}</span>${s.running?`<span class="mbar"><span style="width:${done/n*100}%"></span></span>`:""}${I("chev",14)}</button>`;
+    $("#run-expand").onclick=()=>{RUN.view="open";pref.set("runview","open");renderRun()};return}
+  p.className="runpanel";
+  const icon=st=>st.status==="done"?I("check",12):st.status==="running"?'<span class="spin"></span>':st.status==="failed"?I("x",12):"";
+  const stageList=stages=>`<ul class="stages">${stages.map(st=>`<li class="st ${st.status}"><span class="st-ic">${icon(st)}</span><div class="st-t"><div class="row between" style="flex-wrap:nowrap"><b>${esc(st.label)}${st.llm_calls?`<span class="llm-tag" title="Language-model calls in this step">${st.llm_calls} LLM</span>`:""}</b><span class="secs">${st.status==="done"?fmtDur(st.seconds):""}</span></div>
+    <div class="n">${esc(st.status==="done"?st.note:st.status==="running"?(s.detail||st.about):st.about)}</div></div></li>`).join("")}</ul>`;
+  let body="";
+  if(s.running){
+    body=`<div class="hbar"><span style="width:${Math.max(done/n*100,3)}%"></span></div>
+      <div class="run-meta"><span>Step <b>${Math.min(done+1,n)}</b> of ${n}</span><span><b>${fmtDur(s.elapsed)}</b> elapsed</span><span><b>${s.llm_calls}</b> model calls</span></div>
+      ${cur?`<div class="run-now"><b>${esc(cur.label)}</b><div class="about">${esc(cur.about)}</div>${s.detail?`<div class="detail">${esc(s.detail)}</div>`:""}
+        ${s.llm_active?`<div class="llm-wait"><span class="spin"></span>Waiting for ${esc(s.llm)} (${esc(human(s.llm_active.purpose))}) · ${fmtDur(s.llm_active.seconds)}</div>`:""}</div>`:""}
+      ${stageList(s.stages)}`;
+  }else if(failed){
+    body=`<div class="callout bad">${I("alert",15)}<div><b>Stopped at ${esc(s.stages.find(x=>x.status==="failed")?.label||"a step")}.</b> ${esc(s.error)}</div></div>${stageList(s.stages)}`;
+  }else{
+    const c=counts(S.data),key=["extraction","conflict","compliance","clarification","sdlc","approval"].map(id=>s.stages.find(x=>x.id===id)).filter(Boolean);
+    const acts=[];
+    if(s.project&&s.project!==S.pid){acts.push(`<button class="btn sm primary keep" data-open-project="${esc(s.project)}">${I("arrow",14)}Open ${esc(s.name||"project")}</button>`)}
+    else if(S.data){  // counts describe the project on screen, which is the one that was analysed
+      if(c.openQ)acts.push(`<button class="btn sm primary" data-go="Clarifications">Answer ${plural(c.openQ,"question")}</button>`);
+      if(c.mine||c.pending)acts.push(`<button class="btn sm${acts.length?"":" primary"}" data-go="Approvals">${c.mine?`${plural(c.mine,"decision")} for you`:"Review approvals"}</button>`);
+      acts.push(`<button class="btn sm" data-go="Requirements">Requirements</button>`)}
+    body=`<div class="run-meta"><span><b>${fmtDur(s.elapsed)}</b> total</span><span><b>${s.llm_calls}</b> model calls (${esc(s.llm)})</span><span><b>${n}</b> agents ran</span></div>
+      ${s.llm_failed?`<div class="callout warn">${I("info",15)}<div>${plural(s.llm_failed,"model call")} failed or returned unusable output. Those steps used the rule engine instead.</div></div>`:""}
+      <div><div class="label" style="margin-bottom:8px">What the agents found</div><ul class="outcomes">${key.map(st=>`<li>${I("checkc",15)}<div><b>${esc(st.label)}:</b> ${esc(st.note)}</div></li>`).join("")}</ul></div>
+      <div class="row">${acts.join("")}</div>
+      <details class="disc"><summary class="sm">${I("chev",14)}<b>All ${n} steps</b><span class="muted">· timings and model calls</span></summary><div style="margin-top:8px">${stageList(s.stages)}</div></details>`;
+  }
+  p.innerHTML=`<div class="run-h"><span class="ic ${ok?"ok":failed?"bad":""}">${s.running?'<span class="spin"></span>':I(ok?"checkc":"alert",17)}</span>
+    <div class="t" role="status" aria-live="polite"><b>${title}</b><span>${sub}</span></div>
+    <button class="btn sm icon ghost" id="run-min" aria-label="Minimise" title="Minimise">${I("chev",15)}</button>
+    ${s.running?"":`<button class="btn sm icon ghost" id="run-close" aria-label="Close" title="Close">${I("x",15)}</button>`}</div><div class="run-b">${body}</div>`;
+  $("#run-min").firstElementChild.style.transform="rotate(90deg)";
+  $("#run-min").onclick=()=>{RUN.view="min";pref.set("runview","min");renderRun()};
+  const cl=$("#run-close");if(cl)cl.onclick=()=>{RUN.dismissed=true;renderRun()};
+  const cur2=p.querySelector(".st.running");if(cur2)cur2.scrollIntoView({block:"nearest"});
+}
+async function api(path,opt={}){const h={"Content-Type":"application/json","X-User":$("#user").value||"anonymous","X-Role":$("#role").value};
+  const r=await fetch(path,{...opt,headers:{...h,...(opt.headers||{})}});
+  if(!r.ok){let d;try{d=(await r.json()).detail}catch{d=r.statusText}throw new Error(typeof d==="string"?d:JSON.stringify(d))}
+  return r.headers.get("content-type")?.includes("json")?r.json():r}
+const post=(p,b)=>api(p,{method:"POST",body:b===undefined?undefined:JSON.stringify(b)});
+
+/* ======================================================================================== */
+/* derived counts                                                                           */
+/* ======================================================================================== */
+const myRole=()=>$("#role").value;
+const canDecide=a=>a.status==="pending_approval"&&a.required_roles.includes(myRole())&&!a.decisions.some(x=>x.role===myRole());
+function counts(d){
+  if(!d)return {};
+  const pend=d.approvals.filter(a=>a.status==="pending_approval");
+  return {docs:d.documents.length,reqs:d.requirements.length,
+    openQ:d.questions.filter(q=>!q.answer).length,
+    openC:d.conflicts.filter(c=>!c.resolution).length,
+    openCHigh:d.conflicts.filter(c=>!c.resolution&&["high","critical"].includes(c.severity)).length,
+    gaps:d.coverage.filter(c=>c.mandatory&&c.status==="gap").length,
+    pending:pend.length,mine:pend.filter(canDecide).length,
+    highRisk:d.risks.filter(r=>["high","critical"].includes(r.level)).length};
+}
+
+/* ======================================================================================== */
+/* shell                                                                                    */
+/* ======================================================================================== */
+async function init(){
+  $("#logo").innerHTML=I("spark",18);$("#new-project").innerHTML=I("plus",15);$("#menu").innerHTML=I("menu",18);
+  $("#role").innerHTML=opts(ROLES,pref.get("role")||"business_analyst");
+  $("#user").value=pref.get("user")||"demo.user";avatar();
+  $("#role").onchange=()=>{pref.set("role",myRole());render();if(S.drawer)renderDrawer()};
+  $("#user").oninput=()=>{pref.set("user",$("#user").value);avatar()};
+  themeButton();$("#theme").onclick=cycleTheme;
+  $("#menu").onclick=()=>toggleSidebar(true);
+  $("#scrim").onclick=()=>{toggleSidebar(false);closeDrawer()};
+  $("#project").onchange=async e=>{S.pid=e.target.value||null;pref.set("pid",S.pid||"");S.interview=null;closeDrawer();await load()};
+  const home=()=>{S.pid=null;S.data=null;S.interview=null;pref.set("pid","");$("#project").value="";closeDrawer();go("Overview");setTimeout(()=>$("#pz-text")?.focus(),50)};
+  $("#new-project").onclick=home;$(".brand").onclick=home;$(".brand").style.cursor="pointer";$(".brand").title="Start page";
+  document.addEventListener("click",onClick);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();toggleSidebar(false)}});
+  const [hp,hpage,hreq]=decodeURIComponent(location.hash.slice(1)).split("/");if(PAGES.includes(hpage))S.page=hpage;
+  render();
+  api("/api/health").then(h=>{S.health=h;$("#engine").innerHTML=`<span class="live"></span><span class="muted">Engine</span><b title="${esc(h.llm)}">${esc(h.llm)}</b>`;$("#kbv").textContent=`Knowledge base v${h.kb_version}`})
+    .catch(()=>{$("#engine").innerHTML=`<span class="live" style="background:var(--bad);box-shadow:0 0 0 3px var(--bad-soft)"></span><span>API unreachable</span>`});
+  api("/api/demos").then(s=>{S.demos=s;if(S.page==="Overview"&&!S.data)render()}).catch(()=>{});
+  await refreshProjects();
+  try{const live=(await api("/api/progress")).find(x=>x.running);
+    if(live){S.busy=null;watchRun(live.project,async()=>{await refreshProjects(S.pid||live.project);if(S.pid===live.project||!S.pid){S.pid=live.project;$("#project").value=live.project;await load()}toast("Analysis finished.","ok")})}}catch{}
+  const last=hp||pref.get("pid");
+  if(last&&[...$("#project").options].some(o=>o.value===last)){$("#project").value=last;S.pid=last;try{await load();if(hreq)openReq(hreq);return}catch{S.pid=null}}
+  render();
+}
+function avatar(){$("#avatar").textContent=initials($("#user").value)}
+function themeButton(){const t=pref.get("theme")||"system";$("#theme").innerHTML=`${I(t==="dark"?"moon":t==="light"?"sun":"monitor",15)}<span>${cap(t)}</span>`}
+function cycleTheme(){const order=["system","light","dark"],t=order[(order.indexOf(pref.get("theme")||"system")+1)%3];pref.set("theme",t);
+  if(t==="system")delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;themeButton()}
+function toggleSidebar(on){$("#sidebar").classList.toggle("open",on);if(!S.drawer)$("#scrim").classList.toggle("open",on)}
+function setHash(){const h=S.pid?`#${encodeURIComponent(S.pid)}/${S.page}${S.drawer?"/"+encodeURIComponent(S.drawer):""}`:(S.page==="Overview"?"":`#/${S.page}`);if(location.hash!==h)history.replaceState(null,"",h||location.pathname)}
+function go(page){S.page=page;setHash();toggleSidebar(false);render();window.scrollTo({top:0})}
 async function refreshProjects(sel){
   const ps=await api("/api/projects");
-  $("#project").innerHTML=`<option value="">— select project —</option>`+ps.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
-  if(sel){$("#project").value=sel;S.pid=sel}
+  $("#project").innerHTML=`<option value="">${ps.length?"Select a project…":"No projects yet"}</option>`+ps.map(p=>`<option value="${esc(p.id)}">${p.id.startsWith("demo-")?"Demo · ":""}${esc(p.name)}</option>`).join("");
+  if(sel){S.pid=sel;pref.set("pid",sel)}
+  $("#project").value=S.pid||"";
 }
-async function load(){S.data=S.pid?await api(`/api/projects/${S.pid}`):null;render()}
+async function selectProject(id){S.pid=id;pref.set("pid",id);S.interview=null;closeDrawer();$("#project").value=id;await load();go("Overview")}
+async function openDemo(id,reset=false){
+  try{const r=await post(`/api/demos/${encodeURIComponent(id)}${reset?"?reset=true":""}`);await refreshProjects();await selectProject(r.id);
+    if(reset)toast("Demo reset to its original analysis.","ok");S.demos=await api("/api/demos")}catch(e){toast(e.message,"bad")}
+}
+const isDemo=()=>!!S.pid&&S.pid.startsWith("demo-");
+async function load(){S.data=S.pid?await api(`/api/projects/${encodeURIComponent(S.pid)}`):null;setHash();render();if(S.drawer)renderDrawer();if(RUN.snap&&!RUN.snap.running)renderRun()}
+
+function onClick(e){
+  const g=e.target.closest("[data-go]");if(g){e.preventDefault();if(g.dataset.cat!=null){S.f.rqCat=g.dataset.cat;S.f.rqView="reqs"}if(g.dataset.apf)S.f.ap=g.dataset.apf;closeDrawer();go(g.dataset.go);return}
+  const r=e.target.closest("[data-req]");if(r){e.stopPropagation();openReq(r.dataset.req);return}
+  const sb=e.target.closest("[data-seg] button");if(sb){S.f[sb.parentElement.dataset.seg]=sb.dataset.v;if(sb.parentElement.dataset.seg==="ap")pref.set("ap",sb.dataset.v);render();return}
+  if(e.target.closest("[data-close]")){closeDrawer();return}
+  const dm=e.target.closest("[data-demo]");if(dm){openDemo(dm.dataset.demo,dm.hasAttribute("data-reset"));return}
+  const op=e.target.closest("[data-open-project]");if(op){selectProject(op.dataset.openProject);return}
+}
 
 function render(){
-  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.dataset.t===S.tab));
+  const d=S.data,c=counts(d);
+  const badge={Inputs:[c.docs],Requirements:[c.reqs],Clarifications:[c.openQ,1],Conflicts:[c.openC,1],Compliance:[c.gaps,1],Risks:[c.highRisk],Approvals:[c.mine||c.pending,c.mine]};
+  $("#nav").innerHTML=NAV.map(([group,items])=>`<div class="nav-group"><h6>${group}</h6>${items.map(([p,ic])=>{const [n,hot]=badge[p]||[];
+    return `<button class="nav-item" data-go="${p}"${p===S.page?' aria-current="page"':""}>${I(ic,17)}<span>${LABEL[p]||p}</span>${n?`<span class="count${hot?" hot":""}">${n}</span>`:""}</button>`}).join("")}</div>`).join("");
+  $("#crumbs").innerHTML=d?`<span class="proj-name">${esc(d.project.name)}</span><span class="proj-name">${I("chev",14)}</span><b>${LABEL[S.page]||S.page}</b>`:`<b>${LABEL[S.page]||S.page}</b>`;
   const v=$("#view");
-  if(!S.data&&S.tab!=="Overview"){v.innerHTML=`<div class="panel muted">Select or create a project first.</div>`;return}
-  v.innerHTML=(VIEWS[S.tab]||(()=>""))(S.data);
-  (BIND[S.tab]||(()=>{}))();
+  if(!d&&!NO_PROJECT_OK.has(S.page)){
+    v.innerHTML=pageHead(LABEL[S.page]||S.page)+`<div class="card">${empty("grid","No project selected","Paste stakeholder input on the start page, or open a demo. Everything in this section is produced from a project's stakeholder inputs.",`<button class="btn primary" data-go="Overview">${I("arrow")}Get started</button>`)}</div>`;
+  }else{
+    v.innerHTML=(VIEWS[S.page]||(()=>""))(d,c);
+    (BIND[S.page]||(()=>{}))(d,c);
+  }
+  if(S.busy)lockView(true);
+}
+
+/* ======================================================================================== */
+/* approvals: shared pieces (Approvals page and requirement panel)                          */
+/* ======================================================================================== */
+const GATE_FIX={no_open_high_conflicts:["Resolve the open high-severity conflicts","Conflicts"],no_pending_clarifications:["Answer the open clarification questions","Clarifications"],
+  full_mandatory_coverage:["Cover every mandatory control","Compliance"],all_citations_valid:["Fix invalid regulation citations","Compliance"],traceability_complete:["Trace every requirement to its source","Requirements"]};
+const baselineBlockers=d=>Object.entries(d.metrics?.gates||{}).filter(([,ok])=>!ok).map(([g])=>GATE_FIX[g]||[cap(g),"Overview"]);
+function blockedNote(d){const b=baselineBlockers(d);if(!b.length)return "";
+  return `<div class="callout warn">${I("lock",15)}<div><b>The baseline can't be approved yet.</b> First:<ul class="ac" style="margin-top:4px">${b.map(([t,pg])=>`<li>${esc(t)} <button class="linkbtn" data-go="${pg}">Go</button></li>`).join("")}</ul></div></div>`}
+function decisionBox(a,d){
+  if(a.status!=="pending_approval")return "";
+  if(!canDecide(a)){const waiting=a.required_roles.filter(r=>!a.decisions.some(x=>x.role===r)),all=["sdlc","production_readiness"].includes(a.gate);
+    return `<div class="card-f" style="justify-content:flex-start;gap:6px"><span class="sm muted">${I("lock",13)}</span><span class="sm muted">Needs ${waiting.length?waiting.map(r=>esc(cap(r))).join(all?", ":" or "):"another role"}${all?" (all of them)":""}. You're acting as ${esc(human(myRole()))}; switch role at the top right to decide.</span></div>`}
+  const blocked=a.gate==="baseline"&&!d.metrics?.baseline_ready;
+  return `<div class="card-f" style="display:block"><textarea class="input" data-c="${esc(a.id)}" style="min-height:52px;margin-bottom:10px;background:var(--surface)" placeholder="Comment. For “Modify”, write the replacement text here."></textarea>
+    <div class="row end"><button class="btn sm danger" data-ap="${esc(a.id)}" data-d="reject">Reject</button><button class="btn sm" data-ap="${esc(a.id)}" data-d="regenerate">${I("refresh",13)}Regenerate</button><button class="btn sm" data-ap="${esc(a.id)}" data-d="modify">${I("edit",13)}Modify</button><button class="btn sm primary" data-ap="${esc(a.id)}" data-d="approve"${blocked?' disabled data-blocked title="Blocked until the quality gates pass"':""}>${I("check",14)}Approve</button></div></div>`}
+function bindDecisions(root){
+  root.querySelectorAll("[data-ap]").forEach(b=>b.onclick=()=>{const id=b.dataset.ap,dd=b.dataset.d,c=root.querySelector(`[data-c="${CSS.escape(id)}"]`).value;
+    if(dd==="modify"&&!c.trim()){toast("Write the replacement text in the comment box first.");return}
+    busy(b,`Recording ${dd}`,async()=>{try{await post(`/api/projects/${S.pid}/approvals/${encodeURIComponent(id)}`,{decision:dd,comment:c,modification:dd==="modify"?c:null})}catch(e){throw new Error("Not allowed: "+e.message)}await load();toast(`${id}: ${dd} recorded.`,"ok")},true)});
+  if(S.busy)lockView(true);
+  root.querySelectorAll("[data-blocked]").forEach(b=>b.disabled=true);
+}
+
+/* ======================================================================================== */
+/* requirement drawer                                                                       */
+/* ======================================================================================== */
+function openReq(id){if(!S.data?.requirements.some(r=>r.id===id)){toast(`${id} is not in this project.`);return}
+  S.drawer=id;setHash();renderDrawer();$("#drawer").classList.add("open");$("#drawer").setAttribute("aria-hidden","false");$("#scrim").classList.add("open");$("#drawer [data-close]")?.focus()}
+function closeDrawer(){if(!S.drawer)return;S.drawer=null;setHash();$("#drawer").classList.remove("open");$("#drawer").setAttribute("aria-hidden","true");if(!$("#sidebar").classList.contains("open"))$("#scrim").classList.remove("open")}
+function approvalSection(d,r){
+  const base=d.approvals.find(a=>a.gate==="baseline");
+  const ownPending=d.approvals.filter(a=>a.gate!=="baseline"&&a.status==="pending_approval"&&a.subject_id.split(":")[0]===r.id);
+  let body="";
+  if(r.status==="approved")body=`<div class="callout ok">${I("checkc",15)}<div>Approved.${base?.status==="approved"?" It's part of the approved baseline.":""}</div></div>`;
+  else if(r.status==="rejected")body=`<div class="callout bad">${I("xc",15)}<div>Rejected. Request a change below to rework it.</div></div>`;
+  else if(r.status==="needs_clarification")body=`<div class="callout warn">${I("help",15)}<div>Needs clarification first. Answer its open question below; it then moves to pending approval.</div></div>`;
+  if(ownPending.length)body+=`<p class="sm" style="color:var(--text-2);margin:${body?"10px":"0"} 0 8px">This requirement needs its own sign-off:</p>`+ownPending.map(a=>`<div class="card" style="box-shadow:none;margin-bottom:8px"><div class="card-b" style="padding:12px 14px"><div class="row between"><b class="sm">${esc(cap(a.gate))}</b><span class="tag mono">${esc(a.id)}</span></div><div class="xs muted" style="margin-top:4px">${esc(a.summary)}</div></div>${decisionBox(a,d)}</div>`).join("");
+  if(["pending_approval","modified"].includes(r.status)&&base?.status==="pending_approval")
+    body+=`<div class="callout" style="margin-top:${body?"10px":"0"}">${I("info",15)}<div>${ownPending.length?"After that, it is":"It is"} approved together with all other requirements in the <b>requirements baseline</b> (${esc(base.id)}), by a product owner, business analyst or project manager.
+      <div style="margin-top:6px"><button class="btn sm" data-go="Approvals" data-apf="pending">${I("stamp",13)}Open baseline approval</button></div></div></div>`+(d.metrics?.baseline_ready?"":`<div style="margin-top:8px">${blockedNote(d)}</div>`);
+  return body?`<section><h3>Approval</h3>${body}</section>`:"";
+}
+function renderDrawer(){
+  const d=S.data,r=d?.requirements.find(x=>x.id===S.drawer);if(!r){closeDrawer();return}
+  const docs=Object.fromEntries(d.documents.map(x=>[x.id,x])),maps=d.compliance.filter(m=>m.requirement_id===r.id);
+  const qs=d.questions.filter(q=>q.requirement_id===r.id),cf=d.conflicts.filter(c=>c.requirement_ids.includes(r.id)),rk=d.risks.filter(x=>x.linked_requirements.includes(r.id));
+  const sec=(t,body)=>body?`<section><h3>${t}</h3>${body}</section>`:"";
+  $("#drawer").innerHTML=`<div class="drawer-h"><div style="flex:1;min-width:0"><div class="row" style="margin-bottom:6px"><span class="tag mono">${esc(r.id)}</span>${statusPill(r.status)}${levelPill(r.risk_level)} risk</div>
+      <div class="xs muted">${esc(cap(r.kind))} · ${esc(cap(r.origin))}</div></div><button class="btn sm icon ghost" data-close aria-label="Close">${I("x",18)}</button></div>
+    <div class="drawer-b">
+      <section><p class="statement">${esc(r.statement)}</p><div style="margin-top:10px">${tags(r.categories,"cat")}</div></section>
+      <dl class="facts"><div><dt>Priority</dt><dd>${esc(cap(r.priority))}</dd></div><div><dt>Confidence</dt><dd>${meter(r.confidence)}</dd></div><div><dt>Source</dt><dd>${esc(r.source_stakeholder||"—")}</dd></div></dl>
+      ${approvalSection(d,r)}
+      ${sec("Quality issues",r.quality_issues.length?`<div class="stack" style="gap:8px">${r.quality_issues.map(i=>`<div class="issue">${I("alert",15)}<div><b>${esc(cap(i.type))}</b> · ${esc(i.detail)}${i.suggestion?`<div class="muted sm" style="margin-top:2px">${esc(i.suggestion)}</div>`:""}</div></div>`).join("")}</div>`:"")}
+      ${sec("Open questions",qs.filter(q=>!q.answer).length?qs.filter(q=>!q.answer).map(q=>`<div class="callout warn" style="margin-bottom:6px">${I("help",15)}<div>${esc(q.question)} <button class="linkbtn" data-go="Clarifications">Answer</button></div></div>`).join(""):"")}
+      ${sec("Business justification",r.business_justification?`<p class="sm" style="color:var(--text-2)">${esc(r.business_justification)}</p>`:"")}
+      ${sec("Acceptance criteria",r.acceptance_criteria.length?`<ul class="ac">${r.acceptance_criteria.map(a=>`<li>${esc(a)}</li>`).join("")}</ul>`:"")}
+      ${sec("Evidence",r.evidence.length?`<div class="stack" style="gap:10px">${r.evidence.map(e=>`<div class="quote">“${esc(e.excerpt)}”<small>${esc(e.doc_id)}${docs[e.doc_id]?` · ${esc(docs[e.doc_id].title)}`:""}${e.stakeholder?` · ${esc(e.stakeholder)}`:""}</small></div>`).join("")}</div>`:"")}
+      ${sec("Regulations & citations",r.regulations.length?`<div class="stack" style="gap:8px">${r.regulations.map(c=>`<div class="cite"><div class="row between"><b>${esc(c.kb_id)}</b><span class="xs muted">${esc(c.jurisdiction)} · v${esc(c.version)}</span></div><div class="sm">${esc(c.title)}</div><div class="xs muted">${esc(c.source)}</div></div>`).join("")}</div>`:"")}
+      ${sec("Controls & obligations",maps.length?`<div class="stack" style="gap:8px">${maps.map(m=>`<div class="cite"><div class="row between"><b>${esc(m.control_id)}</b><span class="row">${m.gap?pill("gap","bad"):""}${m.needs_legal_review?pill("legal review","warn"):""}</span></div><div class="sm">${esc(m.control)}</div><div class="xs muted" style="margin-top:2px">${esc(m.obligation)}</div></div>`).join("")}</div>`:r.controls.length?tags(r.controls,"mono"):"")}
+      ${sec("Conflicts",cf.length?cf.map(c=>`<div class="callout ${c.resolution?"ok":"bad"}" style="margin-bottom:6px">${I(c.resolution?"checkc":"alert",15)}<div><b>${esc(cap(c.type))}</b> with ${c.requirement_ids.filter(x=>x!==r.id).map(reqTag).join(" ")}<div class="sm">${esc(c.detail)}</div></div></div>`).join(""):"")}
+      ${sec("Linked risks",rk.length?`<div class="stack" style="gap:6px">${rk.map(x=>`<div class="row between sm"><span>${esc(x.title)}</span>${levelPill(x.level)}</div>`).join("")}</div>`:"")}
+      ${sec("Dependencies",r.dependencies.length?`<div class="tags">${r.dependencies.map(reqTag).join("")}</div>`:"")}
+      ${sec("Assumptions",r.assumptions.length?`<ul class="ac">${r.assumptions.map(a=>`<li>${esc(a)}</li>`).join("")}</ul>`:"")}
+      ${sec("History",r.history.length?`<div class="history">${r.history.map(h=>`<div>${I("history",13)} <b>${esc(cap(h.event))}</b>${h.by?` by ${esc(h.by)}`:""}${h.before?`<div class="muted xs" style="margin-left:20px">was: ${esc(h.before)}</div>`:""}</div>`).join("")}</div>`:"")}
+      <section><h3>Request a change</h3><p class="sm muted" style="margin-bottom:8px">Edits are PII-masked, re-analysed, and, if the requirement was already approved, routed to the change-approval gate.</p>
+        <textarea class="input" id="chg-text">${esc(r.statement)}</textarea>
+        <div class="row end" style="margin-top:8px"><button class="btn primary" id="chg-go">${I("edit",15)}Submit change</button></div></section>
+    </div>`;
+  bindDecisions($("#drawer"));
+  $("#chg-go").onclick=e=>{const t=$("#chg-text").value.trim();if(!t||t===r.statement){toast("Edit the statement first.");return}
+    busy(e.currentTarget,"Applying change and re-analysing",async()=>{await post(`/api/projects/${S.pid}/requirements/${encodeURIComponent(r.id)}/change`,{statement:t});await load();toast(`Change to ${r.id} recorded.`,"ok")},true)};
+  if(S.busy)lockView(true);
+}
+
+/* ======================================================================================== */
+/* input helpers: guess type / role / stakeholder / title from the filename and text         */
+/* ======================================================================================== */
+const TYPE_RULES=[[/\baudit\b/,"audit_finding"],[/incident|outage|postmortem|post-mortem/,"incident_report"],[/openapi|swagger|\bapi\b|endpoint|schema/,"api_spec"],
+  [/legacy|mainframe|\bcbs\b|core banking|architecture/,"legacy_doc"],[/polic(y|ies)|procedure|\bsop\b/,"policy"],[/regulat|circular|directive|master direction|\bact\b/,"regulation"],
+  [/transcript|interview/,"transcript"],[/questionnaire|survey|feedback|research/,"questionnaire"],[/\bsrs\b|\bbrd\b|\bprd\b|requirement|spec/,"requirement_doc"],
+  [/minutes|meeting|notes|workshop/,"meeting_notes"],[/\bemail\b|\bmail\b|memo/,"email"]];
+const ROLE_RULES=[[/compliance|\bmlro\b|\bbsa\b|\baml\b|kyc officer/,"compliance"],[/legal|counsel|\bdpo\b|privacy officer/,"legal"],[/secur|\bciso\b|infosec/,"security"],
+  [/architect|platform team|\bcbs\b|legacy/,"architect"],[/operations|\bops\b/,"operations"],[/\brisk\b/,"risk"],[/audit/,"auditor"],[/product|\bpo\b|sales|business head/,"product_owner"],
+  [/customer|feedback|survey|research panel|advisor/,"customer"],[/developer|engineering|\bdev\b/,"developer"],[/project manager|\bpm\b|delivery/,"project_manager"],[/analyst|\bba\b/,"business_analyst"]];
+const firstMatch=(rules,s)=>(rules.find(([re])=>re.test(s))||[])[1];
+function guess(name,text){
+  const n=(name||"").toLowerCase().replace(/[_\-.]+/g," "),head=text.slice(0,800).toLowerCase(),ext=(name||"").split(".").pop().toLowerCase();
+  const line1=head.split("\n").find(l=>l.trim())||"",speakers=(head.match(/^[a-z][\w .()'-]{0,30}:\s+\S/gm)||[]).length;
+  let type=/^(from|to|subject|cc):/m.test(head)||ext==="eml"?"email":/^(q|a|interviewer|interviewee)\s*[:\-]/m.test(head)?"transcript":null;
+  type=type||firstMatch(TYPE_RULES,n)||(["json","yaml","yml"].includes(ext)&&/openapi|swagger|paths/.test(head)?"api_spec":null)
+    ||(speakers&&/^[a-z][\w .()'-]{0,30}:\s+\S/.test(line1)?"transcript":null)||firstMatch(TYPE_RULES,line1)||"meeting_notes";
+  const role=firstMatch(ROLE_RULES,n)||firstMatch(ROLE_RULES,head)||"";
+  const from=text.match(/^from:\s*"?([^"<\n]+?)"?\s*(<[^>]*>)?\s*$/im);
+  const title=name?name.replace(/\.[^.]+$/,"").replace(/^\d+[\s_\-.]+/,"").replace(/[_\-]+/g," ").replace(/^\w/,c=>c.toUpperCase()):(text.trim().split("\n")[0]||"Input").slice(0,70);
+  return {type,role,stakeholder:from?from[1].trim():"",title};
+}
+function enqueue(text,name,source){const g=guess(name,text);
+  S.queue.push({id:++S.qseq,source,title:g.title,type:g.type,text,role:S.defaults.role||g.role,stakeholder:S.defaults.stakeholder||g.stakeholder,guessed:{type:g.type,role:!S.defaults.role&&g.role}})}
+const TEXT_EXT=/\.(txt|md|eml|csv|json|ya?ml|xml|html?|log)$/i;
+function b64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]||"");r.onerror=()=>rej(r.error);r.readAsDataURL(file)})}
+async function readFiles(files){
+  files=[...files];if(!files.length)return;
+  await busy(null,`Reading ${plural(files.length,"file")}`,async()=>{
+    const bad=[];
+    for(const f of files){try{
+        if(f.size>10*1024*1024)throw new Error("larger than 10 MB");
+        const text=TEXT_EXT.test(f.name)?await f.text():(await post("/api/extract-text",{filename:f.name,content_b64:await b64(f)})).text;
+        if(!text.trim())throw new Error("empty");
+        enqueue(text,f.name,f.name);
+      }catch(e){bad.push(`${f.name}: ${e.message}`)}}
+    render();
+    if(bad.length)toast(`Could not read ${plural(bad.length,"file")}. ${bad.join("; ")}`,"bad",9000);
+    if(files.length>bad.length)toast(`${plural(files.length-bad.length,"file")} queued. Check the details, then analyse.`,"ok");
+  });
+}
+
+/* ======================================================================================== */
+/* pasted input: who said what                                                              */
+/* ======================================================================================== */
+const PASTE_HINT=`Priya (Product Owner): Customers must be able to open an account on the mobile app in under 5 minutes.
+Arjun, Chief Compliance Officer: Every applicant must be screened against sanctions lists before the account is activated.
+Meera – CISO said that biometric data must be encrypted at rest.`;
+const PASTE_EXAMPLE=`Priya (Product Owner): We want customers to open an account fully on the mobile app, in under 5 minutes for a normal customer. Customers must be able to save a half-finished application and resume it within 7 days.
+Arjun, Chief Compliance Officer: Every applicant must be screened against UN and domestic sanctions lists and PEP databases before the account is activated. High-risk customers must go through enhanced due diligence, and KYC records must be kept for at least 5 years after the relationship ends.
+Meera – CISO said that biometric templates and identity documents must be encrypted at rest, and all staff access to customer records must use MFA.
+Rahul (KYC Operations Lead): Analysts must review referred cases within 4 hours, and every manual override needs maker-checker approval.`;
+async function refreshPeople(){
+  const seq=++S.splitSeq,text=S.paste;
+  if(!text.trim()){S.speakers=[];renderPeople();return}
+  try{const r=await post("/api/split-speakers",{text});if(seq!==S.splitSeq)return;S.speakers=r.speakers;renderPeople()}catch(e){if(seq===S.splitSeq)toast(e.message,"bad")}
+}
+function renderPeople(){
+  const box=$("#people");if(!box)return;
+  const sp=S.speakers,named=sp.filter(x=>x.attributed),lbl=$("#pz-run-l");
+  if(lbl)lbl.textContent=named.length>1?`Analyse input from ${named.length} people`:"Analyse";
+  if(!S.paste.trim()||!sp.length){box.innerHTML="";return}
+  const anonOnly=sp.length===1&&!sp[0].attributed;
+  box.innerHTML=`<div class="people-h"><span class="label">${anonOnly?"No names found":`${plural(named.length,"person","people")} found`}${sp.some(x=>!x.attributed)&&!anonOnly?" · plus some unattributed text":""}</span>
+      <span class="xs muted">Each becomes its own source. Check the roles; they steer coverage and who gets asked follow-up questions.</span></div>
+    ${anonOnly?`<div class="callout" style="margin-bottom:10px">${I("info",15)}<div>This will be added as one input. To credit requirements to people, start each person's part with <code>Name (Role):</code>. Or say who it's from below.</div></div>`:""}
+    <div class="people">${sp.map(x=>{const role=x.label in S.roleOv?S.roleOv[x.label]:(x.role||"");
+      const src=x.label in S.roleOv?'<div class="role-src">set by you</div>':x.role_source?`<div class="role-src ok">${I("check",11)} from ${x.role_source==="designation"?`“${esc(x.designation)}”`:"the name"}</div>`:'<div class="role-src warn">couldn\'t tell, please pick</div>';
+      return `<div class="person${x.attributed?"":" anon"}"><span class="av">${x.attributed?esc(initials(x.name)):I("help",16)}</span>
+        <div class="who">${x.attributed?`<b>${esc(x.name)}</b><span>${esc(x.designation||"No designation given")} · ${plural(x.words,"word")}${x.turns>1?` · spoke ${x.turns} times`:""}</span>`
+          :`<input class="input sm" data-name="${esc(x.label)}" placeholder="Who said this? (optional)" value="${esc(S.nameOv[x.label]||"")}" style="max-width:260px"><span style="display:block;margin-top:3px">${plural(x.words,"word")} without a name</span>`}</div>
+        <div class="rolebox"><select class="input sm" data-role="${esc(x.label)}" aria-label="Role for ${esc(x.label)}">${opts(ROLES,role,"Role unknown")}</select>${src}</div>
+        <details class="said disc"><summary class="xs">${I("chev",12)}What ${x.attributed?esc(x.name.split(" ")[0])+" said":"it says"}</summary><pre class="code">${esc(x.text)}</pre></details></div>`}).join("")}</div>`;
+  box.querySelectorAll("[data-role]").forEach(el=>el.onchange=()=>{S.roleOv[el.dataset.role]=el.value||null;renderPeople()});
+  box.querySelectorAll("[data-name]").forEach(el=>el.oninput=()=>{S.nameOv[el.dataset.name]=el.value});
+  if(S.busy)lockView(true);
+}
+
+/* ======================================================================================== */
+/* views                                                                                    */
+/* ======================================================================================== */
+const runBtn=(label="Re-run analysis",id="rerun")=>`<button class="btn" id="${id}">${I("refresh",15)}${label}</button>`;
+const exportBtn=()=>`<a class="btn primary" href="/api/projects/${encodeURIComponent(S.pid)}/export">${I("download",15)}Export artefacts</a>`;
+
+function welcome(){
+  const demos=S.demos||[],js=S.homeJ||["IN"];
+  return `<div class="home">
+  <div class="home-head"><div class="eyebrow">${I("spark",14)}Agentic requirements engineering for KYC & onboarding</div>
+    <h1>What did your stakeholders say?</h1>
+    <p>Paste notes, a meeting or an email thread, with each person's name and role before their words. The agents turn it into traceable requirements, check them against KYC/AML rules, flag gaps and conflicts, and recommend an SDLC.</p></div>
+  <div class="card compose">
+    <div class="compose-top"><input id="hp-name" class="input" placeholder="Untitled project" value="${esc(S.homeName||"")}" aria-label="Project name">
+      <div class="row" role="group" aria-label="Jurisdictions"><span class="xs muted">Jurisdiction</span>${["IN","EU","US","GLOBAL"].map(j=>`<label class="check sm"><input type="checkbox" name="hp-j" value="${j}"${js.includes(j)?" checked":""}>${j}</label>`).join("")}</div></div>
+    <textarea id="pz-text" class="input paste" aria-label="What stakeholders said" placeholder="${esc(PASTE_HINT)}">${esc(S.paste)}</textarea>
+    <div class="compose-mid">
+      <div class="row between"><div class="formats"><span>Works with</span><code>Name (Role): …</code><code>Name, Role: …</code><code>Name – Role said …</code><span>or plain text</span></div>
+        <button class="linkbtn sm" id="pz-example">Fill in an example</button></div>
+      <div id="people"></div>
+      <details class="disc"><summary class="sm">${I("chev",14)}<b>Project details</b><span class="muted">· optional, sharpens the SDLC recommendation</span></summary>
+        <div class="grid g3" style="margin-top:12px;gap:12px">
+          <div class="field" style="grid-column:1/-1"><label for="np-desc">What is being built?</label><input id="np-desc" class="input" placeholder="Digital onboarding for small businesses with video KYC, integrated with core banking"></div>
+          <div class="field"><label for="np-ch">Channels</label><input id="np-ch" class="input" placeholder="mobile app, web"></div>
+          <div class="field"><label for="np-ct">Customer types</label><input id="np-ct" class="input" placeholder="individuals, sole proprietors"></div>
+          <div class="field"><label for="np-ls">Legacy systems</label><input id="np-ls" class="input" placeholder="core banking (batch)"></div>
+          <div class="field"><label for="np-tl">Timeline (months)</label><input id="np-tl" class="input" type="number" min="1" placeholder="6"></div>
+          <div class="field"><label for="np-ts">Team size</label><input id="np-ts" class="input" type="number" min="1" placeholder="10"></div>
+          <div class="field"><label for="np-bf">Budget flexibility</label><select id="np-bf" class="input">${opts(["low","medium","high"],"medium")}</select></div>
+        </div></details>
+    </div>
+    <div class="card-f" style="justify-content:space-between;align-items:center">
+      <button class="linkbtn sm" id="np-empty">Have documents instead? Start an empty project and upload them</button>
+      <div class="row"><span class="xs muted"><kbd>Ctrl</kbd> + <kbd>Enter</kbd></span><button class="btn primary lg" id="pz-run">${I("spark",16)}<span id="pz-run-l">Analyse</span></button></div></div>
+  </div>
+  ${demos.length?`<section class="demos"><div class="demos-h"><h2>Demo projects</h2><span class="xs muted">Already analysed. They open instantly, even while your own input is being analysed.</span></div>
+    <div class="grid g3">${demos.map(x=>`<div class="card demo"><div class="row between" style="margin:0"><div class="tags">${x.jurisdictions.map(j=>tag(j)).join("")}</div>${x.opened?'<span class="xs muted">opened before</span>':""}</div>
+      <h3>${esc(x.name)}</h3><div class="stats">${x.documents} sources · ${x.requirements} requirements · ${x.questions} questions${x.sdlc?` · ${esc(x.sdlc)}`:""}</div>
+      <div class="row"><button class="btn sm keep" data-demo="${esc(x.id)}">${I("arrow",14)}Open demo</button>${x.opened?`<button class="btn sm ghost keep" data-demo="${esc(x.id)}" data-reset title="Discard answers and decisions made in this demo">Reset</button>`:""}</div></div>`).join("")}</div></section>`:""}
+  </div>`;
 }
 
 const VIEWS={
-Overview:d=>{
-  let h=`<div class="panel"><h2>Start</h2><div class="row">
-    <button class="primary" data-sample="kyc_onboarding">Load NeoBank (IN) case study</button>
-    <button data-sample="eu_merchant_onboarding">Load PayFlow (EU)</button>
-    <button data-sample="us_wealth_onboarding">Load Summit (US)</button></div>
-    <h3>…or create an empty project</h3><div class="row">
-    <input id="np-name" type="text" placeholder="Project name" style="max-width:280px">
-    <select id="np-j"><option>IN</option><option>EU</option><option>US</option></select>
-    <button id="np-go">Create</button></div></div>`;
-  if(!d)return h;
-  const m=d.metrics||{};
-  const k=(v,l)=>`<div class="panel kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`;
-  h+=`<div class="panel"><h2>${esc(d.project.name)}</h2><div class="muted small">${esc(d.project.description)}</div>
-    <div class="row small" style="margin-top:6px">Jurisdictions ${chips(d.project.jurisdictions)} · engine <b>${esc(d.llm)}</b></div></div>
-  <div class="grid">${k(m.requirements_total??0,"requirements ("+(m.requirements_derived??0)+" derived)")}${k(m.needs_clarification??0,"need clarification")}
-  ${k(m.conflicts_open_high??0,"open high/critical conflicts")}${k(pct(m.control_coverage_stakeholder),"control coverage from stakeholders")}
-  ${k(pct(m.control_coverage_after_derivation),"coverage after derivation")}${k(pct(m.citation_validity),"citation validity")}
-  ${k(m.pii_masked??0,"PII values masked")}${k(m.injection_quarantined??0,"injected sentences quarantined")}</div>
-  <div class="panel"><h3>Baseline quality gates</h3>${Object.entries(m.gates||{}).map(([g,ok])=>`<div>${ok?'<span class="ok">✔</span>':'<span class="bad">✘</span>'} ${g.replaceAll("_"," ")}</div>`).join("")}
-  <div class="row" style="margin-top:10px"><button id="rerun">Re-run agents</button><a href="/api/projects/${S.pid}/export"><button class="primary">Download artefacts (SRS.docx, RTM, …)</button></a></div></div>`;
-  return h},
-Inputs:d=>`<div class="panel"><h2>Add stakeholder input</h2>
-  <div class="grid"><input id="di-title" type="text" placeholder="Title"><input id="di-st" type="text" placeholder="Stakeholder name">
-  <select id="di-role">${ROLES.map(r=>`<option>${r}</option>`).join("")}</select>
-  <select id="di-type">${["meeting_notes","transcript","email","questionnaire","requirement_doc","policy","legacy_doc","api_spec","incident_report","audit_finding"].map(t=>`<option>${t}</option>`).join("")}</select></div>
-  <textarea id="di-text" placeholder="Paste conversation, email, notes or document text. PII is masked before any agent sees it."></textarea>
-  <div class="row"><button class="primary" id="di-add">Add & re-run</button></div></div>
-  <div class="panel"><h2>Ingested sources (masked view)</h2><table><tr><th>ID</th><th>Title</th><th>Stakeholder</th><th>PII</th><th>Injection</th><th>Masked text</th></tr>
-  ${d.documents.map(x=>`<tr><td>${x.id}</td><td>${esc(x.title)}<div class="muted small">${x.type}</div></td><td>${esc(x.stakeholder)}<div class="muted small">${x.role||""}</div></td>
-  <td>${chips([...new Set(x.pii_findings.map(p=>p.type))])}</td><td class="${x.injection_flags.length?'bad':''}">${chips(x.injection_flags)||"-"}</td><td><pre>${esc(x.masked_text)}</pre></td></tr>`).join("")}</table></div>`,
+Overview:(d,c)=>{
+  if(!d)return welcome();
+  const m=d.metrics||{},ran=d.requirements.length>0||!!d.sdlc,gates=Object.entries(m.gates||{}),okG=gates.filter(g=>g[1]).length;
+  const step=(kind,icon,title,sub,btn)=>`<div class="step"><span class="ic ${kind}">${I(icon,16)}</span><div class="t"><b>${title}</b>${sub?`<span>${sub}</span>`:""}</div>${btn||""}</div>`;
+  const goB=(p,l)=>`<button class="btn sm" data-go="${p}">${l}${I("arrow",14)}</button>`;
+  const steps=[];
+  if(!c.docs)steps.push(step("warn","fileplus","Add stakeholder inputs","Upload documents, paste notes, or run an interview.",`<button class="btn sm primary" data-go="Inputs">Add inputs</button>`));
+  else if(!ran)steps.push(step("warn","spark",`${plural(c.docs,"input")} not analysed yet`,"Run the agents to extract requirements.",`<button class="btn sm primary" id="rerun2">Run analysis</button>`));
+  if(S.queue.length)steps.push(step("warn","clip",`${plural(S.queue.length,"input")} waiting in the queue`,"Review and submit them.",goB("Inputs","Review")));
+  if(c.openQ)steps.push(step("warn","help",`${plural(c.openQ,"clarification question")} open`,"Answers feed back into the analysis.",goB("Clarifications","Answer")));
+  if(c.openCHigh)steps.push(step("bad","alert",`${plural(c.openCHigh,"high-severity conflict")}`,"Conflicting stakeholder expectations block the baseline.",goB("Conflicts","Review")));
+  if(c.gaps)steps.push(step("bad","shield",`${plural(c.gaps,"mandatory control")} not covered`,"No requirement covers them yet.",goB("Compliance","See gaps")));
+  if(c.mine)steps.push(step("info","stamp",`${plural(c.mine,"approval")} waiting for you`,`Acting as ${human(myRole())}.`,goB("Approvals","Decide")));
+  else if(c.pending)steps.push(step("info","stamp",`${plural(c.pending,"approval")} pending`,"Waiting for other roles. Switch role at the top right to act.",goB("Approvals","View")));
+  if(!steps.length)steps.push(step("ok","checkc","You're all caught up","Export the artefacts or add more inputs.",""));
+  const stat=(icon,kind,v,l,s,goTo)=>`<div class="card stat"${goTo?` data-go="${goTo}" style="cursor:pointer"`:""}><span class="ic ${kind}">${I(icon,18)}</span><div><div class="v">${v}</div><div class="l">${l}</div>${s?`<div class="s">${s}</div>`:""}</div></div>`;
+  const lr=m.last_run&&m.last_run.stages?m.last_run:null;
+  const cats=Object.entries(m.by_category||{}).sort((a,b)=>b[1]-a[1]),cmax=Math.max(...cats.map(x=>x[1]),1);
+  return pageHead(esc(d.project.name),esc(d.project.description),(isDemo()?`<button class="btn ghost" id="demo-reset">Reset demo</button>`:"")+(ran?runBtn()+exportBtn():""))+
+  `<div class="row" style="margin:-12px 0 22px">${isDemo()?pill("demo · pre-analysed","info"):""}${(d.project.jurisdictions||[]).map(j=>pill(j,"accent")).join("")}${(d.project.channels||[]).map(x=>tag(x)).join("")}</div>
+  ${ran?`<div class="grid g4" style="margin-bottom:16px">
+    ${stat("list","",m.requirements_total??0,"Requirements",`${m.requirements_extracted??0} extracted · ${m.requirements_derived??0} derived`,"Requirements")}
+    ${stat("help",c.openQ?"warn":"ok",c.openQ,"Open questions",`${m.needs_clarification??0} requirements need clarification`,"Clarifications")}
+    ${stat("alert",c.openCHigh?"bad":c.openC?"warn":"ok",c.openC,"Open conflicts",`${c.openCHigh} high or critical`,"Conflicts")}
+    <div class="card stat" data-go="Compliance" style="cursor:pointer">${ring(m.control_coverage_after_derivation,52)}<div><div class="l">Control coverage</div><div class="s">${pct(m.control_coverage_stakeholder)} from stakeholders, ${pct(m.control_coverage_after_derivation)} after derived requirements</div></div></div>
+  </div>`:""}
+  <div class="grid g-side" style="margin-bottom:16px">
+    <div class="card"><div class="card-h"><h2>Next steps</h2></div><div class="list">${steps.join("")}</div></div>
+    <div class="card"><div class="card-h"><div><h2>Baseline readiness</h2><p>${gates.length?`${okG} of ${gates.length} quality gates passing`:"Run the analysis to evaluate gates"}</p></div>${gates.length?(m.baseline_ready?pill("ready","ok"):pill("blocked","warn")):""}</div>
+      <div class="card-b" style="padding-top:12px">${gates.length?`<div class="hbar" style="margin-bottom:10px"><span style="width:${okG/gates.length*100}%;background:${okG===gates.length?"var(--ok)":"var(--accent)"}"></span></div>
+        ${gates.map(([g,ok])=>`<div class="gate ${ok?"ok":"no"}">${I(ok?"checkc":"xc",17)}${esc(cap(g))}</div>`).join("")}`:`<p class="muted sm">No gates evaluated yet.</p>`}</div></div>
+  </div>
+  ${lr?`<div class="card" style="margin-bottom:16px"><div class="card-h"><div><h2>Last run</h2><p>${esc(cap(lr.trigger||"analysis"))}${lr.finished?` · ${fmtTime(lr.finished*1000)}`:""} · ${fmtDur(lr.elapsed)} · ${plural(lr.llm_calls||0,"model call")} on ${esc(lr.llm||d.llm)}${lr.llm_failed?` · ${lr.llm_failed} fell back to rules`:""}</p></div>${I("spark",16)}</div>
+    <div class="card-b" style="padding-top:6px;padding-bottom:10px"><ul class="stages lastrun">${lr.stages.map(st=>`<li class="st ${st.status}"><span class="st-ic">${st.status==="done"?I("check",12):I("x",12)}</span><div class="st-t"><div class="row between" style="flex-wrap:nowrap"><b>${esc(st.label)}${st.llm_calls?`<span class="llm-tag">${st.llm_calls} LLM</span>`:""}</b><span class="secs">${fmtDur(st.seconds)}</span></div><div class="n">${esc(st.note||st.about)}</div></div></li>`).join("")}</ul></div></div>`:""}
+  ${ran?`<div class="grid g2">
+    <div class="card"><div class="card-h"><div><h2>Requirements by category</h2><p>Multi-label: one requirement can sit in several</p></div></div><div class="card-b stack" style="gap:9px">
+      ${cats.map(([k,n])=>`<button class="linkbtn" data-go="Requirements" data-cat="${esc(k)}" style="color:inherit;font-weight:500;text-align:left"><div class="row between sm"><span>${esc(cap(k))}</span><span class="muted">${n}</span></div><div class="hbar" style="height:6px;margin-top:3px"><span style="width:${n/cmax*100}%"></span></div></button>`).join("")}</div></div>
+    <div class="card"><div class="card-h"><div><h2>Trust & safety</h2><p>Guards applied on the last run</p></div>${I("lock",16)}</div><div class="card-b"><dl class="kv">
+      <dt>Citation validity</dt><dd>${pct(m.citation_validity)}</dd><dt>Traceability coverage</dt><dd>${pct(m.traceability_coverage)}</dd>
+      <dt>Ungrounded extractions dropped</dt><dd>${m.hallucinated_extractions??0}</dd><dt>Out-of-evidence citations dropped</dt><dd>${m.hallucinated_citations??0}</dd>
+      <dt>PII values masked</dt><dd>${m.pii_masked??0}</dd><dt>Injected sentences quarantined</dt><dd>${m.injection_quarantined??0}</dd>
+      <dt>Average confidence</dt><dd>${(m.avg_confidence??0).toFixed(2)}</dd><dt>Low-confidence items</dt><dd>${m.low_confidence??0}</dd></dl></div></div>
+  </div>`:""}`},
+
+Inputs:d=>{const q=S.queue;
+  return pageHead("Inputs","Paste what stakeholders said: one paragraph or a whole meeting. Put each person's name and role before their words, and every requirement is credited to the person who said it. PII is masked before any agent sees the text.",
+    `<button class="btn" data-go="Interview">${I("chat",15)}Interview someone instead</button>`)+
+  `<div class="card" style="margin-bottom:16px"><div class="card-b stack" style="gap:12px">
+    <textarea id="pz-text" class="input paste" aria-label="Stakeholder input" placeholder="${esc(PASTE_HINT)}">${esc(S.paste)}</textarea>
+    <div class="row between"><div class="formats"><span>Works with</span><code>Name (Role): …</code><code>Name, Role: …</code><code>Name – Role said …</code><span>or plain text</span></div>
+      <button class="linkbtn sm" id="pz-example">Fill in an example</button></div>
+    <div id="people"></div>
+  </div>
+  <div class="card-f" style="justify-content:space-between;align-items:center">
+    <input id="pz-title" class="input sm" style="max-width:300px" placeholder="Where is this from? e.g. Kick-off workshop" value="${esc(S.pasteTitle)}" aria-label="Source title">
+    <div class="row"><span class="xs muted"><kbd>Ctrl</kbd> + <kbd>Enter</kbd></span><button class="btn ghost" id="pz-add">Add without analysing</button><button class="btn primary" id="pz-run">${I("spark",15)}<span id="pz-run-l">Analyse</span></button></div></div></div>
+
+  <details class="card disc" style="margin-bottom:16px"${q.length?" open":""}><summary class="card-h" style="border-bottom:0">${I("chev",15)}<div style="flex:1"><h2>Upload documents</h2><p>Emails, transcripts, policies, specs, audit findings · .txt .md .eml .docx .pdf</p></div>${q.length?pill(q.length+" queued","warn"):""}</summary>
+   <div class="card-b" style="border-top:1px solid var(--border)">
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload files" style="min-height:150px"><span class="ic">${I("upload",20)}</span><b>Drop files here, or click to browse</b><span class="xs muted">Several at once · up to 10 MB each · type and author are guessed, and you can correct them</span></div>
+    <details class="disc" style="margin-top:14px"${S.defaults.stakeholder||S.defaults.role?" open":""}><summary class="sm">${I("chev",14)}<b>Same author for several files?</b><span class="muted">· set defaults</span></summary>
+      <div class="row" style="margin-top:10px"><input id="df-st" class="input sm" style="max-width:240px" placeholder="Stakeholder name" value="${esc(S.defaults.stakeholder)}">
+      <select id="df-role" class="input sm" style="width:auto">${opts(ROLES,S.defaults.role,"Guess role from content")}</select>${q.length?`<button class="btn sm" id="df-apply">Apply to ${plural(q.length,"queued file")}</button>`:""}</div></details></div>
+   ${q.length?`<div style="border-top:1px solid var(--border)">${q.map(x=>`<div class="qitem" data-qi="${x.id}"><div class="qgrid">
+      <div class="field"><label>Title</label><input class="input sm" data-f="title" value="${esc(x.title)}"></div>
+      <div class="field"><label>Stakeholder</label><input class="input sm" data-f="stakeholder" value="${esc(x.stakeholder)}" placeholder="Name (role)"></div>
+      <div class="field"><label>Role${x.guessed.role&&x.role===x.guessed.role?'<span class="guess">guessed</span>':""}</label><select class="input sm" data-f="role">${opts(ROLES,x.role,"Unknown")}</select></div>
+      <div class="field"><label>Type${x.type===x.guessed.type?'<span class="guess">guessed</span>':""}</label><select class="input sm" data-f="type">${opts(TYPES,x.type)}</select></div>
+      <button class="btn sm icon ghost" data-rm="${x.id}" aria-label="Remove ${esc(x.title)}" title="Remove">${I("x",16)}</button></div>
+      <details class="disc" style="margin-top:10px"><summary class="xs muted">${I("chev",13)}${x.source?esc(x.source)+" · ":""}${x.text.length.toLocaleString()} characters · preview and edit</summary>
+        <textarea class="input" data-f="text" style="margin-top:8px;min-height:150px;font:12.5px/1.55 var(--mono)">${esc(x.text)}</textarea></details></div>`).join("")}</div>
+    <div class="card-f"><button class="btn ghost" id="q-clear">${I("trash",14)}Clear</button><button class="btn" id="q-add">Add without analysing</button><button class="btn primary" id="q-run">${I("spark",15)}Add ${plural(q.length,"file")} & analyse</button></div>`:""}
+  </details>
+
+  <div class="card"><div class="card-h"><div><h2>Sources · ${d.documents.length}</h2><p>One per person or document, stored masked. Raw text is discarded after masking.</p></div>
+    ${d.documents.length&&!d.requirements.length&&!q.length?`<button class="btn primary sm" id="in-run">${I("spark",14)}Analyse ${plural(d.documents.length,"input")}</button>`:""}</div>
+  ${d.documents.length?`<div class="tw"><table><thead><tr><th>Source</th><th>Stakeholder</th><th>PII masked</th><th>Injection screen</th><th></th></tr></thead><tbody>
+    ${d.documents.map(x=>`<tr class="click" data-doc="${esc(x.id)}"><td><div class="row" style="flex-wrap:nowrap"><span class="filetype">${I("file",16)}</span><div><b>${esc(x.title)}</b><div class="xs muted"><span class="mono">${esc(x.id)}</span> · ${esc(cap(x.type))}</div></div></div></td>
+      <td>${esc(x.stakeholder||"—")}<div class="xs muted">${esc(cap(x.role||""))}</div></td>
+      <td>${x.pii_findings.length?`<div class="tags">${[...new Set(x.pii_findings.map(p=>p.type))].map(t=>tag(t)).join("")}</div>`:'<span class="muted">None found</span>'}</td>
+      <td>${x.injection_flags.length?pill("quarantined","bad"):pill("clean","ok")}</td><td style="text-align:right;color:var(--text-3)">${I("chev",15)}</td></tr>
+      <tr class="hidden" data-doc-body="${esc(x.id)}"><td colspan="5" style="background:var(--surface-2)">${x.injection_flags.length?`<div class="callout bad" style="margin-bottom:10px">${I("alert",15)}<div>Instruction-like text was quarantined: ${x.injection_flags.map(esc).join(", ")}</div></div>`:""}<pre class="code">${esc(x.masked_text)}</pre></td></tr>`).join("")}</tbody></table></div>`
+    :empty("users","No input yet","Paste what people said above. The agents will work out who said what.")}</div>`},
+
 Interview:d=>{const s=S.interview;
-  if(!s)return `<div class="panel"><h2>Adaptive stakeholder interview</h2><p class="muted small">The interaction agent picks questions by role, follows up on vague answers, and skips topics already covered.</p>
-   <div class="row"><input id="iv-name" type="text" placeholder="Stakeholder name" style="max-width:240px"><select id="iv-role">${ROLES.map(r=>`<option>${r}</option>`).join("")}</select><button class="primary" id="iv-start">Start</button></div></div>`;
-  return `<div class="panel"><h2>Interview: ${esc(s.stakeholder)} (${s.role})</h2>
-   ${s.turns.map(t=>`<div style="margin:8px 0"><div><span class="chip">${t.topic}${t.followup?" · follow-up":""}</span> <b>${esc(t.question)}</b></div>${t.answer?`<div class="muted">↳ ${esc(t.answer)}</div>`:""}</div>`).join("")}
-   ${s.done?'<p class="ok">Interview complete.</p>':`<textarea id="iv-ans" placeholder="Answer…"></textarea><div class="row"><button class="primary" id="iv-send">Send answer</button></div>`}
-   <div class="row" style="margin-top:8px"><button id="iv-finish">Finish & analyse</button></div></div>`},
-Requirements:d=>{const cats=[...new Set(d.requirements.flatMap(r=>r.categories))];
-  return `<div class="panel"><div class="row"><h2 style="margin:0">Requirements</h2><select id="rq-cat"><option value="">all categories</option>${cats.map(c=>`<option>${c}</option>`).join("")}</select>
-  <select id="rq-st"><option value="">all statuses</option>${["needs_clarification","pending_approval","approved","modified","rejected"].map(c=>`<option>${c}</option>`).join("")}</select></div>
-  <table id="rq"><tr><th>ID</th><th>Requirement</th><th>Categories</th><th>Source</th><th>Regulations / controls</th><th>Risk</th><th>Conf.</th><th>Status</th></tr>
-  ${d.requirements.map(r=>`<tr data-cat="${r.categories.join(" ")}" data-st="${r.status}"><td><b>${r.id}</b><div class="muted small">${r.priority} · ${r.origin}</div></td>
-  <td>${esc(r.statement)}${r.quality_issues.length?`<div class="small warn">${r.quality_issues.map(i=>`[${i.type}] ${esc(i.detail)}`).join("<br>")}</div>`:""}
-  <details class="small"><summary class="muted">acceptance criteria · evidence</summary><ul>${r.acceptance_criteria.map(a=>`<li>${esc(a)}</li>`).join("")}</ul>${r.evidence.map(e=>`<div class="muted">“${esc(e.excerpt)}” — ${esc(e.doc_id)}</div>`).join("")}</details></td>
-  <td>${chips(r.categories)}</td><td class="small">${esc(r.source_stakeholder||"-")}</td><td>${chips(r.regulations.map(c=>c.kb_id))}${chips(r.controls)}</td>
-  <td class="lvl-${r.risk_level}">${r.risk_level}</td><td>${r.confidence.toFixed(2)}</td><td class="s-${r.status}">${r.status.replaceAll("_"," ")}</td></tr>`).join("")}</table></div>
-  <div class="panel"><h2>User stories</h2>${d.stories.slice(0,200).map(s=>`<div class="small" style="margin:4px 0"><b>${s.id}</b> ${esc(s.story)}</div>`).join("")}</div>
-  <div class="panel"><h2>Use cases</h2>${d.use_cases.map(u=>`<h3>${u.id} ${esc(u.name)}</h3><div class="small muted">Actor: ${esc(u.actor)} · Requirements: ${u.requirements.join(", ")}</div><ol class="small">${u.main.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`).join("")}</div>`},
-Clarifications:d=>`<div class="panel"><h2>Clarification questions</h2><table><tr><th>ID</th><th>For</th><th>Question</th><th>Reason</th><th>Answer</th></tr>
-  ${d.questions.map(q=>`<tr><td>${q.id}<div class="muted small">${q.requirement_id||""}</div></td><td>${q.target_role||""}</td><td>${esc(q.question)}</td><td class="small muted">${esc(q.reason)}</td>
-  <td>${q.answer?`<span class="ok">${esc(q.answer)}</span>`:`<textarea data-q="${q.id}" style="min-height:60px"></textarea><button data-qa="${q.id}">Submit</button>`}</td></tr>`).join("")}</table></div>`,
-Conflicts:d=>`<div class="panel"><h2>Conflicts</h2><table><tr><th>ID</th><th>Type</th><th>Severity</th><th>Requirements</th><th>Detail</th><th>Resolution</th></tr>
-  ${d.conflicts.map(c=>`<tr><td>${c.id}</td><td>${c.type}</td><td class="lvl-${c.severity}">${c.severity}</td><td>${chips(c.requirement_ids)}</td><td>${esc(c.detail)}</td><td class="${c.resolution?'ok':'warn'}">${esc(c.resolution||"OPEN")}</td></tr>`).join("")}</table></div>`,
-Compliance:d=>`<div class="panel"><h2>Mandatory control coverage</h2><table><tr><th>Control</th><th>Title</th><th>Status</th><th>Covered by</th></tr>
-  ${d.coverage.map(c=>`<tr><td>${c.control_id}${c.mandatory?"":" <span class='muted small'>(optional)</span>"}</td><td>${esc(c.title)}</td><td class="${c.status==='covered'?'ok':c.status==='derived'?'warn':'bad'}">${c.status}</td><td>${chips(c.covered_by)}</td></tr>`).join("")}</table></div>
-  <div class="panel"><h2>Requirement → control → citation mappings</h2><table><tr><th>Req</th><th>Control</th><th>Citations</th><th>Obligation</th><th>Flags</th></tr>
-  ${d.compliance.map(m=>`<tr><td>${m.requirement_id}</td><td>${m.control_id}<div class="small muted">${esc(m.control)}</div></td><td>${m.citations.map(c=>`<span class="chip" title="${esc(c.title)} · ${esc(c.source)} · v${esc(c.version)}">${c.kb_id}</span>`).join("")}</td>
-  <td class="small">${esc(m.obligation)}</td><td>${m.gap?'<span class="bad">GAP</span> ':''}${m.needs_legal_review?'<span class="warn">legal review</span>':''}</td></tr>`).join("")}</table></div>`,
-Risks:d=>`<div class="panel"><h2>Threat & risk register</h2><table><tr><th>ID</th><th>Risk</th><th>Cat.</th><th>L×I</th><th>Level</th><th>Mitigation</th><th>Owner</th></tr>
-  ${d.risks.map(r=>`<tr><td>${r.id}</td><td><b>${esc(r.title)}</b><div class="small">${esc(r.description)}</div><div>${chips(r.linked_requirements.slice(0,8))}</div></td><td>${r.category}</td><td>${r.likelihood}×${r.impact}</td><td class="lvl-${r.level}">${r.level}</td><td class="small">${esc(r.mitigation)}</td><td>${r.owner}</td></tr>`).join("")}</table></div>`,
-SDLC:d=>{const s=d.sdlc;if(!s)return `<div class="panel muted">Run the agents first.</div>`;
-  return `<div class="panel"><h2>Recommended SDLC: ${esc(s.selected)} <span class="small s-${s.status}">(${s.status.replaceAll("_"," ")})</span></h2><p>${esc(s.explanation)}</p>
-  ${s.ranked.map(o=>`<div style="margin:8px 0"><div class="row" style="justify-content:space-between"><b>${esc(o.model)}</b><span>${o.score}%</span></div><div class="bar"><span style="width:${o.score}%"></span></div><div class="small muted">${o.reasons.map(esc).join(" · ")}</div></div>`).join("")}</div>
-  <div class="panel"><h2>Decision factors</h2><table><tr><th>Factor</th><th>Score</th><th>Rationale</th></tr>${s.factors.map(f=>`<tr><td>${f.name.replaceAll("_"," ")}</td><td>${"●".repeat(f.score)}${"○".repeat(5-f.score)}</td><td class="small">${esc(f.rationale)}</td></tr>`).join("")}</table></div>
-  <div class="panel"><h2>Project-specific workflow</h2>${s.workflow.map((p,i)=>`<h3>${i+1}. ${esc(p.name)}</h3><table class="small">
-   ${[["Activities",p.activities],["Roles",p.roles],["Deliverables",p.deliverables],["Security",p.security_activities],["Testing",p.testing],["Compliance checkpoints",p.compliance_checkpoints],["Entry",p.entry_criteria],["Exit",p.exit_criteria]].map(([l,a])=>a.length?`<tr><th style="width:170px">${l}</th><td>${a.map(esc).join("; ")}</td></tr>`:"").join("")}
-   <tr><th>Approval gate</th><td><b>${esc(p.approval_gate)}</b></td></tr></table>`).join("")}</div>`},
-Approvals:d=>`<div class="panel"><h2>Human approval queue</h2><p class="small muted">Decisions are checked against the role selected at the top right. The SDLC and production-readiness gates need every listed role to approve.</p>
-  <div class="row"><select id="ap-filter"><option value="pending_approval">pending</option><option value="">all</option></select></div>
-  <table><tr><th>ID</th><th>Gate</th><th>Summary</th><th>Required roles</th><th>Status</th><th>Decision</th></tr>
-  ${d.approvals.map(a=>`<tr data-st="${a.status}"><td>${a.id}</td><td>${a.gate.replaceAll("_"," ")}</td><td class="small">${esc(a.summary)}${a.decisions.map(x=>`<div class="muted">${esc(x.user)} (${x.role}): ${x.decision} ${esc(x.comment||"")}</div>`).join("")}</td>
-  <td>${chips(a.required_roles)}</td><td class="s-${a.status}">${a.status.replaceAll("_"," ")}</td>
-  <td>${a.status==="pending_approval"?`<input type="text" data-c="${a.id}" placeholder="comment / modified text"><div class="row" style="margin-top:4px">${["approve","reject","modify","regenerate"].map(x=>`<button data-ap="${a.id}" data-d="${x}">${x}</button>`).join("")}</div>`:""}</td></tr>`).join("")}</table></div>`,
-Audit:d=>`<div class="panel"><h2>Audit trail</h2><div id="audit">Loading…</div></div>`,
+  if(!s)return pageHead("Adaptive interview","The interaction agent asks role-specific questions, follows up when an answer is vague, and skips topics earlier inputs already cover. When you finish, the transcript becomes an input and is analysed.")+
+   `<div class="grid g-side"><div class="card"><div class="card-h"><h2>Start an interview</h2></div><div class="card-b stack">
+     <div class="grid g2"><div class="field"><label for="iv-name">Stakeholder</label><input id="iv-name" class="input" placeholder="e.g. Arjun (Chief Compliance Officer)"></div>
+     <div class="field"><label for="iv-role">Their role</label><select id="iv-role" class="input">${opts(ROLES,myRole())}</select></div></div>
+     <div class="callout">${I("info",15)}<div>Specific answers (numbers, limits, who approves what) avoid follow-up questions and produce testable requirements.</div></div></div>
+     <div class="card-f"><button class="btn primary" id="iv-start">${I("chat",15)}Start interview</button></div></div>
+   <div class="card"><div class="card-h"><h2>Topics it can cover</h2></div><div class="card-b"><div class="tags">${TOPICS.map(t=>tag(t)).join("")}</div></div></div></div>`;
+  const answered=s.turns.filter(t=>t.answer).length,covered=new Set(s.turns.filter(t=>t.answer).map(t=>human(t.topic).toLowerCase()));
+  return pageHead(`Interview with ${esc(s.stakeholder)}`,`${esc(cap(s.role))} · ${plural(answered,"answer")} so far`)+
+  `<div class="grid g-side"><div class="card" style="display:flex;flex-direction:column">
+    <div class="chat" id="chat">${s.turns.map(t=>`<div class="msg"><span class="av">${I("spark",15)}</span><div><div class="meta">${tag(cap(t.topic))}${t.followup?pill("follow-up","warn"):""}</div><div class="bubble">${esc(t.question)}</div></div></div>
+      ${t.answer?`<div class="msg me"><span class="av">${esc(initials(s.stakeholder))}</span><div class="bubble">${esc(t.answer)}</div></div>`:""}`).join("")}
+      ${s.done?`<div class="callout ok">${I("checkc",15)}<div>All relevant topics covered. Finish to analyse the transcript.</div></div>`:""}</div>
+    ${s.done?"":`<div class="composer"><textarea id="iv-ans" class="input" placeholder="Type ${esc(s.stakeholder)}'s answer…"></textarea>
+      <div class="row between" style="margin-top:8px"><span class="xs muted"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to send</span><button class="btn primary" id="iv-send">${I("send",15)}Send</button></div></div>`}</div>
+   <div class="stack"><div class="card"><div class="card-h"><h2>Progress</h2><span class="muted sm">${answered} answered</span></div><div class="card-b">
+      <div class="topic-list">${s.turns.map(t=>human(t.topic)).filter((t,i,a)=>a.indexOf(t)===i).map(t=>`<div class="${covered.has(t.toLowerCase())?"done":""}">${I(covered.has(t.toLowerCase())?"checkc":"help",15)}${esc(cap(t))}</div>`).join("")}</div></div>
+      <div class="card-f"><button class="btn ghost" id="iv-cancel">Discard</button><button class="btn primary" id="iv-finish">${I("spark",15)}Finish & analyse</button></div></div></div></div>`},
+
+Requirements:(d,c)=>{
+  if(!d.requirements.length)return pageHead("Requirements")+`<div class="card">${empty("list","No requirements yet","Add stakeholder inputs and run the analysis. Extracted and derived requirements appear here.",`<button class="btn primary" data-go="Inputs">${I("fileplus",15)}Add inputs</button>`)}</div>`;
+  const byCat={};d.requirements.forEach(r=>r.categories.forEach(k=>byCat[k]=(byCat[k]||0)+1));
+  const head=pageHead("Requirements",`${d.requirements.length} requirements from ${plural(c.docs,"source")}, each traced to its stakeholder evidence. Select a row for details.`,exportBtn())+
+    `<div style="margin-bottom:16px">${seg("rqView",[["reqs","Requirements",d.requirements.length],["stories","User stories",d.stories.length],["ucs","Use cases",d.use_cases.length]])}</div>`;
+  if(S.f.rqView==="stories")return head+`<div class="card list">${d.stories.map(s=>`<div><div class="row" style="margin-bottom:6px"><span class="tag mono">${esc(s.id)}</span>${reqTag(s.requirement_id)}</div><p>${esc(s.story)}</p>
+     ${s.acceptance_criteria?.length?`<details class="disc" style="margin-top:6px"><summary class="xs muted">${I("chev",13)}${plural(s.acceptance_criteria.length,"acceptance criterion","acceptance criteria")}</summary><ul class="ac">${s.acceptance_criteria.map(a=>`<li>${esc(a)}</li>`).join("")}</ul></details>`:""}</div>`).join("")}</div>`;
+  if(S.f.rqView==="ucs")return head+`<div class="stack">${d.use_cases.map(u=>`<div class="card"><div class="card-h"><div><h2>${esc(u.id)} · ${esc(u.name)}</h2><p>Actor: ${esc(u.actor)}</p></div></div><div class="card-b grid g2">
+     <div><h3 style="margin-bottom:6px">Main flow</h3><ol class="ac">${u.main.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>
+     <div class="stack" style="gap:12px">${u.pre?.length?`<div><h3 style="margin-bottom:6px">Preconditions</h3><ul class="ac">${u.pre.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+     ${u.alt?.length?`<div><h3 style="margin-bottom:6px">Alternate flows</h3><ul class="ac">${u.alt.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+     ${u.post?.length?`<div><h3 style="margin-bottom:6px">Postconditions</h3><ul class="ac">${u.post.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}</div>
+     <div style="grid-column:1/-1"><h3 style="margin-bottom:6px">Requirements</h3><div class="tags">${u.requirements.map(reqTag).join("")}</div></div></div></div>`).join("")}</div>`;
+  return head+`<div class="card"><div class="card-b stack" style="gap:12px;padding-bottom:14px">
+    <div class="row"><div class="search">${I("search",15)}<input id="rq-q" class="input" type="search" placeholder="Search statement, ID, control, stakeholder…" value="${esc(S.f.rqQ)}" aria-label="Search requirements"></div>
+      <select id="rq-st" class="input" style="width:auto">${opts(["needs_clarification","pending_approval","approved","modified","rejected"],S.f.rqSt,"All statuses")}</select>
+      <select id="rq-pri" class="input" style="width:auto">${opts(["must","should","could","wont"],S.f.rqPri,"All priorities")}</select>
+      <span id="rq-n" class="sm muted" style="margin-left:auto"></span></div>
+    <div class="chipbar" id="rq-cats"><button data-cat-f="" aria-pressed="${!S.f.rqCat}">All</button>${Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<button data-cat-f="${esc(k)}" aria-pressed="${S.f.rqCat===k}">${esc(cap(k))}<span class="n">${n}</span></button>`).join("")}</div></div>
+  <div class="tw"><table id="rq"><thead><tr><th>ID</th><th>Requirement</th><th>Categories</th><th>Risk</th><th>Confidence</th><th>Status</th></tr></thead><tbody>
+  ${d.requirements.map(r=>`<tr class="click" data-req="${esc(r.id)}" data-cat="${esc(r.categories.join(" "))}" data-st="${r.status}" data-pri="${r.priority}" data-txt="${esc([r.id,r.statement,r.source_stakeholder,...r.controls,...r.regulations.map(x=>x.kb_id)].join(" ").toLowerCase())}">
+    <td class="id">${esc(r.id)}<div class="xs muted" style="font-family:var(--sans);font-weight:400">${esc(cap(r.priority))}${r.origin!=="extracted"?" · "+esc(r.origin.replace("derived_control","derived")):""}</div></td>
+    <td style="min-width:320px"><div class="clamp">${esc(r.statement)}</div><div class="row xs muted" style="margin-top:4px;gap:10px">${r.source_stakeholder?`<span>${I("user",12)}</span><span style="margin-left:-6px">${esc(r.source_stakeholder)}</span>`:""}${r.quality_issues.length?`<span style="color:var(--warn)">${plural(r.quality_issues.length,"issue")}</span>`:""}${r.regulations.length?`<span>${plural(r.regulations.length,"citation")}</span>`:""}</div></td>
+    <td><div class="tags">${r.categories.slice(0,2).map(k=>tag(cap(k))).join("")}${r.categories.length>2?tag("+"+(r.categories.length-2)):""}</div></td>
+    <td>${levelPill(r.risk_level)}</td><td>${meter(r.confidence)}</td><td>${statusPill(r.status)}</td></tr>`).join("")}</tbody></table></div>
+  <div id="rq-none" class="hidden">${empty("search","No matching requirements","Try a different search or clear the filters.",`<button class="btn sm" id="rq-reset">Clear filters</button>`)}</div></div>`},
+
+Clarifications:(d,c)=>{
+  const mine=S.f.clMine,list=d.questions.filter(q=>(S.f.cl==="all"||(S.f.cl==="open"?!q.answer:!!q.answer))&&(!mine||q.target_role===myRole()));
+  return pageHead("Clarifications","Questions the agents raised about ambiguous, incomplete or untestable requirements. Each answer becomes evidence, and the analysis re-runs.")+
+  `<div class="row between" style="margin-bottom:16px">${seg("cl",[["open","Open",c.openQ],["answered","Answered",d.questions.length-c.openQ],["all","All",d.questions.length]])}
+    <label class="check"><input type="checkbox" id="cl-mine"${mine?" checked":""}>Only for ${esc(human(myRole()))}</label></div>
+  ${list.length?`<div class="stack">${list.map(q=>`<div class="card"><div class="card-b">
+    <div class="row between" style="margin-bottom:10px"><div class="row"><span class="tag mono">${esc(q.id)}</span>${q.requirement_id?reqTag(q.requirement_id):""}</div>${q.target_role?pill("ask "+human(q.target_role),q.target_role===myRole()?"accent":""):""}</div>
+    <p style="font-size:15px;font-weight:550">${esc(q.question)}</p><p class="sm muted" style="margin-top:4px">${esc(q.reason)}</p>
+    ${q.answer?`<div class="callout ok" style="margin-top:12px">${I("checkc",15)}<div>${esc(q.answer)}</div></div>`
+      :`<div style="margin-top:12px"><textarea class="input" data-q="${esc(q.id)}" style="min-height:64px" placeholder="Your answer"></textarea>
+        <div class="row between" style="margin-top:8px"><span class="xs muted"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to submit</span><button class="btn primary sm" data-qa="${esc(q.id)}">Submit answer</button></div></div>`}
+  </div></div>`).join("")}</div>`
+  :`<div class="card">${empty(S.f.cl==="open"?"checkc":"help",S.f.cl==="open"?"No open questions":"Nothing here",S.f.cl==="open"?"Every clarification has been answered"+(mine?" for this role.":"."):"No questions match this filter.")}</div>`}`},
+
+Conflicts:(d,c)=>{
+  const list=d.conflicts.filter(x=>S.f.cf==="all"||!x.resolution),rq=Object.fromEntries(d.requirements.map(r=>[r.id,r]));
+  return pageHead("Conflicts","Contradictions and duplicates between stakeholder requirements. Resolve them through the conflict approval gate.",`<button class="btn" data-go="Approvals">${I("stamp",15)}Go to approvals</button>`)+
+  `<div style="margin-bottom:16px">${seg("cf",[["open","Open",c.openC],["all","All",d.conflicts.length]])}</div>
+  ${list.length?`<div class="stack">${list.map(x=>`<div class="card"><div class="card-h"><div class="row">${levelPill(x.severity)}<b>${esc(cap(x.type))}</b><span class="tag mono">${esc(x.id)}</span></div>${x.resolution?pill("resolved","ok"):pill("open","warn")}</div>
+    <div class="card-b stack" style="gap:12px"><p>${esc(x.detail)}</p>
+    <div class="grid g2" style="gap:10px">${x.requirement_ids.map(id=>`<button class="cite" data-req="${esc(id)}" style="text-align:left;background:var(--surface);cursor:pointer"><div class="row between"><b>${esc(id)}</b>${rq[id]?`<span class="xs muted">${esc(rq[id].source_stakeholder||"")}</span>`:""}</div><div class="sm clamp" style="margin-top:4px;color:var(--text-2)">${esc(rq[id]?.statement||"")}</div></button>`).join("")}</div>
+    ${x.resolution?`<div class="callout ok">${I("checkc",15)}<div>${esc(x.resolution)}</div></div>`:""}</div></div>`).join("")}</div>`
+  :`<div class="card">${empty("checkc",d.conflicts.length?"No open conflicts":"No conflicts detected","Stakeholder requirements are consistent so far.")}</div>`}`},
+
+Compliance:d=>{
+  const mand=d.coverage.filter(x=>x.mandatory),cnt=k=>mand.filter(x=>x.status===k).length,m=d.metrics||{};
+  const statusK={covered:"ok",derived:"accent",partial:"warn",gap:"bad"};
+  const maps=d.compliance.filter(x=>S.f.cmp==="all"||(S.f.cmp==="gap"?x.gap:x.needs_legal_review));
+  return pageHead("Compliance","Mandatory KYC/AML controls, which requirements cover them, and the regulatory citations behind each mapping. Final legal interpretation stays with compliance and legal officers.")+
+  `<div class="grid g4" style="margin-bottom:16px">
+    <div class="card stat">${ring(m.control_coverage_after_derivation,56,"var(--ok)")}<div><div class="l">Mandatory coverage</div><div class="s">${mand.length} mandatory controls</div></div></div>
+    <div class="card stat"><span class="ic ok">${I("checkc",18)}</span><div><div class="v">${cnt("covered")}</div><div class="l">Covered by stakeholders</div></div></div>
+    <div class="card stat"><span class="ic">${I("spark",18)}</span><div><div class="v">${cnt("derived")+cnt("partial")}</div><div class="l">Derived or partial</div><div class="s">Added by the compliance agent</div></div></div>
+    <div class="card stat"><span class="ic ${cnt("gap")?"bad":"ok"}">${I(cnt("gap")?"alert":"shield",18)}</span><div><div class="v">${cnt("gap")}</div><div class="l">Gaps</div></div></div></div>
+  <div class="card" style="margin-bottom:16px"><div class="card-h"><h2>Control coverage</h2></div><div class="tw"><table><thead><tr><th>Control</th><th>Title</th><th>Status</th><th>Covered by</th></tr></thead><tbody>
+    ${d.coverage.map(x=>`<tr><td class="id">${esc(x.control_id)}</td><td>${esc(x.title)}${x.mandatory?"":` <span class="xs muted">· optional</span>`}</td><td>${pill(x.status,statusK[x.status]||"")}</td><td><div class="tags">${x.covered_by.map(reqTag).join("")||'<span class="muted">—</span>'}</div></td></tr>`).join("")}</tbody></table></div></div>
+  <div class="card"><div class="card-h"><div><h2>Requirement → control mappings</h2><p>${d.compliance.length} mappings with citations from the versioned knowledge base</p></div>
+    ${seg("cmp",[["all","All",d.compliance.length],["gap","Gaps",d.compliance.filter(x=>x.gap).length],["legal","Legal review",d.compliance.filter(x=>x.needs_legal_review).length]])}</div>
+  ${maps.length?`<div class="tw"><table><thead><tr><th>Requirement</th><th>Control</th><th>Obligation</th><th>Citations</th><th>Flags</th></tr></thead><tbody>
+    ${maps.map(x=>`<tr><td>${reqTag(x.requirement_id)}</td><td><b class="mono">${esc(x.control_id)}</b><div class="xs muted">${esc(x.control)}</div></td><td class="sm" style="min-width:240px">${esc(x.obligation)}</td>
+      <td><div class="tags">${x.citations.map(ci=>`<span class="tag mono" title="${esc(ci.title)} · ${esc(ci.source)} · v${esc(ci.version)}">${esc(ci.kb_id)}</span>`).join("")}</div></td>
+      <td><div class="tags">${x.gap?pill("gap","bad"):""}${x.needs_legal_review?pill("legal review","warn"):""}</div></td></tr>`).join("")}</tbody></table></div>`
+  :empty("checkc","Nothing to show","No mappings match this filter.")}</div>`},
+
+Risks:d=>{
+  const cell={};d.risks.forEach(r=>{const k=r.likelihood+"-"+r.impact;cell[k]=(cell[k]||0)+1});
+  const heat=(l,i)=>{const s=l*i;return s>=20?"h5":s>=12?"h4":s>=8?"h3":s>=4?"h2":"h1"};
+  const list=d.risks.filter(r=>!S.f.risk||S.f.risk===r.likelihood+"-"+r.impact);
+  const lv=["critical","high","medium","low"].map(l=>[l,d.risks.filter(r=>r.level===l).length]);
+  const tm=d.threat_model||[];
+  return pageHead("Risks","Business, technical, compliance, security and privacy risks, scored by likelihood and impact, with owners and mitigations.")+
+  `<div class="grid g-side" style="margin-bottom:16px">
+    <div class="card"><div class="card-h"><div><h2>Risk matrix</h2><p>Select a cell to filter the register</p></div>${S.f.risk?`<button class="btn sm ghost" id="risk-clear">Clear filter</button>`:""}</div><div class="card-b">
+      <div class="heat"><div></div>${[1,2,3,4,5].map(i=>`<div class="ax">${i}</div>`).join("")}
+      ${[5,4,3,2,1].map(l=>`<div class="ax">${l}</div>${[1,2,3,4,5].map(i=>{const k=l+"-"+i,n=cell[k]||0;return `<button class="${heat(l,i)}" data-cell="${k}" aria-pressed="${S.f.risk===k}"${n?"":" disabled"} aria-label="Likelihood ${l}, impact ${i}: ${n} risks">${n||""}</button>`}).join("")}`).join("")}</div>
+      <div class="row between xs muted" style="margin-top:8px;padding-left:26px"><span>↑ Likelihood</span><span>Impact →</span></div></div></div>
+    <div class="card"><div class="card-h"><h2>By level</h2></div><div class="card-b stack" style="gap:12px">
+      ${lv.map(([l,n])=>`<div><div class="row between sm"><span>${levelPill(l)}</span><b>${n}</b></div><div class="hbar" style="height:6px;margin-top:6px"><span style="width:${d.risks.length?n/d.risks.length*100:0}%;background:${l==="critical"||l==="high"?"var(--bad)":l==="medium"?"var(--warn)":"var(--text-3)"}"></span></div></div>`).join("")}
+    </div></div></div>
+  <div class="card" style="margin-bottom:16px"><div class="card-h"><div><h2>Risk register</h2><p>${list.length} of ${d.risks.length} shown</p></div></div>
+  ${list.length?`<div class="tw"><table><thead><tr><th>Risk</th><th>Category</th><th>L × I</th><th>Level</th><th>Mitigation</th><th>Owner</th></tr></thead><tbody>
+    ${list.map(r=>`<tr><td style="min-width:280px"><div class="row" style="gap:6px;margin-bottom:2px"><span class="tag mono">${esc(r.id)}</span><b>${esc(r.title)}</b></div><div class="sm" style="color:var(--text-2)">${esc(r.description)}</div>${r.linked_requirements.length?`<div class="tags" style="margin-top:6px">${r.linked_requirements.slice(0,6).map(reqTag).join("")}${r.linked_requirements.length>6?tag("+"+(r.linked_requirements.length-6)):""}</div>`:""}</td>
+      <td>${tag(cap(r.category))}</td><td class="mono" style="white-space:nowrap">${r.likelihood} × ${r.impact}</td><td>${levelPill(r.level)}</td><td class="sm" style="min-width:220px">${esc(r.mitigation)}</td><td class="sm">${esc(cap(r.owner))}</td></tr>`).join("")}</tbody></table></div>`
+  :empty("pulse","No risks","Run the analysis to build the register.")}</div>
+  ${tm.length?`<div class="card"><div class="card-h"><div><h2>Threat model</h2><p>STRIDE-style threats and the requirements that mitigate them</p></div></div><div class="list">
+    ${tm.map(t=>`<div class="row between" style="align-items:flex-start;flex-wrap:nowrap;gap:16px"><div><div class="row" style="gap:6px;margin-bottom:4px">${tag(t.stride||"")}${levelPill(t.level||"medium")}</div><div class="sm">${esc(t.threat)}</div></div>
+      <div class="tags" style="justify-content:flex-end;flex:none;max-width:45%">${(t.covered_by||[]).length?t.covered_by.map(reqTag).join(""):pill("uncovered","bad")}</div></div>`).join("")}</div></div>`:""}`},
+
+SDLC:d=>{const s=d.sdlc;
+  if(!s)return pageHead("SDLC recommendation")+`<div class="card">${empty("flow","No recommendation yet","Add inputs and run the analysis. The SDLC agent scores project factors against seven lifecycle models.",`<button class="btn primary" data-go="Inputs">${I("fileplus",15)}Add inputs</button>`)}</div>`;
+  const top=s.ranked[0]?.score||0;
+  return pageHead("SDLC recommendation","Hard rules and weighted multi-criteria scoring over 14 project factors. Scores are deterministic; the language model only writes the explanation. The final choice needs the project manager, architect, security and compliance.",`<button class="btn" data-go="Approvals">${I("stamp",15)}Approve</button>`)+
+  `<div class="card" style="margin-bottom:16px"><div class="card-b" style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">${ring(top/100,96)}<div style="flex:1;min-width:240px">
+      <div class="row" style="margin-bottom:6px"><span class="eyebrow" style="margin:0">${I("spark",14)}Recommended</span>${statusPill(s.status)}</div>
+      <h2 style="font-size:24px;letter-spacing:-.02em">${esc(s.selected)}</h2><p style="margin-top:8px;color:var(--text-2);max-width:900px">${esc(s.explanation)}</p></div></div></div>
+  <div class="grid g2" style="margin-bottom:16px;align-items:start">
+    <div class="card"><div class="card-h"><div><h2>Ranked options</h2><p>Weighted fit across the decision factors</p></div></div><div class="card-b" style="padding-top:4px;padding-bottom:4px">
+      ${s.ranked.map((o,i)=>`<div class="option${i===0?" top":""}"><b>${esc(o.model)}</b><span class="score">${Math.round(o.score)}%</span><div class="hbar"><span style="width:${o.score}%;${i?"opacity:.55":""}"></span></div>${o.reasons.length?`<div class="why">${o.reasons.map(esc).join(" · ")}</div>`:""}</div>`).join("")}</div></div>
+    <div class="card"><div class="card-h"><div><h2>Decision factors</h2><p>Scored 1–5 from the analysed requirements</p></div></div><div class="list">
+      ${s.factors.map(f=>`<div><div class="row between"><b class="sm">${esc(cap(f.name))}</b><span class="dots" aria-label="${f.score} of 5">${[1,2,3,4,5].map(n=>`<i class="${n<=f.score?"on":""}"></i>`).join("")}</span></div><div class="xs muted" style="margin-top:3px">${esc(f.rationale)}</div></div>`).join("")}</div></div></div>
+  <div class="card"><div class="card-h"><div><h2>Project-specific workflow</h2><p>${plural(s.workflow.length,"phase")}, each ending in a human approval gate</p></div></div><div class="card-b"><div class="timeline">
+      ${s.workflow.map((p,i)=>`<details class="phase disc"${i===0?" open":""}><summary><span class="num">${i+1}</span><div style="flex:1"><b>${esc(p.name)}</b><div class="xs muted">${I("stamp",12)} ${esc(p.approval_gate)}</div></div>${I("chev",15)}</summary>
+        <div class="body">${[["Activities",p.activities],["Roles",p.roles],["Deliverables",p.deliverables],["Security",p.security_activities],["Testing",p.testing],["Compliance checkpoints",p.compliance_checkpoints],["Entry criteria",p.entry_criteria],["Exit criteria",p.exit_criteria],["Traceability",p.traceability]]
+          .filter(([,a])=>a&&a.length).map(([l,a])=>`<div><h4>${l}</h4><ul>${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div></details>`).join("")}</div></div></div>`},
+
+Approvals:(d,c)=>{
+  const f=S.f.ap,list=d.approvals.filter(a=>f==="all"||(f==="pending"?a.status==="pending_approval":canDecide(a)));
+  const reqIds=new Set(d.requirements.map(r=>r.id));
+  return pageHead("Approvals",`Human-in-the-loop gates for baselines, regulatory interpretations, high-risk security, conflicts, architecture, SDLC and changes. You are acting as <b>${esc(human(myRole()))}</b>; switch role at the top right.`)+
+  `<div style="margin-bottom:16px">${seg("ap",[["mine","Waiting for me",c.mine],["pending","All pending",c.pending],["all","Everything",d.approvals.length]])}</div>
+  ${list.length?`<div class="stack">${list.map(a=>{const approved=r=>a.decisions.some(x=>x.role===r&&x.decision==="approve");
+    return `<div class="card"><div class="card-h"><div class="row"><span class="tag mono">${esc(a.id)}</span><b>${esc(cap(a.gate))}</b>${reqIds.has(a.subject_id)?reqTag(a.subject_id):""}</div>${statusPill(a.status)}</div>
+    <div class="card-b stack" style="gap:14px"><p>${esc(a.summary)}</p>
+      <div><div class="label" style="margin-bottom:6px">Required approvers</div><div class="roles">${a.required_roles.map(r=>`<span class="role ${approved(r)?"done":r===myRole()?"me":""}">${I(approved(r)?"checkc":"user",14)}${esc(cap(r))}</span>`).join("")}</div></div>
+      ${a.decisions.length?`<div class="history">${a.decisions.map(x=>`<div>${I(x.decision==="approve"?"checkc":x.decision==="reject"?"xc":"edit",13)} <b>${esc(x.user)}</b> (${esc(human(x.role))}) ${esc(x.decision)}${x.comment?` · <span class="muted">${esc(x.comment)}</span>`:""}</div>`).join("")}</div>`:""}
+      ${a.gate==="baseline"&&a.status==="pending_approval"?`<p class="sm muted">Approving the baseline approves every requirement that is pending approval.</p>${blockedNote(d)}`:""}
+    </div>
+    ${decisionBox(a,d)}</div>`}).join("")}</div>`
+  :`<div class="card">${empty("checkc",f==="mine"?"Nothing waiting for you":"No approval items",f==="mine"?`No pending gate needs ${esc(human(myRole()))}. Pick another role at the top right, or view all pending items.`:"Approval items appear after the analysis runs.")}</div>`}`},
+
+Audit:()=>pageHead("Audit trail","Every agent action, prompt hash, evidence retrieval, human decision and change, in a hash-chained log. Any edit to past entries breaks the chain.")+`<div id="audit">${empty("history","Loading…","")}</div>`,
+
+Knowledge:()=>{const k=S.kb;
+  if(!k)return pageHead("Knowledge base")+`<div class="card">${empty("book","Loading…","")}</div>`;
+  const js=[...new Set(k.items.map(i=>i.jurisdiction))].sort();
+  return pageHead("Knowledge base",`Version ${esc(k.kb_version)} · ${k.items.length} sources and ${k.control_catalogue.length} controls. Every item carries source, jurisdiction, effective date and version; retrieval is restricted to this allowlist.`)+
+  (k.disclaimer?`<div class="callout warn" style="margin-bottom:16px">${I("info",15)}<div>${esc(k.disclaimer)}</div></div>`:"")+
+  `<div class="row between" style="margin-bottom:16px">${seg("kbView",[["items","Sources",k.items.length],["controls","Controls",k.control_catalogue.length]])}
+    <div class="row"><div class="search">${I("search",15)}<input id="kb-q" class="input" type="search" placeholder="Search…" value="${esc(S.f.kbQ)}" aria-label="Search knowledge base"></div>
+    <select id="kb-j" class="input" style="width:auto">${opts(js,S.f.kbJ,"All jurisdictions")}</select></div></div>
+  <div class="card"><div class="tw"><table id="kb">${S.f.kbView==="items"
+    ?`<thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Jurisdiction</th><th>Effective</th><th>Version</th></tr></thead><tbody>${k.items.map(i=>`<tr data-j="${esc(i.jurisdiction)}" data-txt="${esc((i.id+" "+i.title+" "+i.source).toLowerCase())}"><td class="id">${esc(i.id)}</td><td>${esc(i.title)}<div class="xs muted">${esc(i.source)}</div></td><td>${tag(cap(i.type))}</td><td>${tag(i.jurisdiction)}</td><td class="sm">${esc(i.effective_date)}</td><td class="sm mono">${esc(i.version)}</td></tr>`).join("")}</tbody>`
+    :`<thead><tr><th>Control</th><th>Title</th><th>Mandatory</th><th>Jurisdictions</th><th>Sources</th></tr></thead><tbody>${k.control_catalogue.map(c=>`<tr data-j="${esc(c.jurisdictions.join(" "))}" data-txt="${esc((c.id+" "+c.title).toLowerCase())}"><td class="id">${esc(c.id)}</td><td>${esc(c.title)}</td><td>${c.mandatory?pill("mandatory","accent"):pill("optional")}</td><td><div class="tags">${c.jurisdictions.map(j=>tag(j)).join("")}</div></td><td><div class="tags">${c.kb_refs.map(r=>tag(r,"mono")).join("")}</div></td></tr>`).join("")}</tbody>`}
+  </table></div></div>`},
 };
 
+/* ======================================================================================== */
+/* behaviour per view                                                                       */
+/* ======================================================================================== */
+const runAnalysis=btn=>busy(btn,"Analysing",async()=>{await post(`/api/projects/${S.pid}/run`);await load();toast("Analysis complete.","ok")},true);
+const ctrlEnter=(el,fn)=>{if(el)el.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();fn()}})};
+const csv=s=>s.split(",").map(x=>x.trim()).filter(Boolean);
+const on=(sel,fn)=>{const el=$(sel);if(el)el.onclick=e=>fn(e.currentTarget)};
+
 const BIND={
-Overview:()=>{document.querySelectorAll("[data-sample]").forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await api(`/api/projects/from-sample/${b.dataset.sample}`,{method:"POST"});await refreshProjects(r.id);await load();toast("Case study loaded and analysed")}catch(e){toast(e.message)}finally{b.disabled=false}});
-  const g=$("#np-go");if(g)g.onclick=async()=>{try{const r=await api("/api/projects",{method:"POST",body:JSON.stringify({name:$("#np-name").value||"New KYC project",jurisdictions:[$("#np-j").value]})});await refreshProjects(r.id);await load();S.tab="Inputs";render()}catch(e){toast(e.message)}};
-  const rr=$("#rerun");if(rr)rr.onclick=async()=>{await api(`/api/projects/${S.pid}/run`,{method:"POST"});await load();toast("Agents re-run")}},
-Inputs:()=>{$("#di-add").onclick=async()=>{try{const r=await api(`/api/projects/${S.pid}/documents`,{method:"POST",body:JSON.stringify({title:$("#di-title").value||"Input",text:$("#di-text").value,type:$("#di-type").value,stakeholder:$("#di-st").value,role:$("#di-role").value})});
-  await api(`/api/projects/${S.pid}/run`,{method:"POST"});await load();toast(`Added ${r.id}: ${r.pii_masked} PII masked${r.injection_flags.length?", injection quarantined":""}`)}catch(e){toast(e.message)}}},
-Interview:()=>{const st=$("#iv-start");if(st)st.onclick=async()=>{S.interview=await api(`/api/projects/${S.pid}/interviews`,{method:"POST",body:JSON.stringify({stakeholder:$("#iv-name").value||"Stakeholder",role:$("#iv-role").value})});render()};
-  const sd=$("#iv-send");if(sd)sd.onclick=async()=>{S.interview=await api(`/api/projects/${S.pid}/interviews/${S.interview.id}/answer`,{method:"POST",body:JSON.stringify({answer:$("#iv-ans").value})});render()};
-  const fn=$("#iv-finish");if(fn)fn.onclick=async()=>{await api(`/api/projects/${S.pid}/interviews/${S.interview.id}/finish`,{method:"POST"});S.interview=null;await load();S.tab="Requirements";render();toast("Interview analysed")}},
-Requirements:()=>{const f=()=>{const c=$("#rq-cat").value,s=$("#rq-st").value;document.querySelectorAll("#rq tr[data-cat]").forEach(r=>r.classList.toggle("hidden",(c&&!r.dataset.cat.split(" ").includes(c))||(s&&r.dataset.st!==s)))};$("#rq-cat").onchange=f;$("#rq-st").onchange=f},
-Clarifications:()=>{document.querySelectorAll("[data-qa]").forEach(b=>b.onclick=async()=>{const q=b.dataset.qa;const a=document.querySelector(`[data-q="${q}"]`).value;if(!a)return;
-  try{await api(`/api/projects/${S.pid}/questions/${q}/answer`,{method:"POST",body:JSON.stringify({answer:a})});await load();toast("Answer applied; agents re-ran")}catch(e){toast(e.message)}})},
-Approvals:()=>{const f=()=>{const v=$("#ap-filter").value;document.querySelectorAll("tr[data-st]").forEach(r=>r.classList.toggle("hidden",v&&r.dataset.st!==v))};$("#ap-filter").onchange=f;f();
-  document.querySelectorAll("[data-ap]").forEach(b=>b.onclick=async()=>{const id=b.dataset.ap,d=b.dataset.d,c=document.querySelector(`[data-c="${id}"]`).value;
-  try{await api(`/api/projects/${S.pid}/approvals/${id}`,{method:"POST",body:JSON.stringify({decision:d,comment:c,modification:d==="modify"?c:null})});await load();toast(`${id}: ${d} recorded`)}catch(e){toast("Denied: "+e.message)}})},
-Audit:async()=>{const a=await api(`/api/projects/${S.pid}/audit`);$("#audit").innerHTML=`<p>Hash chain: ${a.verified?'<span class="ok">verified</span>':'<span class="bad">BROKEN</span>'} · head <code>${a.head.slice(0,24)}…</code> · ${a.events.length} events shown</p>
-  <table><tr><th>#</th><th>Time</th><th>Actor</th><th>Action</th><th>Subject</th><th>Payload</th></tr>${a.events.slice().reverse().map(e=>`<tr><td>${e.seq}</td><td class="small">${e.ts}</td><td>${esc(e.actor)}</td><td>${esc(e.action)}</td><td>${esc(e.subject)}</td><td><pre>${esc(JSON.stringify(e.payload))}</pre></td></tr>`).join("")}</table>`},
+Overview:()=>{
+  if(!S.data){
+    const ta=$("#pz-text");let timer;
+    ta.oninput=()=>{S.paste=ta.value;clearTimeout(timer);timer=setTimeout(refreshPeople,350);if(!ta.value.trim()){S.speakers=[];renderPeople()}};
+    $("#hp-name").oninput=e=>S.homeName=e.target.value;
+    $$('input[name="hp-j"]').forEach(c=>c.onchange=()=>S.homeJ=$$('input[name="hp-j"]:checked').map(x=>x.value));
+    on("#pz-example",()=>{ta.value=S.paste=PASTE_EXAMPLE;if(!S.homeName){S.homeName="Digital onboarding & KYC";$("#hp-name").value=S.homeName}refreshPeople();ta.focus()});
+    renderPeople();if(S.paste&&!S.speakers.length)refreshPeople();
+    const project=()=>{const n=id=>{const v=parseInt($(id).value,10);return Number.isFinite(v)&&v>0?v:null},j=$$('input[name="hp-j"]:checked').map(x=>x.value);
+      return {name:$("#hp-name").value.trim()||`Stakeholder input · ${new Date().toLocaleDateString(undefined,{day:"numeric",month:"short"})}`,jurisdictions:j.length?j:["GLOBAL"],
+        description:$("#np-desc").value.trim(),channels:csv($("#np-ch").value),customer_types:csv($("#np-ct").value),legacy_systems:csv($("#np-ls").value),
+        timeline_months:n("#np-tl"),team_size:n("#np-ts"),budget_flexibility:$("#np-bf").value}};
+    const analyse=btn=>{if(!S.paste.trim()){toast("Paste what people said first, or open a demo below.");ta.focus();return}
+      const proj=project();
+      busy(btn,"Analysing",async()=>{
+        const r=await post("/api/projects",proj);await refreshProjects();
+        await post(`/api/projects/${r.id}/conversation`,{text:S.paste,title:"Stakeholder input",roles:S.roleOv,names:S.nameOv,run:true});
+        Object.assign(S,{paste:"",speakers:[],roleOv:{},nameOv:{},homeName:""});
+        if(!S.pid){await selectProject(r.id);toast(`“${proj.name}” is analysed.`,"ok")}  // still on the start page: show it
+        else{await refreshProjects();toast(`“${proj.name}” is analysed. Open it from the panel when you're ready.`,"ok",8000)}  // presenting a demo: don't interrupt
+      },"any")};
+    on("#pz-run",analyse);ctrlEnter(ta,()=>analyse($("#pz-run")));
+    on("#np-empty",g=>busy(g,"Creating project",async()=>{const r=await post("/api/projects",project());await refreshProjects();S.queue=[];await selectProject(r.id);go("Inputs");toast("Project created. Upload documents or paste text.","ok")}));
+    return}
+  on("#demo-reset",()=>{if(confirm("Reset this demo to its original analysis? Answers and decisions made in it are discarded."))openDemo(S.pid.replace(/^demo-/,"").replaceAll("-","_"),true)});
+  on("#rerun",runAnalysis);on("#rerun2",runAnalysis)},
+Inputs:()=>{
+  // --- the main path: one pasted text, split into people ---
+  const ta=$("#pz-text");let timer;
+  ta.oninput=()=>{S.paste=ta.value;clearTimeout(timer);timer=setTimeout(refreshPeople,350);if(!ta.value.trim()){S.speakers=[];renderPeople()}};
+  $("#pz-title").oninput=e=>S.pasteTitle=e.target.value;
+  on("#pz-example",()=>{ta.value=S.paste=PASTE_EXAMPLE;if(!S.pasteTitle){S.pasteTitle="Kick-off workshop";$("#pz-title").value=S.pasteTitle}refreshPeople();ta.focus()});
+  const submitPaste=(btn,run)=>{if(!S.paste.trim()){toast("Paste what people said first.");ta.focus();return}
+    busy(btn,run?"Adding and analysing":"Adding",async()=>{
+      const r=await post(`/api/projects/${S.pid}/conversation`,{text:S.paste,title:S.pasteTitle,roles:S.roleOv,names:S.nameOv,run});
+      Object.assign(S,{paste:"",pasteTitle:"",speakers:[],roleOv:{},nameOv:{}});
+      const pii=r.documents.reduce((a,x)=>a+x.pii_masked,0);
+      await load();toast(`Added input from ${plural(r.documents.length,"person","people")}${pii?` · ${plural(pii,"PII value")} masked`:""}${run?"":" · not analysed yet"}`,"ok",6000)},run)};
+  on("#pz-run",b=>submitPaste(b,true));on("#pz-add",b=>submitPaste(b,false));ctrlEnter(ta,()=>submitPaste($("#pz-run"),true));
+  renderPeople();if(S.paste&&!S.speakers.length)refreshPeople();
+
+  // --- secondary path: files ---
+  const drop=$("#drop"),pick=$("#file-pick");
+  drop.onclick=()=>{pick.value="";pick.click()};drop.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();drop.click()}};
+  pick.onchange=()=>readFiles(pick.files);
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add("over")};drop.ondragleave=()=>drop.classList.remove("over");
+  drop.ondrop=e=>{e.preventDefault();drop.classList.remove("over");readFiles(e.dataTransfer.files)};
+  $("#df-st").oninput=e=>S.defaults.stakeholder=e.target.value;$("#df-role").onchange=e=>S.defaults.role=e.target.value;
+  on("#df-apply",()=>{S.queue.forEach(x=>{if(S.defaults.stakeholder)x.stakeholder=S.defaults.stakeholder;if(S.defaults.role)x.role=S.defaults.role});render()});
+  $$(".qitem").forEach(el=>{const it=S.queue.find(x=>x.id===+el.dataset.qi);el.querySelectorAll("[data-f]").forEach(inp=>{inp.oninput=inp.onchange=()=>{it[inp.dataset.f]=inp.value}})});
+  $$("[data-rm]").forEach(b=>b.onclick=()=>{S.queue=S.queue.filter(x=>x.id!==+b.dataset.rm);render()});
+  on("#q-clear",()=>{if(confirm(`Remove all ${S.queue.length} queued files?`)){S.queue=[];render()}});
+  const submit=(btn,run)=>{const docs=S.queue.filter(x=>x.text.trim());if(!docs.length){toast("The queued files have no text.");return}
+    busy(btn,run?`Adding ${plural(docs.length,"file")} and analysing`:`Adding ${plural(docs.length,"file")}`,async()=>{
+      const r=await post(`/api/projects/${S.pid}/documents/batch`,{run,documents:docs.map(x=>({title:x.title||"Input",text:x.text,type:x.type,stakeholder:x.stakeholder,role:x.role||null}))});
+      const ids=new Set(docs.map(x=>x.id));S.queue=S.queue.filter(x=>!ids.has(x.id));
+      const pii=r.documents.reduce((a,x)=>a+x.pii_masked,0),inj=r.documents.filter(x=>x.injection_flags.length).length;
+      await load();toast(`Added ${plural(r.documents.length,"file")} · ${plural(pii,"PII value")} masked${inj?` · injection quarantined in ${inj}`:""}${run?"":" · not analysed yet"}`,"ok",6000)},run)};
+  on("#q-add",b=>submit(b,false));on("#q-run",b=>submit(b,true));on("#in-run",runAnalysis);
+  $$("tr[data-doc]").forEach(tr=>tr.onclick=()=>{const body=document.querySelector(`tr[data-doc-body="${CSS.escape(tr.dataset.doc)}"]`);body.classList.toggle("hidden");tr.querySelector("td:last-child .i").style.transform=body.classList.contains("hidden")?"":"rotate(90deg)"})},
+Interview:()=>{
+  on("#iv-start",b=>busy(b,"Starting interview",async()=>{S.interview=await post(`/api/projects/${S.pid}/interviews`,{stakeholder:$("#iv-name").value.trim()||"Stakeholder",role:$("#iv-role").value});render();$("#iv-ans")?.focus()}));
+  const chat=$("#chat");if(chat)chat.scrollTop=chat.scrollHeight;
+  const send=()=>{const a=$("#iv-ans").value.trim();if(!a){toast("Type an answer first.");return}
+    busy($("#iv-send"),"Sending",async()=>{S.interview=await post(`/api/projects/${S.pid}/interviews/${S.interview.id}/answer`,{answer:a});render();$("#iv-ans")?.focus()})};
+  on("#iv-send",send);ctrlEnter($("#iv-ans"),send);
+  on("#iv-cancel",()=>{if(confirm("Discard this interview? The answers are not saved.")){S.interview=null;render()}});
+  on("#iv-finish",b=>{if(!S.interview.turns.some(t=>t.answer)){toast("Answer at least one question first.");return}
+    busy(b,"Analysing interview",async()=>{await post(`/api/projects/${S.pid}/interviews/${S.interview.id}/finish`);S.interview=null;await load();go("Requirements");toast("Interview added and analysed.","ok")},true)})},
+Requirements:()=>{if(!$("#rq"))return;
+  const apply=()=>{const q=S.f.rqQ.trim().toLowerCase();let n=0;const rows=$$("#rq tbody tr");
+    rows.forEach(r=>{const hide=(S.f.rqCat&&!r.dataset.cat.split(" ").includes(S.f.rqCat))||(S.f.rqSt&&r.dataset.st!==S.f.rqSt)||(S.f.rqPri&&r.dataset.pri!==S.f.rqPri)||(q&&!r.dataset.txt.includes(q));r.classList.toggle("hidden",hide);if(!hide)n++});
+    $("#rq-n").textContent=`${n} of ${rows.length}`;$("#rq-none").classList.toggle("hidden",n>0);$("#rq").classList.toggle("hidden",n===0);
+    $$("#rq-cats button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.catF===S.f.rqCat)))};
+  $("#rq-q").oninput=e=>{S.f.rqQ=e.target.value;apply()};$("#rq-st").onchange=e=>{S.f.rqSt=e.target.value;apply()};$("#rq-pri").onchange=e=>{S.f.rqPri=e.target.value;apply()};
+  $$("#rq-cats button").forEach(b=>b.onclick=()=>{S.f.rqCat=b.dataset.catF;apply()});
+  on("#rq-reset",()=>{Object.assign(S.f,{rqQ:"",rqCat:"",rqSt:"",rqPri:""});render()});apply()},
+Clarifications:()=>{$("#cl-mine").onchange=e=>{S.f.clMine=e.target.checked;render()};
+  const submit=b=>{const q=b.dataset.qa,a=document.querySelector(`[data-q="${CSS.escape(q)}"]`).value.trim();if(!a){toast("Type an answer first.");return}
+    busy(b,"Applying answer",async()=>{await post(`/api/projects/${S.pid}/questions/${encodeURIComponent(q)}/answer`,{answer:a});await load();toast("Answer applied and analysis re-run.","ok")},true)};
+  $$("[data-qa]").forEach(b=>{b.onclick=()=>submit(b);ctrlEnter(document.querySelector(`[data-q="${CSS.escape(b.dataset.qa)}"]`),()=>submit(b))})},
+Risks:()=>{$$("[data-cell]").forEach(b=>b.onclick=()=>{S.f.risk=S.f.risk===b.dataset.cell?"":b.dataset.cell;render()});on("#risk-clear",()=>{S.f.risk="";render()})},
+Approvals:()=>bindDecisions($("#view")),
+Audit:async()=>{try{const a=await api(`/api/projects/${S.pid}/audit`);if(S.page!=="Audit"||!$("#audit"))return;
+  const draw=()=>{const q=S.f.au.toLowerCase(),ev=a.events.slice().reverse().filter(e=>!q||(e.actor+" "+e.action+" "+e.subject).toLowerCase().includes(q));
+    $("#audit-body").innerHTML=ev.map(e=>`<tr class="click" data-ev="${e.seq}"><td class="mono xs muted">${e.seq}</td><td class="sm" style="white-space:nowrap">${fmtTime(e.ts)}</td><td>${tag(e.actor,e.actor.startsWith("user:")?"":"mono")}</td><td><b class="sm">${esc(cap(e.action))}</b></td><td class="mono xs">${esc(e.subject)}</td></tr>
+      <tr class="hidden" data-ev-body="${e.seq}"><td colspan="5" style="background:var(--surface-2)"><pre class="code">${esc(JSON.stringify(e.payload,null,2))}</pre></td></tr>`).join("")||`<tr><td colspan="5">${empty("search","No matching events","")}</td></tr>`;
+    $$("tr[data-ev]").forEach(tr=>tr.onclick=()=>document.querySelector(`tr[data-ev-body="${tr.dataset.ev}"]`).classList.toggle("hidden"))};
+  $("#audit").innerHTML=`<div class="callout ${a.verified?"ok":"bad"}" style="margin-bottom:16px">${I(a.verified?"lock":"alert",16)}<div><b>${a.verified?"Hash chain verified":"Hash chain broken"}</b> · ${plural(a.events.length,"event")} · head <code>${esc(a.head.slice(0,20))}…</code></div></div>
+    <div class="card"><div class="card-b" style="padding-bottom:12px"><div class="search" style="max-width:none">${I("search",15)}<input id="au-q" class="input" type="search" placeholder="Filter by actor, action or subject…" value="${esc(S.f.au)}"></div></div>
+    <div class="tw"><table><thead><tr><th>#</th><th>Time</th><th>Actor</th><th>Action</th><th>Subject</th></tr></thead><tbody id="audit-body"></tbody></table></div></div>`;
+  $("#au-q").oninput=e=>{S.f.au=e.target.value;draw()};draw()}
+  catch(e){if($("#audit"))$("#audit").innerHTML=`<div class="callout bad">${I("alert",15)}<div>${esc(e.message)}</div></div>`}},
+Knowledge:()=>{
+  if(!S.kb){api("/api/kb").then(k=>{S.kb=k;if(S.page==="Knowledge")render()}).catch(e=>toast(e.message,"bad"));return}
+  const apply=()=>{const q=S.f.kbQ.toLowerCase(),j=S.f.kbJ;$$("#kb tbody tr").forEach(r=>r.classList.toggle("hidden",(q&&!r.dataset.txt.includes(q))||(j&&!r.dataset.j.split(" ").includes(j))))};
+  $("#kb-q").oninput=e=>{S.f.kbQ=e.target.value;apply()};$("#kb-j").onchange=e=>{S.f.kbJ=e.target.value;apply()};apply()},
 };
 init();
 </script>
