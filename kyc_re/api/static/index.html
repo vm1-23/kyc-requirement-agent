@@ -702,6 +702,7 @@ function onClick(e){
   if(e.target.closest("[data-close]")){closeDrawer();return}
   const dm=e.target.closest("[data-demo]");if(dm){openDemo(dm.dataset.demo,dm.hasAttribute("data-reset"));return}
   const op=e.target.closest("[data-open-project]");if(op){selectProject(op.dataset.openProject);return}
+  const ab=e.target.closest("[data-approve-baseline]");if(ab){approveBaseline(ab);return}
 }
 
 function render(){
@@ -727,12 +728,26 @@ const GATE_FIX={no_open_high_conflicts:["Resolve the open high-severity conflict
   full_mandatory_coverage:["Cover every mandatory control","Compliance"],all_citations_valid:["Fix invalid regulation citations","Compliance"],traceability_complete:["Trace every requirement to its source","Requirements"]};
 const baselineBlockers=d=>Object.entries(d.metrics?.gates||{}).filter(([,ok])=>!ok).map(([g])=>GATE_FIX[g]||[cap(g),"Overview"]);
 function blockedNote(d){const b=baselineBlockers(d);if(!b.length)return "";
-  return `<div class="callout warn">${I("lock",15)}<div><b>The baseline can't be approved yet.</b> First:<ul class="ac" style="margin-top:4px">${b.map(([t,pg])=>`<li>${esc(t)} <button class="linkbtn" data-go="${pg}">Go</button></li>`).join("")}</ul></div></div>`}
+  return `<div class="callout">${I("info",15)}<div><b>Open issues are recorded with the approval, not blocking it:</b><ul class="ac" style="margin-top:4px">${b.map(([t,pg])=>`<li>${esc(t)} <button class="linkbtn" data-go="${pg}">Go</button></li>`).join("")}</ul></div></div>`}
+const BASELINE_ROLES=["business_analyst","product_owner","project_manager"];
+const pendingBaseline=d=>d?.approvals.find(a=>a.gate==="baseline"&&a.status==="pending_approval");
+function approveButton(d,cls="primary"){
+  if(!d||!d.requirements.length)return "";
+  const base=pendingBaseline(d);
+  if(!base)return d.approvals.some(a=>a.gate==="baseline"&&a.status==="approved")?pill("requirements approved","ok"):"";
+  const ok=BASELINE_ROLES.includes(myRole());
+  return `<button class="btn ${cls}" data-approve-baseline title="Approves every requirement that isn't rejected${ok?"":"; switches you to the Business analyst role"}">${I("check",15)}${ok?"Approve requirements":"Approve as Business analyst"}</button>`}
+async function approveBaseline(btn){
+  const base=pendingBaseline(S.data);if(!base){toast("The requirements are already approved.");return}
+  if(!BASELINE_ROLES.includes(myRole())){$("#role").value="business_analyst";pref.set("role","business_analyst");toast("Acting as Business analyst to approve the baseline.")}
+  const n=S.data.requirements.filter(r=>r.status!=="rejected"&&r.status!=="approved").length;
+  await busy(btn,"Approving",async()=>{await post(`/api/projects/${S.pid}/approvals/${encodeURIComponent(base.id)}`,{decision:"approve",comment:""});
+    await load();if(S.drawer)renderDrawer();toast(`${plural(n,"requirement")} approved.${S.data.questions.some(q=>!q.answer)||S.data.conflicts.some(c=>!c.resolution)?" Open questions and conflicts stay listed as open issues.":""}`,"ok",6000)})}
 function decisionBox(a,d){
   if(a.status!=="pending_approval")return "";
   if(!canDecide(a)){const waiting=a.required_roles.filter(r=>!a.decisions.some(x=>x.role===r)),all=["sdlc","production_readiness"].includes(a.gate);
     return `<div class="card-f" style="justify-content:flex-start;gap:6px"><span class="sm muted">${I("lock",13)}</span><span class="sm muted">Needs ${waiting.length?waiting.map(r=>esc(cap(r))).join(all?", ":" or "):"another role"}${all?" (all of them)":""}. You're acting as ${esc(human(myRole()))}; switch role at the top right to decide.</span></div>`}
-  const blocked=a.gate==="baseline"&&!d.metrics?.baseline_ready;
+  const blocked=false;
   return `<div class="card-f" style="display:block"><textarea class="input" data-c="${esc(a.id)}" style="min-height:52px;margin-bottom:10px;background:var(--surface)" placeholder="Comment. For “Modify”, write the replacement text here."></textarea>
     <div class="row end"><button class="btn sm danger" data-ap="${esc(a.id)}" data-d="reject">Reject</button><button class="btn sm" data-ap="${esc(a.id)}" data-d="regenerate">${I("refresh",13)}Regenerate</button><button class="btn sm" data-ap="${esc(a.id)}" data-d="modify">${I("edit",13)}Modify</button><button class="btn sm primary" data-ap="${esc(a.id)}" data-d="approve"${blocked?' disabled data-blocked title="Blocked until the quality gates pass"':""}>${I("check",14)}Approve</button></div></div>`}
 function bindDecisions(root){
@@ -758,8 +773,8 @@ function approvalSection(d,r){
   else if(r.status==="needs_clarification")body=`<div class="callout warn">${I("help",15)}<div>Needs clarification first. Answer its open question below; it then moves to pending approval.</div></div>`;
   if(ownPending.length)body+=`<p class="sm" style="color:var(--text-2);margin:${body?"10px":"0"} 0 8px">This requirement needs its own sign-off:</p>`+ownPending.map(a=>`<div class="card" style="box-shadow:none;margin-bottom:8px"><div class="card-b" style="padding:12px 14px"><div class="row between"><b class="sm">${esc(cap(a.gate))}</b><span class="tag mono">${esc(a.id)}</span></div><div class="xs muted" style="margin-top:4px">${esc(a.summary)}</div></div>${decisionBox(a,d)}</div>`).join("");
   if(["pending_approval","modified"].includes(r.status)&&base?.status==="pending_approval")
-    body+=`<div class="callout" style="margin-top:${body?"10px":"0"}">${I("info",15)}<div>${ownPending.length?"After that, it is":"It is"} approved together with all other requirements in the <b>requirements baseline</b> (${esc(base.id)}), by a product owner, business analyst or project manager.
-      <div style="margin-top:6px"><button class="btn sm" data-go="Approvals" data-apf="pending">${I("stamp",13)}Open baseline approval</button></div></div></div>`+(d.metrics?.baseline_ready?"":`<div style="margin-top:8px">${blockedNote(d)}</div>`);
+    body+=`<div class="callout" style="margin-top:${body?"10px":"0"}">${I("info",15)}<div>It is approved together with all other requirements in one step, the <b>requirements baseline</b> (${esc(base.id)}). Open questions and conflicts stay on record as open issues.
+      <div class="row" style="margin-top:8px">${approveButton(d,"primary sm")}<button class="btn sm ghost" data-go="Approvals" data-apf="pending">Open in Approvals</button></div></div></div>`;
   return body?`<section><h3>Approval</h3>${body}</section>`:"";
 }
 function renderDrawer(){
@@ -928,13 +943,14 @@ Overview:(d,c)=>{
   if(c.openQ)steps.push(step("warn","help",`${plural(c.openQ,"clarification question")} open`,"Answers feed back into the analysis.",goB("Clarifications","Answer")));
   if(c.openCHigh)steps.push(step("bad","alert",`${plural(c.openCHigh,"high-severity conflict")}`,"Conflicting stakeholder expectations block the baseline.",goB("Conflicts","Review")));
   if(c.gaps)steps.push(step("bad","shield",`${plural(c.gaps,"mandatory control")} not covered`,"No requirement covers them yet.",goB("Compliance","See gaps")));
+  if(pendingBaseline(d))steps.push(step("info","check","Approve the requirements",`${plural(d.requirements.filter(r=>!["approved","rejected"].includes(r.status)).length,"requirement")} waiting. Open questions stay on record.`,approveButton(d,"sm primary")));
   if(c.mine)steps.push(step("info","stamp",`${plural(c.mine,"approval")} waiting for you`,`Acting as ${human(myRole())}.`,goB("Approvals","Decide")));
   else if(c.pending)steps.push(step("info","stamp",`${plural(c.pending,"approval")} pending`,"Waiting for other roles. Switch role at the top right to act.",goB("Approvals","View")));
   if(!steps.length)steps.push(step("ok","checkc","You're all caught up","Export the artefacts or add more inputs.",""));
   const stat=(icon,kind,v,l,s,goTo)=>`<div class="card stat"${goTo?` data-go="${goTo}" style="cursor:pointer"`:""}><span class="ic ${kind}">${I(icon,18)}</span><div><div class="v">${v}</div><div class="l">${l}</div>${s?`<div class="s">${s}</div>`:""}</div></div>`;
   const lr=m.last_run&&m.last_run.stages?m.last_run:null;
   const cats=Object.entries(m.by_category||{}).sort((a,b)=>b[1]-a[1]),cmax=Math.max(...cats.map(x=>x[1]),1);
-  return pageHead(esc(d.project.name),esc(d.project.description),(isDemo()?`<button class="btn ghost" id="demo-reset">Reset demo</button>`:"")+(ran?runBtn()+exportBtn():""))+
+  return pageHead(esc(d.project.name),esc(d.project.description),(isDemo()?`<button class="btn ghost" id="demo-reset">Reset demo</button>`:"")+(ran?runBtn()+approveButton(d,"")+exportBtn():""))+
   `<div class="row" style="margin:-12px 0 22px">${isDemo()?pill("demo · pre-analysed","info"):""}${(d.project.jurisdictions||[]).map(j=>pill(j,"accent")).join("")}${(d.project.channels||[]).map(x=>tag(x)).join("")}</div>
   ${ran?`<div class="grid g4" style="margin-bottom:16px">
     ${stat("list","",m.requirements_total??0,"Requirements",`${m.requirements_extracted??0} extracted · ${m.requirements_derived??0} derived`,"Requirements")}
@@ -1023,7 +1039,7 @@ Interview:d=>{const s=S.interview;
 Requirements:(d,c)=>{
   if(!d.requirements.length)return pageHead("Requirements")+`<div class="card">${empty("list","No requirements yet","Add stakeholder inputs and run the analysis. Extracted and derived requirements appear here.",`<button class="btn primary" data-go="Inputs">${I("fileplus",15)}Add inputs</button>`)}</div>`;
   const byCat={};d.requirements.forEach(r=>r.categories.forEach(k=>byCat[k]=(byCat[k]||0)+1));
-  const head=pageHead("Requirements",`${d.requirements.length} requirements from ${plural(c.docs,"source")}, each traced to its stakeholder evidence. Select a row for details.`,exportBtn())+
+  const head=pageHead("Requirements",`${d.requirements.length} requirements from ${plural(c.docs,"source")}, each traced to its stakeholder evidence. Select a row for details.`,approveButton(d)+exportBtn())+
     `<div style="margin-bottom:16px">${seg("rqView",[["reqs","Requirements",d.requirements.length],["stories","User stories",d.stories.length],["ucs","Use cases",d.use_cases.length]])}</div>`;
   if(S.f.rqView==="stories")return head+`<div class="card list">${d.stories.map(s=>`<div><div class="row" style="margin-bottom:6px"><span class="tag mono">${esc(s.id)}</span>${reqTag(s.requirement_id)}</div><p>${esc(s.story)}</p>
      ${s.acceptance_criteria?.length?`<details class="disc" style="margin-top:6px"><summary class="xs muted">${I("chev",13)}${plural(s.acceptance_criteria.length,"acceptance criterion","acceptance criteria")}</summary><ul class="ac">${s.acceptance_criteria.map(a=>`<li>${esc(a)}</li>`).join("")}</ul></details>`:""}</div>`).join("")}</div>`;

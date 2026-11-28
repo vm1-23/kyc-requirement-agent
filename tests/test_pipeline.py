@@ -104,8 +104,14 @@ def test_approval_rbac_and_baseline_gate(neobank):
     neobank.decide(reg.id, "arjun", "compliance", "approve", "Confirmed")
     assert reg.status == ApprovalStatus.APPROVED
     base = next(a for a in st.approvals if a.gate == "baseline")
-    with pytest.raises(PermissionDenied):  # quality gates still failing
-        neobank.decide(base.id, "priya", "product_owner", "approve")
+    with pytest.raises(PermissionDenied):  # only product owner / analyst / PM may baseline
+        neobank.decide(base.id, "c", "customer", "approve")
+    assert not st.metrics["baseline_ready"]  # quality gates still failing ...
+    neobank.decide(base.id, "priya", "product_owner", "approve")  # ... but the approver may baseline anyway
+    assert base.status == ApprovalStatus.APPROVED
+    assert "no pending clarifications" in base.decisions[-1]["comment"] and base.decisions[-1]["open_issues"]
+    assert all(r.status == ApprovalStatus.APPROVED for r in st.requirements if r.status != ApprovalStatus.REJECTED)
+    assert any(q.answer is None for q in st.questions)  # open questions remain on record as open issues
 
 
 def test_sdlc_gate_requires_all_roles(neobank):

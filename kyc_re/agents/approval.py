@@ -52,11 +52,13 @@ class ApprovalAgent(Agent):
             raise PermissionDenied(f"role '{role.value}' may not decide gate '{item.gate}'")
         if decision not in DECISIONS:
             raise ValueError(f"decision must be one of {list(DECISIONS)}")
+        open_issues: list[str] = []
         if item.gate == "baseline" and decision == "approve" and not st.metrics.get("baseline_ready", False):
-            failing = [k for k, v in st.metrics.get("gates", {}).items() if not v]
-            raise PermissionDenied(f"baseline cannot be approved; failing quality gates: {failing}")
+            # The approver decides: failing quality gates are recorded with the approval, not enforced.
+            open_issues = [k for k, v in st.metrics.get("gates", {}).items() if not v]
+            comment = (comment + " · " if comment else "") + "approved with open issues: " + ", ".join(g.replace("_", " ") for g in open_issues)
         item.decisions.append({"user": user, "role": role.value, "decision": decision, "comment": comment,
-                               "modification": modification, "ts": utcnow()})
+                               "modification": modification, "ts": utcnow(), **({"open_issues": open_issues} if open_issues else {})})
         outcome = DECISIONS[decision]
         if outcome == S.APPROVED and item.gate in UNANIMOUS_GATES:
             approved_roles = {R(d["role"]) for d in item.decisions if d["decision"] == "approve"}
@@ -84,8 +86,9 @@ class ApprovalAgent(Agent):
         if subject == "sdlc" and st.sdlc is not None:
             st.sdlc.status = outcome
         if subject == "baseline" and outcome == S.APPROVED:
+            # Everything not explicitly rejected is baselined; open questions and conflicts stay listed as open issues.
             for req in st.requirements:
-                if req.status in (S.PENDING_APPROVAL, S.MODIFIED):
+                if req.status in (S.PENDING_APPROVAL, S.MODIFIED, S.NEEDS_CLARIFICATION, S.DRAFT):
                     req.status = S.APPROVED
 
     def summary(self) -> dict[str, Any]:
